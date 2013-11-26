@@ -5,7 +5,7 @@ import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.bolts.UDFStreamingBolt;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -17,7 +17,7 @@ public class UDFTestTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 
 		builder.setSpout("spout", new CounterProducer(), 1);
-		builder.setBolt("map", new UDFBolt(new Fields("key", "value"), new Fields("key", "value"),
+		builder.setBolt("map", new UDFStreamingBolt(new Fields("key", "value"), new Fields("key", "value"),
 			new IOperator() {
 				private static final long serialVersionUID = -4627321197468747477L;
 				public Values[] execute(Values param) {
@@ -30,7 +30,7 @@ public class UDFTestTopology {
 				}
 			}
 		), 1).shuffleGrouping("spout");
-		builder.setBolt("flatmap", new UDFBolt(new Fields("key", "value"), new Fields("key", "value"),
+		builder.setBolt("flatmap", new UDFStreamingBolt(new Fields("key", "value"), new Fields("key", "value"),
 			new IOperator() {
 				private static final long serialVersionUID = 6893429130604026037L;
 				public Values[] execute(Values param) {
@@ -49,7 +49,7 @@ public class UDFTestTopology {
 				}
 			}
 		), 1).shuffleGrouping("map");
-		builder.setBolt("filter", new UDFBolt(new Fields("value"), new Fields("value"),
+		builder.setBolt("filter", new UDFStreamingBolt(new Fields("value"), new Fields("value"),
 			new FilterOperator(new FilterUDF() {
 				private static final long serialVersionUID = -8778283315568184418L;
 				public Boolean execute(Values param) {

@@ -5,17 +5,30 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class FilterOperator implements IOperator {
 	
-	private static final long serialVersionUID = -1921795142772743781L;
+	private static final long serialVersionUID = 1L;
 	
-	protected FilterUDF filter;
+	
+/* Global Variables: */
+/* ================= */
+	
+	final protected FilterUDF _filter;
+	
+	
+/* Constructor: */
+/* ============ */
 	
 	public FilterOperator(FilterUDF filter) {
-		this.filter = filter;
+		this._filter = filter;
 	}
 
+	
+	
+/* Public Methods (from IOPerator): */
+/* ================================ */
+	
 	public Values[] execute(Values param) {
 		Values[] result = null;
-		if(filter.execute(param)) {
+		if(_filter.execute(param)) {
 			result = new Values[] { param };
 		}
 		return result;
