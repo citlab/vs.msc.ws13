@@ -1,6 +1,8 @@
 package de.tu_berlin.citlab.storm.operators;
 
-import backtype.storm.tuple.Values;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class FilterOperator implements IOperator {
@@ -13,10 +15,11 @@ public class FilterOperator implements IOperator {
 		this.filter = filter;
 	}
 
-	public Values[] execute(Values param) {
-		Values[] result = null;
-		if(filter.execute(param)) {
-			result = new Values[] { param };
+	public List<List<Object>> execute(List<List<Object>> param) {
+		List<List<Object>> result = null;
+		if(filter.execute(param.get(0))) {
+			result = new ArrayList<List<Object>>(1);
+			result.add(param.get(0));
 		}
 		return result;
 	}
