@@ -1,39 +1,41 @@
 package de.tu_berlin.citlab.storm.bolts;
 
-import java.util.LinkedList;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 
 public class SlidingWindow<WindowEntry> 
 {
-	private final LinkedList<WindowEntry> _slidingWindow;
-	private WindowEntry _actEntry;
-	private long _windowSize;
+	private final ArrayList<WindowEntry> _windowEntries;
 	
+	private final long _windowSize;
 	
 	public SlidingWindow(long windowSize)
 	{
-		_slidingWindow = new LinkedList<WindowEntry>();
-		_actEntry = null;
+		_windowEntries = new ArrayList<WindowEntry>();
 		_windowSize = windowSize;
 	}
 	
 	
 	public boolean appendEntry(WindowEntry entry)
 	{
-		boolean added = _slidingWindow.add(entry);
-		if(added)
-			_actEntry = entry;
-		
+		boolean added = _windowEntries.add(entry);
 		return added;
 	}
 
 	
-	//public WindowEntry[] TODO: write a prepare_emission() function
-	
-	
 	public boolean check_sizeReached()
 	{
-		if(_slidingWindow.size() < _windowSize)
+		if(_windowEntries.size() < _windowSize)
 			return false;
 		else return true;
+	}
+	
+	//TODO: reset Sliding Window after window was successfully submitted.
+	
+	public Iterator<WindowEntry> getWindowEntries()
+	{
+		return _windowEntries.iterator();
 	}
 }

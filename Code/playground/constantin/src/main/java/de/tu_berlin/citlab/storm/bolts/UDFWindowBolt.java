@@ -1,5 +1,8 @@
 package de.tu_berlin.citlab.storm.bolts;
 
+
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,37 +15,40 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import de.tu_berlin.citlab.storm.spouts.FieldKeys;
-import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.udf.IBatchOperator;
 
-public class UDFStreamingBolt			extends BaseRichBolt 
-										implements UDFStreaming<Tuple>
+
+public class UDFWindowBolt<Key extends Comparable<Key>>	extends BaseRichBolt
 {
-
 	private static final long serialVersionUID = 1L;
 	
 	
-/* Global Variables: */
+/* Global Constants: */
 /* ================= */
 	
 	protected final Fields _inputFields;
 	protected final Fields _outputFields;
-	protected final BucketStore<Tuple> _bucketStore;
+	protected final BucketStore<Key, Values> _bucketStore;
 	
-	protected final IOperator _operator;
+	protected final IBatchOperator<Key> _batchOp;
+	
+/* Global Variables: */
+/* ================= */
+	
 	private OutputCollector _collector;
 	
 	
 /* Constructor: */
 /* ============ */
 	
-	public UDFStreamingBolt(FieldKeys fieldKeys, Fields inputFields, Fields outputFields, IOperator operator) 
+	public UDFWindowBolt(Fields inputFields, Fields outputFields, int winCount, IBatchOperator<Key> batchOp) 
 	{
-		this._inputFields = inputFields;
-		this._outputFields = outputFields;
-		this._bucketStore = new BucketStore<Tuple>(fieldKeys, 1000);
+		_inputFields = inputFields;
+		_outputFields = outputFields;
+		_bucketStore = new BucketStore<Key, Values>(winCount);
 		
-		this._operator = operator;
+		_batchOp = batchOp;
+		
 	}
 	
 	
@@ -80,34 +86,36 @@ public class UDFStreamingBolt			extends BaseRichBolt
 
 	public void execute(Tuple input) 
 	{
-		this.emissionRequest();
-		
-		if(this.isTickTuple(input) == false)
+	//Check for full Windows in each execute-loop and execute those:
+		HashMap<Key, Iterator<Values>> readyTupleMap = _bucketStore.readyForExecution();
+		if(readyTupleMap.isEmpty() == false)
 		{
-			this.groupBy(input);
-			
-			Values params = (Values) input.select(_inputFields);
-			Values[] outputValues = _operator.execute(params);
-			if(outputValues != null) {
-				for(List<Object> outputValue : outputValues) 
-				{
-					_collector.emit(outputValue);
+			List<Values[]> returnVals = _batchOp.execute_batch(readyTupleMap);
+			if(returnVals != null){
+				for(Values[] actValArr : returnVals){
+					for(List<Object> outputValue : actValArr){
+						_collector.emit(outputValue);
+					}
 				}
 			}
+		}	
+			
+	//If the current input tuple is no tick-tuple, then add it by a key to one window:
+		if(this.isTickTuple(input) == false)
+		{			
+			Values params = (Values) input.select(_inputFields); //<- TODO Why problems here?
+			Key sortKey = _batchOp.sortBy_winKey(params);
+			_bucketStore.sortInBucket(sortKey, params);
+			//Values[] outputValues = _operator.execute(params);
+//			if(outputValues != null) {
+//				for(List<Object> outputValue : outputValues) 
+//				{
+//					_collector.emit(outputValue);
+//				}
+//			}
 		}
 		
 	}
-
-	public void groupBy(Tuple input) 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public void emissionRequest() 
-	{
-		//_bucketStore. TODO: call a prepare_emission() function.	
-	}	
 
 	
 /* Private Methods: */
