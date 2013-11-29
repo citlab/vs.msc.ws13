@@ -1,7 +1,6 @@
 package de.tu_berlin.citlab.storm.bolts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.WindowHandler;
 
 public class UDFBolt extends BaseRichBolt {
 
@@ -28,50 +30,29 @@ public class UDFBolt extends BaseRichBolt {
 
 	protected IOperator operator;
 
-	protected int windowSize;
-
-	protected int windowSlidingOffset;
-
-	/**
-	 * the value <code>0</code> disables time based window semantics
-	 */
-	protected int windowTimeout = 0;
-
-	/**
-	 * the value <code>null</code> indicates, that no grouping by a key should
-	 * be done, and all tuples are gathered in a global Window instead
-	 */
-	protected Fields keyFields = null;
-
-	protected List<Object> defaultKey = new ArrayList<Object>();
-
-	protected Map<List<Object>, Window<Tuple>> windows;
+	protected WindowHandler windowHandler;
 
 	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator) {
-		this(inputFields, outputFields, operator, 1, null);
+		this(inputFields, outputFields, operator, new CountWindow<Tuple>(1));
 	}
 
 	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator,
-			int windowSize) {
-		this(inputFields, outputFields, operator, windowSize, null);
+			Window<Tuple, List<Tuple>> window) {
+		this(inputFields, outputFields, operator, window, null);
 	}
 
 	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator,
-			int windowSize, Fields keyFields) {
+			Window<Tuple, List<Tuple>> window, Fields keyFields) {
 		this.inputFields = inputFields;
 		this.outputFields = outputFields;
 		this.operator = operator;
-		this.keyFields = keyFields;
-		this.windowSize = windowSize;
-		// currently no sliding
-		windowSlidingOffset = windowSize;
-		// currently no timeout
-		windowTimeout = 0;
-		windows = new HashMap<List<Object>, Window<Tuple>>();
+		windowHandler = new WindowHandler(window, keyFields);
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(outputFields);
+		if (outputFields != null) {
+			declarer.declare(outputFields);
+		}
 	}
 
 	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
@@ -81,49 +62,41 @@ public class UDFBolt extends BaseRichBolt {
 
 	public Map<String, Object> getComponentConfiguration() {
 		Config conf = new Config();
-		if(windowTimeout > 0) {
-			conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, windowTimeout);
+		if (windowHandler.getStub() instanceof TimeWindow) {
+			conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
+					((TimeWindow<Tuple>) windowHandler.getStub()).getTimeSlot());
 		}
 		return conf;
 	}
 
 	public void execute(Tuple input) {
 		if (TupleHelper.isTickTuple(input)) {
-			for (List<Object> key : windows.keySet()) {
-				Window<Tuple> window = windows.get(key);
-				executeBatch(window.flush());
-			}
-		} else {
-			List<Object> key;
-			if (keyFields == null) {
-				key = defaultKey;
-			} else {
-				key = input.select(keyFields);
-			}
-			if (!windows.containsKey(key)) {
-				windows.put(key, new Window<Tuple>(windowSize));
-			}
-			Window<Tuple> window = windows.get(key);
-			window.add(input);
-			if (window.isFull()) {
-				executeBatch(window.flush());
+			executeBatches(windowHandler.flush());
+		}
+		else {
+			windowHandler.add(input);
+			if (windowHandler.isSatisfied()) {
+				executeBatches(windowHandler.flush());
 			}
 		}
+
 	}
 
-	private void executeBatch(List<Tuple> window) {
-		List<List<Object>> params = new ArrayList<List<Object>>();
-		for (Tuple input : window) {
-			params.add(input.select(inputFields));
-		}
-		List<List<Object>> outputValues = operator.execute(params);
-		if (outputValues != null) {
-			for (List<Object> outputValue : outputValues) {
-				collector.emit(outputValue);
+	private void executeBatches(List<List<Tuple>> windows) {
+		for (List<Tuple> window : windows) {
+			List<List<Object>> inputValues = new ArrayList<List<Object>>();
+			for (Tuple tuple : window) {
+				inputValues.add(tuple.select(inputFields));
 			}
-		}
-		for (Tuple input : window) {
-			collector.ack(input);
+			List<List<Object>> outputValues = operator.execute(inputValues);
+			if (outputValues != null) {
+				for (List<Object> outputValue : outputValues) {
+					collector.emit(outputValue);
+				}
+			}
+			for (Tuple tuple : window) {
+				collector.ack(tuple);
+			}
 		}
 	}
 

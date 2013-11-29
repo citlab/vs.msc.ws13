@@ -6,18 +6,18 @@ import java.util.List;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class FilterOperator implements IOperator {
-	
+
 	private static final long serialVersionUID = -1921795142772743781L;
-	
+
 	protected FilterUDF filter;
-	
+
 	public FilterOperator(FilterUDF filter) {
 		this.filter = filter;
 	}
 
 	public List<List<Object>> execute(List<List<Object>> param) {
 		List<List<Object>> result = null;
-		if(filter.execute(param.get(0))) {
+		if (filter.execute(param.get(0))) {
 			result = new ArrayList<List<Object>>(1);
 			result.add(param.get(0));
 		}

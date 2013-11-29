@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.CountWindow;
 
 public class WindowTest {
 
 	@Test
 	public void testNotSlidingWindowContent() {
-		Window<Integer> window = new Window<Integer>(2);
+		CountWindow<Integer> window = new CountWindow<Integer>(2);
 		window.add(1);
 		window.add(2);
 		List<Integer> result = window.flush();
@@ -22,11 +22,11 @@ public class WindowTest {
 		compare.add(2);
 		assertTrue(result.equals(compare));
 	}
-	
+
 	@Test
 	public void testNotSlidingWindowEmptyAfterFlush() {
 		List<Integer> empty = new ArrayList<Integer>();
-		Window<Integer> window = new Window<Integer>(2);
+		CountWindow<Integer> window = new CountWindow<Integer>(2);
 		assertTrue(empty.equals(window.flush()));
 		window.add(1);
 		window.flush();
@@ -36,11 +36,11 @@ public class WindowTest {
 		window.flush();
 		assertTrue(empty.equals(window.flush()));
 	}
-	
+
 	@Test
 	public void testSlidingWindowOne() {
 		List<Integer> compare = new ArrayList<Integer>();
-		Window<Integer> window = new Window<Integer>(3,1);
+		CountWindow<Integer> window = new CountWindow<Integer>(3, 1);
 		window.add(1);
 		window.add(2);
 		window.add(3);
@@ -52,11 +52,11 @@ public class WindowTest {
 		compare.add(3);
 		assertTrue(compare.equals(window.flush()));
 	}
-	
+
 	@Test
 	public void testSlidingWindowTwo() {
 		List<Integer> compare = new ArrayList<Integer>();
-		Window<Integer> window = new Window<Integer>(3,2);
+		CountWindow<Integer> window = new CountWindow<Integer>(3, 2);
 		window.add(1);
 		window.add(2);
 		window.add(3);
@@ -66,30 +66,28 @@ public class WindowTest {
 		compare.clear();
 		assertTrue(compare.equals(window.flush()));
 	}
-	
+
 	@Test
 	public void testWindowOverflowException() {
-		Window<Integer> window = new Window<Integer>(3);
+		CountWindow<Integer> window = new CountWindow<Integer>(3);
 		window.add(1);
 		window.add(2);
 		window.add(3);
 		boolean exceptionCaught = false;
 		try {
 			window.add(4);
-		}
-		catch(ArrayIndexOutOfBoundsException e) {
+		} catch (ArrayIndexOutOfBoundsException e) {
 			exceptionCaught = true;
 		}
 		assertTrue(exceptionCaught);
 	}
-	
+
 	@Test
 	public void testWindowImpossibleOffsetException() {
 		boolean exceptionCaught = false;
 		try {
-			new Window<Integer>(0,1);
-		}
-		catch(IllegalArgumentException e) {
+			new CountWindow<Integer>(0, 1);
+		} catch (IllegalArgumentException e) {
 			exceptionCaught = true;
 		}
 		assertTrue(exceptionCaught);
