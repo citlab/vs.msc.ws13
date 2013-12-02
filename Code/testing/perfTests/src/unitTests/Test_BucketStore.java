@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import units.bucketstore.BucketStore;
 import units.bucketstore.BucketStore.WinTypes;
+import units.bucketstore.UDFWindowBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 
@@ -19,11 +21,14 @@ public class Test_BucketStore extends DataPerformanceTest
 		long startTime = System.currentTimeMillis();
 		
 	//Count-Based Input Window Test:
-		BucketStore<List<Object>, Values> bstore = new BucketStore<List<Object>, Values>(100, WinTypes.CounterBased);
+		Fields inputFields = new Fields("key", "value");
+		UDFWindowBolt<List<Object>> windowBolt = new UDFWindowBolt<List<Object>>(inputFields, 100, WinTypes.CounterBased);
+		//BucketStore<List<Object>, Values> bstore = new BucketStore<List<Object>, Values>(100, WinTypes.CounterBased);
 		
 		for(int n = 0 ; n < inputIterations ; n++){
-			bstore.sortInBucket(keyInputBuffer.get(n), valInputBuffer.get(n));
-			bstore.readyForExecution();
+			windowBolt.execute(sortKey, input);
+//			bstore.sortInBucket(keyInputBuffer.get(n), valInputBuffer.get(n));
+//			bstore.readyForExecution();
 		}
 		//bstore.sortInBucket(sortKey, input)
 		
