@@ -2,7 +2,6 @@ package de.tu_berlin.citlab.storm.topologies;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import backtype.storm.Config;
@@ -10,11 +9,9 @@ import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import de.tu_berlin.citlab.storm.bolts.windows.BucketStore.WinTypes;
 import de.tu_berlin.citlab.storm.bolts.UDFWindowBolt;
-import de.tu_berlin.citlab.storm.operators.FilterOperator;
-import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IBatchOperator;
-import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class UDFTestTopology {
 	
@@ -24,24 +21,23 @@ public class UDFTestTopology {
 
 		builder.setSpout("spout", new CounterProducer(), 1);
 		
-		builder.setBolt("map", new UDFWindowBolt<String>(new Fields("key", "value"), new Fields("key", "value"), 1,
+		builder.setBolt("map", new UDFWindowBolt<String>(new Fields("key", "value"), new Fields("key", "value"), 1, WinTypes.CounterBased,
 			new IBatchOperator<String>()
 			{
 				private static final long serialVersionUID = 1L;
 
-				public List<Values[]> execute_batch(HashMap<String, Iterator<Values>> entryMap) 
+				public List<Values[]> execute_batch(HashMap<String, List<Values>> entryMap) 
 				{
 					List<Values[]> returnVals = new ArrayList<Values[]>();
-					Iterator<Values> paramIterator = entryMap.get("all");
+					List<Values> paramList = entryMap.get("all");
 					
-					while(paramIterator.hasNext()){
-						Values param = paramIterator.next();
-						
+					for(Values param : paramList){
 						String newKey = param.get(0) + " mapped";
 						int newValue = myExistingFunction((Integer)param.get(1));
 						
 						returnVals.add(new Values[] { new Values(newKey, newValue) });
 					}
+					
 					return returnVals;
 				}
 				private int myExistingFunction(int param) 
@@ -58,18 +54,17 @@ public class UDFTestTopology {
 			}
 		), 1).shuffleGrouping("spout");
 		
-		builder.setBolt("flatmap", new UDFWindowBolt<String>(new Fields("key", "value"), new Fields("key", "value"), 1,
+		builder.setBolt("flatmap", new UDFWindowBolt<String>(new Fields("key", "value"), new Fields("key", "value"), 1, WinTypes.CounterBased,
 			new IBatchOperator<String>() 
 			{
 				private static final long serialVersionUID = 1L;
 
-				public List<Values[]> execute_batch(HashMap<String, Iterator<Values>> entryMap) 
+				public List<Values[]> execute_batch(HashMap<String, List<Values>> entryMap) 
 				{
 					List<Values[]> returnVals = new ArrayList<Values[]>();
-					Iterator<Values> paramIterator = entryMap.get("all");
+					List<Values> paramList = entryMap.get("all");
 					
-					while(paramIterator.hasNext()){
-						Values param = paramIterator.next();
+					for(Values param : paramList){
 						Values[] result = new Values[2];
 						String inputKey = (String)param.get(0);
 						int inputValue = (Integer)param.get(1);
@@ -78,6 +73,7 @@ public class UDFTestTopology {
 						
 						returnVals.add(result);
 					}
+					
 					return returnVals;
 				}
 				private int myExistingFunction1(int param) 

@@ -2,7 +2,6 @@ package de.tu_berlin.citlab.storm.bolts;
 
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +14,8 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import de.tu_berlin.citlab.storm.bolts.windows.BucketStore;
+import de.tu_berlin.citlab.storm.bolts.windows.BucketStore.WinTypes;
 import de.tu_berlin.citlab.storm.udf.IBatchOperator;
 
 
@@ -41,11 +42,11 @@ public class UDFWindowBolt<Key extends Comparable<Key>>	extends BaseRichBolt
 /* Constructor: */
 /* ============ */
 	
-	public UDFWindowBolt(Fields inputFields, Fields outputFields, int winCount, IBatchOperator<Key> batchOp) 
+	public UDFWindowBolt(Fields inputFields, Fields outputFields, int winCount, WinTypes winType, IBatchOperator<Key> batchOp) 
 	{
 		_inputFields = inputFields;
 		_outputFields = outputFields;
-		_bucketStore = new BucketStore<Key, Values>(winCount);
+		_bucketStore = new BucketStore<Key, Values>(winCount, winType);
 		
 		_batchOp = batchOp;
 		
@@ -87,7 +88,7 @@ public class UDFWindowBolt<Key extends Comparable<Key>>	extends BaseRichBolt
 	public void execute(Tuple input) 
 	{
 	//Check for full Windows in each execute-loop and execute those:
-		HashMap<Key, Iterator<Values>> readyTupleMap = _bucketStore.readyForExecution();
+		HashMap<Key, List<Values>> readyTupleMap = _bucketStore.readyForExecution();
 		if(readyTupleMap.isEmpty() == false)
 		{
 			List<Values[]> returnVals = _batchOp.execute_batch(readyTupleMap);

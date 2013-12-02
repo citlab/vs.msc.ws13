@@ -1,13 +1,20 @@
-package de.tu_berlin.citlab.storm.bolts;
+package de.tu_berlin.citlab.storm.bolts.windows;
+
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
-public class BucketStore<Key extends Comparable<Key>, WindowEntry> implements Serializable
+
+public class BucketStore<Key /*extends Comparable<Key>*/, WindowEntry> implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+/* Public Enums: */
+/* ============= */
+	
+	public enum WinTypes {None, CounterBased, TimeBased}
 	
 	
 /* Global Constants: */
@@ -16,16 +23,21 @@ public class BucketStore<Key extends Comparable<Key>, WindowEntry> implements Se
 	private final Vector<SlidingWindow<WindowEntry>> _bucketStore;
 	private final HashMap<Key, WindowPointer> _bucketPointer;
 	private final Vector<WindowPointer> _fullWindows;
-	private final long _windowSize;
+	private final int _windowSize;
+	private final WinTypes _winType;
 	
 	
 /* Constructor: */
 /* ============ */
 	
-	public BucketStore(long windowSize)
+	public BucketStore()
 	{
-		//Generic Workaround for "new SlidingWindow<BucketData>>[FieldKeys.values().length];":
-		//_bucketStore = (SlidingWindow<WindowEntry>[]) Array.newInstance(SlidingWindow.class, FieldKeys.values().length);
+		this(1, WinTypes.None);
+	}
+	
+	public BucketStore(int windowSize, WinTypes winType)
+	{
+		_winType = winType;
 		_bucketStore = new Vector<SlidingWindow<WindowEntry>>();
 		_bucketPointer = new HashMap<Key, WindowPointer>();
 		_fullWindows = new Vector<WindowPointer>();
@@ -38,6 +50,7 @@ public class BucketStore<Key extends Comparable<Key>, WindowEntry> implements Se
 /* =============== */
 
 	public SlidingWindow<WindowEntry> sortInBucket(Key sortKey, WindowEntry input)
+										throws NullPointerException
 	{
 		SlidingWindow<WindowEntry> slidingWindow;
 		if(_bucketPointer.containsKey(sortKey))
@@ -45,36 +58,50 @@ public class BucketStore<Key extends Comparable<Key>, WindowEntry> implements Se
 			WindowPointer winPtr = _bucketPointer.get(sortKey);
 			slidingWindow = _bucketStore.get(winPtr.getVectorIndex());
 			slidingWindow.appendEntry(input);
-			winPtr.setWinSizeReached(slidingWindow.check_sizeReached());
+			winPtr.setWinSizeReached(slidingWindow.check_windowLimit());
 			if(winPtr.isWindowSizeReached())
 				_fullWindows.add(winPtr);
 		}
 		else
 		{
-			slidingWindow = new SlidingWindow<WindowEntry>(_windowSize);
-			slidingWindow.appendEntry(input);
-			boolean added = _bucketStore.add(slidingWindow);
-			if(added)
+			switch(_winType)
 			{
-				int vectorIndex = _bucketStore.indexOf(slidingWindow);
-				boolean sizeReached = slidingWindow.check_sizeReached();
-				WindowPointer winPtr = new WindowPointer(sortKey, vectorIndex, sizeReached);
-				_bucketPointer.put(sortKey, winPtr);
-				if(winPtr.isWindowSizeReached())
-					_fullWindows.add(winPtr);
+				case CounterBased:
+					slidingWindow = new CountWindow<WindowEntry>(_windowSize);
+					break;
+				case TimeBased:
+					slidingWindow = new TimeWindow<WindowEntry>(_windowSize);
+					break;
+				default:
+					slidingWindow = null;
 			}
+			if(slidingWindow != null)
+			{
+				slidingWindow.appendEntry(input);
+				boolean added = _bucketStore.add(slidingWindow);
+				if(added)
+				{
+					int vectorIndex = _bucketStore.indexOf(slidingWindow);
+					boolean sizeReached = slidingWindow.check_windowLimit();
+					WindowPointer winPtr = new WindowPointer(sortKey, vectorIndex, sizeReached);
+					_bucketPointer.put(sortKey, winPtr);
+					if(winPtr.isWindowSizeReached())
+						_fullWindows.add(winPtr);
+				}
+			}
+			else throw new NullPointerException();
 				
 		}
 		return slidingWindow;
 	}
 	
 	
-	public HashMap<Key, Iterator<WindowEntry>> readyForExecution()
+	public HashMap<Key, List<WindowEntry>> readyForExecution()
 	{
-		HashMap<Key, Iterator<WindowEntry>> readyEntryGroups = new HashMap<Key, Iterator<WindowEntry>>();
+		HashMap<Key, List<WindowEntry>> readyEntryGroups = new HashMap<Key, List<WindowEntry>>();
 		for(WindowPointer actWinPtr : _fullWindows)
 		{
-			Iterator<WindowEntry> entryIt = _bucketStore.get(actWinPtr.getVectorIndex()).getWindowEntries();
+			List<WindowEntry> entryIt = _bucketStore.get(actWinPtr.getVectorIndex()).flush_winSlide();
 			readyEntryGroups.put(actWinPtr.getSortKey(), entryIt);
 		}
 		
