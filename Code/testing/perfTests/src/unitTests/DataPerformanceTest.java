@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
@@ -17,8 +19,11 @@ public class DataPerformanceTest
 /* ================= */
 	
 	protected static final int keyCount = 5;
-	protected static final int keyCombinCount = 20;
-	protected static final int inputIterations = 1000;
+	protected static final int keyCombinCount = 10;
+	protected static final int inputIterations = 10000;
+	
+	protected static final Fields inputFields = new Fields("key", "value");
+	protected static final Fields keyFields = new Fields("key1");
 	
 	
 /* Global Variables: */
@@ -27,8 +32,9 @@ public class DataPerformanceTest
 	protected static List<ArrayList<Object>> keyCombinations;
 	protected static ArrayList<Object> keys;
 	
-	protected static List<ArrayList<Object>> keyInputBuffer;
-	protected static List<Values> valInputBuffer;
+	//protected static List<ArrayList<Object>> keyInputBuffer;
+	//protected static List<Values> valInputBuffer;
+	protected static List<Tuple> tupleInputBuffer;
 	
 	
 	
@@ -46,12 +52,19 @@ public class DataPerformanceTest
 		}
 	
 	//Buffer Generation:
-		keyInputBuffer = new ArrayList<ArrayList<Object>>(inputIterations);
-		valInputBuffer = new ArrayList<Values>(inputIterations);
+//		keyInputBuffer = new ArrayList<ArrayList<Object>>(inputIterations);
+//		valInputBuffer = new ArrayList<Values>(inputIterations);
+		tupleInputBuffer = new ArrayList<Tuple>(inputIterations);
 		for(int i = 0 ; i <= inputIterations ; i++){
 			int randKeyComb = (int) Math.round((Math.random() * (keyCombinCount-1)));
-			keyInputBuffer.add(keyCombinations.get(randKeyComb));
-			valInputBuffer.add(new Values("Value "+ i));
+//			keyInputBuffer.add(keyCombinations.get(randKeyComb));
+//			valInputBuffer.add(new Values("Value "+ i));
+			
+			List<Object> key = keyCombinations.get(randKeyComb);
+			Values vals = new Values("Value "+ i);
+			
+			Tuple inputTuple = MockTuple.mockTuple(key, vals, inputFields, keyFields);
+			tupleInputBuffer.add(inputTuple);
 		}
 	}
 

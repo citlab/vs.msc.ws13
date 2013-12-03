@@ -5,14 +5,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import units.bucketstore.BucketStore;
-import units.bucketstore.BucketStore.WinTypes;
-import units.bucketstore.UDFWindowBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
+import stormFS.bolts.UDFBoltMock;
+import stormFS.udf.IOperator;
+import stormFS.window.CountWindow;
+import backtype.storm.tuple.Tuple;
 
 
-public class Test_BucketStore extends DataPerformanceTest
+public class Test_StormFS extends DataPerformanceTest
 {
 
 	@Test
@@ -21,12 +20,17 @@ public class Test_BucketStore extends DataPerformanceTest
 		long startTime = System.currentTimeMillis();
 		
 	//Count-Based Input Window Test:
-		Fields inputFields = new Fields("key", "value");
-		UDFWindowBolt<List<Object>> windowBolt = new UDFWindowBolt<List<Object>>(inputFields, 100, WinTypes.CounterBased);
-		//BucketStore<List<Object>, Values> bstore = new BucketStore<List<Object>, Values>(100, WinTypes.CounterBased);
+		UDFBoltMock winBolt = new UDFBoltMock(inputFields, null, new IOperator(){
+			private static final long serialVersionUID = 1L;
+			public List<List<Object>> execute(List<List<Object>> param) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		}, new CountWindow<Tuple>(100, 50), keyFields);
 		
 		for(int n = 0 ; n < inputIterations ; n++){
-			windowBolt.execute(sortKey, input);
+			Tuple actMockTuple = tupleInputBuffer.get(n);
+			winBolt.execute(actMockTuple);
 //			bstore.sortInBucket(keyInputBuffer.get(n), valInputBuffer.get(n));
 //			bstore.readyForExecution();
 		}

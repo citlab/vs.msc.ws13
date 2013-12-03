@@ -1,5 +1,4 @@
-package units.udfbolt;
-
+package stormFS.window;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import java.util.Map;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
 
 public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
