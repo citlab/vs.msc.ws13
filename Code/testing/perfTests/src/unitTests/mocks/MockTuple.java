@@ -1,4 +1,4 @@
-package unitTests;
+package unitTests.mocks;
 
 
 import static org.mockito.Mockito.mock;
@@ -27,6 +27,7 @@ public final class MockTuple
 	        Tuple tuple = mock(Tuple.class);
 	        when(tuple.getSourceComponent()).thenReturn(componentId);
 	        when(tuple.getSourceStreamId()).thenReturn(streamId);
+	        
 	        return tuple;
 	    }
 	    
@@ -51,8 +52,7 @@ public final class MockTuple
 				}
 	        	
 	        });
-//	        when(tuple.getSourceComponent()).thenReturn(componentId);
-//	        when(tuple.getSourceStreamId()).thenReturn(streamId);
+
 	        return tuple;
 	    }
 	    

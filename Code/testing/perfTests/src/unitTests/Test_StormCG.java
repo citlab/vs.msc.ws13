@@ -1,26 +1,44 @@
 package unitTests;
 
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import stormCG.bolts.UDFWindowBoltMock;
 import stormCG.bolts.windows.BucketStore;
 import stormCG.bolts.windows.BucketStore.WinTypes;
 import stormCG.udf.IBatchOperator;
+import unitTests.helpers.DataTest;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
-public class Test_StormCG extends DataTest
+public class Test_StormCG
 {
 
+/* Global Test Params: */
+/* =================== */
+	private static int keyIDCount = 5;
+	private static int keyListCount = 10;
+	private static int maxValueCount = 10;
+	private static int iterations = 10000;
+	private static int tickInterval = 10;
+	
+	private static Fields inputFields = new Fields("key", "value");
+	private static Fields keyFields = new Fields("key1");
+	
+/* Global Buffers: */
+/* =============== */
+	private static List<Tuple> tupleBuffer;
+	
+	
+/* Global Testing Objects: */
+/* ======================= */
 	UDFWindowBoltMock winBolt;
 	BucketStore<List<Object>, Values> bs;
 	
@@ -41,6 +59,28 @@ public class Test_StormCG extends DataTest
 		
 		this.bs = winBolt.get_bucketStore();
 	}
+
+	
+	
+	
+/* JUnit 4 Test Setup: */
+/* =================== */
+	
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception
+	{
+		DataTest.setupFields(inputFields, keyFields);
+		DataTest.setupTestParams(keyIDCount, keyListCount, maxValueCount, iterations);
+		
+		tupleBuffer = DataTest.generateTupleBuffer(tickInterval);
+	}
+
+	
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception
+	{
+	}
+	
 	
 	@Test
 	public void testPerformance()
@@ -48,8 +88,8 @@ public class Test_StormCG extends DataTest
 		long startTime = System.currentTimeMillis();
 		
 		int n;
-		for(n = 0 ; n < inputIterations ; n++){
-			Tuple actMockTuple = tupleInputBuffer.get(n);
+		for(n = 0 ; n < iterations ; n++){
+			Tuple actMockTuple = tupleBuffer.get(n);
 			winBolt.execute(actMockTuple);
 		}
 		
@@ -60,11 +100,13 @@ public class Test_StormCG extends DataTest
 		System.out.println("Elapsed time for input: "+ inputTimeDiff);
 	}
 	
+	
 	@Test
 	public void testFunctionality()
 	{
 		Fields inputFields = new Fields("key", "value");
 		Fields keyFields = new Fields("key1");
+		DataTest.setupFields(inputFields, keyFields);
 		
 		List<Object> key1 = DataTest.generateKey();
 		List<Object> key2 = DataTest.generateKey();
@@ -73,11 +115,11 @@ public class Test_StormCG extends DataTest
 		for(int n = 0 ; n < 20 ; n++){
 			Tuple actTuple;
 			if(toggle){
-				actTuple = DataTest.generateTuple(key1, inputFields, keyFields);
+				actTuple = DataTest.generateTuple(key1);
 				toggle = false;
 			}
 			else{
-				actTuple = DataTest.generateTuple(key2, inputFields, keyFields);
+				actTuple = DataTest.generateTuple(key2);
 				toggle = true;
 			}
 			System.out.println(actTuple.toString());
