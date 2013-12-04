@@ -46,3 +46,5 @@ Thumbs.db
 # Dirs #
 ########
 __pycache__
+/target
+/bin

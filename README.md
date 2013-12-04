@@ -23,7 +23,7 @@ Code Composition:
     <td>Testing</td><td>Test-Suite for Storm-Free Debugging (currently WIP!)</td>
   </tr>
   <tr>
-    <td>Master</td><td>The Master Code Branch</td>
+    <td>Master</td><td>The Joint Master Directory of Code</td>
   </tr>
 </table>
 
