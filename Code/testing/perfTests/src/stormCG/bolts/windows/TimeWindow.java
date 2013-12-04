@@ -41,7 +41,7 @@ public class TimeWindow<WindowEntry> extends SlidingWindow<WindowEntry>
 		return added;
 	}
 	
-	public boolean check_windowLimit()
+	public boolean windowLimitReached()
 	{
 		long currentTime = System.currentTimeMillis();
 		if(currentTime < _endTime)
@@ -50,7 +50,7 @@ public class TimeWindow<WindowEntry> extends SlidingWindow<WindowEntry>
 	}
 
 	
-	public List<WindowEntry> flush_winSlide()
+	public List<WindowEntry> flushWinSlide()
 	{
 		int windowLimiter;
 		for(windowLimiter = 0; windowLimiter < _windowEntries.size() ; windowLimiter++ ){

@@ -6,6 +6,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
 import backtype.storm.Constants;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -35,12 +38,47 @@ public final class MockTuple
 	        when(tuple.getSourceStreamId()).thenReturn("No Tick Tuple.");
 	        
 	        when(tuple.getValues()).thenReturn(vals);
-	        
+	        when(tuple.getFields()).thenReturn(keyFields, inputFields);
 	        when(tuple.select(inputFields)).thenReturn(vals);
 	        when(tuple.select(keyFields)).thenReturn(key);
+	        
+	        when(tuple.toString()).thenAnswer(new Answer<String>(){
+
+				public String answer(InvocationOnMock invocation)
+						throws Throwable {
+					String toString = MockTuple.toString((Tuple) invocation.getMock());
+					return toString;
+				}
+	        	
+	        });
 //	        when(tuple.getSourceComponent()).thenReturn(componentId);
 //	        when(tuple.getSourceStreamId()).thenReturn(streamId);
 	        return tuple;
+	    }
+	    
+	    private static String toString(Tuple mockTuple)
+	    {
+	    	String tupleString = "Tuple <Vals: (";
+	    	int valSize = mockTuple.getValues().size();
+	    	for(int n = 0 ; n < valSize ; n++){
+	    		String actVal = (String) mockTuple.getValues().get(n);
+	    		tupleString += actVal;
+	    		if(n+1 != valSize)
+	    			tupleString += ", ";
+	    	}
+	    	tupleString += "), Key: (";
+	    	Fields keyFields = mockTuple.getFields();
+	    	List<Object> key = mockTuple.select(keyFields);
+	    	
+	    	for(int n = 0 ; n < key.size() ; n++){
+	    		Integer actInt = (Integer) key.get(n);
+	    		tupleString += Integer.toString(actInt);
+	    		if(n+1 != key.size())
+	    			tupleString += ", ";
+	    	}
+	    	tupleString += ")>";
+	    	
+	    	return tupleString;
 	    }
 
 }

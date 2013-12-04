@@ -31,7 +31,7 @@ public abstract class SlidingWindow<WindowEntry>
 		}
 
 		
-		abstract public boolean check_windowLimit();
+		abstract public boolean windowLimitReached();
 
-		abstract public List<WindowEntry> flush_winSlide();
+		abstract public List<WindowEntry> flushWinSlide();
 }

@@ -12,7 +12,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
-public class DataPerformanceTest
+public class DataTest
 {
 	
 /* Global Constants: */
@@ -20,6 +20,7 @@ public class DataPerformanceTest
 	
 	protected static final int keyCount = 5;
 	protected static final int keyCombinCount = 10;
+	protected static final int maxValueCount = 10;
 	protected static final int inputIterations = 10000;
 	
 	protected static final Fields inputFields = new Fields("key", "value");
@@ -29,11 +30,9 @@ public class DataPerformanceTest
 /* Global Variables: */
 /* ================= */
 	
-	protected static List<ArrayList<Object>> keyCombinations;
-	protected static ArrayList<Object> keys;
+	protected static List<List<Object>> keyCombinations;
+	protected static List<Object> keys;
 	
-	//protected static List<ArrayList<Object>> keyInputBuffer;
-	//protected static List<Values> valInputBuffer;
 	protected static List<Tuple> tupleInputBuffer;
 	
 	
@@ -44,7 +43,7 @@ public class DataPerformanceTest
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
 	{
-		keyCombinations = new ArrayList<ArrayList<Object>>(keyCombinCount);
+		keyCombinations = new ArrayList<List<Object>>(keyCombinCount);
 		keys = new ArrayList<Object>(keyCount);
 		
 		for(int n = 0 ; n < keyCombinCount ; n++){
@@ -52,8 +51,6 @@ public class DataPerformanceTest
 		}
 	
 	//Buffer Generation:
-//		keyInputBuffer = new ArrayList<ArrayList<Object>>(inputIterations);
-//		valInputBuffer = new ArrayList<Values>(inputIterations);
 		tupleInputBuffer = new ArrayList<Tuple>(inputIterations);
 		for(int i = 0 ; i <= inputIterations ; i++){
 			int randKeyComb = (int) Math.round((Math.random() * (keyCombinCount-1)));
@@ -61,9 +58,8 @@ public class DataPerformanceTest
 //			valInputBuffer.add(new Values("Value "+ i));
 			
 			List<Object> key = keyCombinations.get(randKeyComb);
-			Values vals = new Values("Value "+ i);
 			
-			Tuple inputTuple = MockTuple.mockTuple(key, vals, inputFields, keyFields);
+			Tuple inputTuple = DataTest.generateTuple(key, inputFields, keyFields);
 			tupleInputBuffer.add(inputTuple);
 		}
 	}
@@ -75,10 +71,10 @@ public class DataPerformanceTest
 	
 	
 	
-/* Private JUnit-Methods: */
-/* ===================== */
+/* Public Testing-Methods: */
+/* ======================= */
 	
-	static private ArrayList<Object> generateKey()
+	public static ArrayList<Object> generateKey()
 	{
 		int keyCombSize = (int) Math.round(Math.random() * keyCount);
 		ArrayList<Object> keyComb = new ArrayList<Object>(keyCombSize);
@@ -92,10 +88,23 @@ public class DataPerformanceTest
 		//Combine some Keys to a Key-Combination, later used for a Value grouping:
 		for(int n = 0 ; n < keyCombSize ; n++){
 			int keySelector = (int) Math.round(Math.random() * (keyCount-1));
-			keyComb.add(keys.get(keySelector));
+			keyComb.add(keys.get(keySelector)); 
 		}
 		
 		return keyComb;
+	}
+	
+	
+	public static Tuple generateTuple(List<Object> key, Fields inputFields, Fields keyFields)
+	{
+		int valCount = (int) Math.round(Math.random() * maxValueCount);
+		Values vals = new Values();
+		
+		for(int n = 0 ; n < valCount ; n++){
+			vals.add(new String("Value "+ n));
+		}
+		Tuple mockTuple = MockTuple.mockTuple(key, vals, inputFields, keyFields);
+		return mockTuple;
 	}
 
 }

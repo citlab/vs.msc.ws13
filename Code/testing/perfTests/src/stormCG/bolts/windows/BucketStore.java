@@ -58,7 +58,7 @@ public class BucketStore<Key /*extends Comparable<Key>*/, WindowEntry> implement
 			WindowPointer winPtr = _bucketPointer.get(sortKey);
 			slidingWindow = _bucketStore.get(winPtr.getVectorIndex());
 			slidingWindow.appendEntry(input);
-			winPtr.setWinSizeReached(slidingWindow.check_windowLimit());
+			winPtr.setWinSizeReached(slidingWindow.windowLimitReached());
 			if(winPtr.isWindowSizeReached())
 				_fullWindows.add(winPtr);
 		}
@@ -82,7 +82,7 @@ public class BucketStore<Key /*extends Comparable<Key>*/, WindowEntry> implement
 				if(added)
 				{
 					int vectorIndex = _bucketStore.indexOf(slidingWindow);
-					boolean sizeReached = slidingWindow.check_windowLimit();
+					boolean sizeReached = slidingWindow.windowLimitReached();
 					WindowPointer winPtr = new WindowPointer(sortKey, vectorIndex, sizeReached);
 					_bucketPointer.put(sortKey, winPtr);
 					if(winPtr.isWindowSizeReached())
@@ -96,13 +96,15 @@ public class BucketStore<Key /*extends Comparable<Key>*/, WindowEntry> implement
 	}
 	
 	
-	public HashMap<Key, List<WindowEntry>> readyForExecution()
+	public HashMap<Key, List<WindowEntry>> flushBuckets()
 	{
 		HashMap<Key, List<WindowEntry>> readyEntryGroups = new HashMap<Key, List<WindowEntry>>();
-		for(WindowPointer actWinPtr : _fullWindows)
+		for(int n = 0 ; n < _fullWindows.size() ; n++)
 		{
-			List<WindowEntry> entryIt = _bucketStore.get(actWinPtr.getVectorIndex()).flush_winSlide();
+			WindowPointer actWinPtr = _fullWindows.get(n);
+			List<WindowEntry> entryIt = _bucketStore.get(actWinPtr.getVectorIndex()).flushWinSlide();
 			readyEntryGroups.put(actWinPtr.getSortKey(), entryIt);
+			_fullWindows.remove(n);
 		}
 		
 		return readyEntryGroups;

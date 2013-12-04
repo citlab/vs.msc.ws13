@@ -4,6 +4,6 @@ import java.util.List;
 
 import backtype.storm.tuple.Values;
 
-public interface IBatchOperator<K> extends IBatchExecutable<K, Values, List<Values[]>>{
+public interface IBatchOperator extends IBatchExecutable<List<Object>, List<Values>, List<Values[]>>{
 
 }

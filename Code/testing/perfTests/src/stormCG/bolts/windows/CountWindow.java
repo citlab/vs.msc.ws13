@@ -28,7 +28,7 @@ public class CountWindow<WindowEntry> extends SlidingWindow<WindowEntry>
 /* Public-Methods: */
 /* =============== */
 		
-	public boolean check_windowLimit()
+	public boolean windowLimitReached()
 	{
 		if(_windowEntries.size() < _windowSize)
 			return false;
@@ -36,7 +36,7 @@ public class CountWindow<WindowEntry> extends SlidingWindow<WindowEntry>
 	}
 
 	
-	public List<WindowEntry> flush_winSlide()
+	public List<WindowEntry> flushWinSlide()
 	{
 		List<WindowEntry> winSlide;
 	//If Window is just filled to _windowSize:

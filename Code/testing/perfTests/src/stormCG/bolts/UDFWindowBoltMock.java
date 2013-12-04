@@ -13,25 +13,35 @@ import stormCG.bolts.windows.BucketStore.WinTypes;
 import stormCG.udf.IBatchOperator;
 
 
-public class UDFWindowBoltMock<Key>
+public class UDFWindowBoltMock
 {
 /* Global Constants: */
 /* ================= */
 	
 	protected final Fields _inputFields;
 	protected final Fields _outputFields;
-	protected final BucketStore<Key, Values> _bucketStore;
+	protected final Fields _keyFields;
+	protected final BucketStore<List<Object>, Values> _bucketStore;
 	
-	protected final IBatchOperator<Key> _batchOp;	
+	protected final IBatchOperator _batchOp;	
+	
+	
+/* Getters & Setters: */
+/* ================== */
+	
+	public final BucketStore<List<Object>, Values> get_bucketStore() { return _bucketStore; }
+	public final IBatchOperator get_batchOp() { return _batchOp; }
+	 
 	
 /* Constructor: */
 /* ============ */
 	
-	public UDFWindowBoltMock(Fields inputFields, Fields outputFields, int winCount, WinTypes winType, IBatchOperator<Key> batchOp) 
+	public UDFWindowBoltMock(Fields inputFields, Fields outputFields, Fields keyFields, int winCount, WinTypes winType, IBatchOperator batchOp) 
 	{
 		_inputFields = inputFields;
 		_outputFields = outputFields;
-		_bucketStore = new BucketStore<Key, Values>(winCount, winType);
+		_keyFields = keyFields;
+		_bucketStore = new BucketStore<List<Object>, Values>(winCount, winType);
 		
 		_batchOp = batchOp;
 		
@@ -46,7 +56,7 @@ public class UDFWindowBoltMock<Key>
 	public void execute(Tuple input) 
 	{
 	//Check for full Windows in each execute-loop and execute those:
-		HashMap<Key, List<Values>> readyTupleMap = _bucketStore.readyForExecution();
+		HashMap<List<Object>, List<Values>> readyTupleMap = _bucketStore.flushBuckets();
 		if(readyTupleMap.isEmpty() == false)
 		{
 			List<Values[]> returnVals = _batchOp.execute_batch(readyTupleMap);
@@ -62,9 +72,10 @@ public class UDFWindowBoltMock<Key>
 	//If the current input tuple is no tick-tuple, then add it by a key to one window:
 		if(this.isTickTuple(input) == false)
 		{			
-			Values params = (Values) input.select(_inputFields); //<- TODO Why problems here?
-			Key sortKey = _batchOp.sortBy_winKey(params);
-			_bucketStore.sortInBucket(sortKey, params);
+			Values vals = new Values();
+			vals.addAll(input.select(_inputFields));
+			List<Object> key = input.select(_keyFields); //<- TODO Why problems here?
+			_bucketStore.sortInBucket(key, vals);
 			//Values[] outputValues = _operator.execute(params);
 //			if(outputValues != null) {
 //				for(List<Object> outputValue : outputValues) 
