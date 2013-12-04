@@ -9,24 +9,21 @@ This Master Project from the CIT team of the Berlin Institute of Technology is i
 *[GIT-Reference](http://gitref.org/)*  
 
 
-Repository Composition:
+Code Composition:
 -----------------------
 
 <table>
   <tr>
-    <th>Element/Dir</th><th>Description</th>
+    <th>Code Path</th><th>Description</th>
   </tr>
   <tr>
-    <td>Links.txt</td><td>A simple .txt file for useful links that you may find in your endless journeys on this topic.</td>
+    <td>Playground</td><td>First Code tries. Every Programmer has its own directory</td>
   </tr>
   <tr>
-    <td>Meeting-Notes</td><td>Minutes of Meeting are in good hands here.</td>
+    <td>Testing</td><td>Test-Suite for Storm-Free Debugging (currently WIP!)</td>
   </tr>
   <tr>
-    <td>Presentations</td><td>Presentations, this way!</td>
-  </tr>
-  <tr>
-    <td>Code</td><td>Subdirs for every Project Part would be a nice to have.</td>
+    <td>Master</td><td>The Master Code Branch</td>
   </tr>
 </table>
 

@@ -37,12 +37,9 @@
 ehthumbs.db
 Thumbs.db
 
-#Project-Data#
-##############
-.project
-.settings
-.classpath
 
 # Dirs #
 ########
+/target
+/bin
 __pycache__
