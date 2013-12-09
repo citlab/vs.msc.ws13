@@ -5,37 +5,59 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
-	private static final long serialVersionUID = -3653875602558667831L;
+	private static final long serialVersionUID = 1L;
 
-	protected Map<List<Object>, Window<Tuple, List<Tuple>>> windows;
-
-	protected List<Object> defaultKey = new ArrayList<Object>();
-
+/* Global Constants: */
+/* ================= */
+	
+	final protected Map<List<Object>, Window<Tuple, List<Tuple>>> windows;
 	final Window<Tuple, List<Tuple>> stub;
-
+	
+	final protected List<Object> defaultKey = new ArrayList<Object>();
 	final protected Fields keyFields;
+	final protected IKeyConfig keyConfig;
+	
+	
 
+/* Constructors: */
+/* ============= */
+	
 	public WindowHandler(Window<Tuple, List<Tuple>> stub) {
-		this(stub, null);
+		this(stub, null, null);
 	}
 
 	public WindowHandler(Window<Tuple, List<Tuple>> stub, Fields keyFields) {
+		this(stub, keyFields, null);
+	}
+	
+	public WindowHandler(Window<Tuple, List<Tuple>> stub, Fields keyFields, IKeyConfig keyConfig) {
 		this.stub = stub;
 		this.keyFields = keyFields;
+		this.keyConfig = keyConfig;
+		
 		windows = new HashMap<List<Object>, Window<Tuple, List<Tuple>>>();
 	}
+	
+	
+	
+/* Public Methods: */
+/* =============== */
 
 	public void add(Tuple input) {
 		List<Object> key;
 		if (keyFields == null) {
 			key = defaultKey;
 		} else {
-			key = input.select(keyFields);
+			if(keyConfig == null)
+				key = input.select(keyFields);
+			else
+				key = keyConfig.sortWithKey(input, keyFields);
 		}
 		if ( ! windows.containsKey(key)) {
 			windows.put(key, stub.clone());
@@ -67,6 +89,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 		
 	}
 
+	
 	public Window<Tuple, List<Tuple>> getStub() {
 		return stub;
 	}

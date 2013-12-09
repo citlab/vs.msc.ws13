@@ -26,7 +26,7 @@ public class UDFTestTopology {
 				"map",
 				new UDFBolt(new Fields("key", "value"), new Fields("key",
 						"value"), new IOperator() {
-					private static final long serialVersionUID = -4627321197468747477L;
+					private static final long serialVersionUID = 1L;
 
 					public List<List<Object>> execute(List<List<Object>> param) {
 						String newKey = param.get(0).get(0) + " mapped";
@@ -42,11 +42,13 @@ public class UDFTestTopology {
 						return param + 10;
 					}
 				}), 1).shuffleGrouping("spout");
+		
+		
 		builder.setBolt(
 				"flatmap",
 				new UDFBolt(new Fields("key", "value"), new Fields("key",
 						"value"), new IOperator() {
-					private static final long serialVersionUID = 6893429130604026037L;
+					private static final long serialVersionUID = 1L;
 
 					public List<List<Object>> execute(List<List<Object>> param) {
 						List<List<Object>> result = new ArrayList<List<Object>>();
@@ -67,21 +69,25 @@ public class UDFTestTopology {
 						return param *= -1;
 					}
 				}), 1).shuffleGrouping("map");
+		
+		
 		builder.setBolt(
 				"filter",
 				new UDFBolt(new Fields("value"), new Fields("value"),
 						new FilterOperator(new FilterUDF() {
-							private static final long serialVersionUID = -8778283315568184418L;
+							private static final long serialVersionUID = 1L;
 
 							public Boolean execute(List<Object> param) {
 								return (Integer) param.get(0) > 0;
 							}
 						})), 1).shuffleGrouping("flatmap");
+		
+		
 		builder.setBolt(
 				"reducer",
 				new UDFBolt(new Fields("value"), new Fields("value"),
 						new IOperator() {
-							private static final long serialVersionUID = 7655644319650809859L;
+							private static final long serialVersionUID = 1L;
 
 							public List<List<Object>> execute(
 									List<List<Object>> param) {
@@ -97,6 +103,7 @@ public class UDFTestTopology {
 						}, new CountWindow<Tuple>(2)), 1).fieldsGrouping(
 				"filter", new Fields("value"));
 
+		
 		Config conf = new Config();
 		conf.setDebug(true);
 

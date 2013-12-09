@@ -1,6 +1,6 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +16,10 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+
 
 public class SlidingCountWindowGroupingTestTopology {
 	private static final int windowSize = 4;
@@ -67,6 +69,8 @@ public class SlidingCountWindowGroupingTestTopology {
 				return null;
 			}
 		}, 1);
+		
+		
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
 
@@ -74,9 +78,16 @@ public class SlidingCountWindowGroupingTestTopology {
 						System.out.println(param);
 						return null;
 					}
-				}, new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key")), 1)
+				}, new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
+
+					public List<Object> sortWithKey(Tuple input, Fields keyFields) {
+						return input.select(keyFields);
+					}
+					
+				}), 1)
 				.shuffleGrouping("spout");
 
+		
 		Config conf = new Config();
 		conf.setDebug(true);
 
