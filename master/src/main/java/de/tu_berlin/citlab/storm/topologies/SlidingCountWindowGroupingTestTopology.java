@@ -18,6 +18,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.helpers.ValuesHelper;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
@@ -84,13 +85,8 @@ public class SlidingCountWindowGroupingTestTopology {
 				}, 
 				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
 
-					public List<Object> sortWithKey( Fields input, Fields keyFields) {
-				        List<Object> ret = new ArrayList<Object>(keyFields.size());
-				        Iterator<String> it = keyFields.iterator();
-						while( it.hasNext() ){
-							ret.add( input.get( input.fieldIndex( it.next() ) ) );
-						}
-						return ret;
+					public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
+						return tuple.select(keyFields);
 					}
 					
 				}), 1)

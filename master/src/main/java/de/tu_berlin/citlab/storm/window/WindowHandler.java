@@ -8,6 +8,7 @@ import java.util.Map;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
@@ -57,7 +58,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 			if(keyConfig == null)
 				key = input.select(keyFields);
 			else
-				key = keyConfig.sortWithKey(input.getFields(), keyFields);
+				key = keyConfig.sortWithKey( input, keyFields);
 		}
 		if ( ! windows.containsKey(key)) {
 			windows.put(key, stub.clone());
