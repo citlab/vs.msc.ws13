@@ -112,12 +112,14 @@ public class UDFBolt extends BaseRichBolt {
 /* ================ */
 	
 	private void executeBatches(List<List<Tuple>> windows) {
-		Context context = new Context();
 		for (List<Tuple> window : windows) {
 			List<Values> inputValues = new ArrayList<Values>();
+			String source="";
 			for (Tuple tuple : window) {
 				inputValues.add( new Values(tuple.select(inputFields)) );
+				source=tuple.getSourceStreamId();
 			}
+			Context context = new Context(source);
 			
 			List<Values> outputValues = operator.execute(inputValues, context );
 			if (outputValues != null) {
