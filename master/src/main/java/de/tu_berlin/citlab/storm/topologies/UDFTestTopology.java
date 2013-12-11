@@ -14,6 +14,7 @@ import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.udf.Context;
 
 public class UDFTestTopology {
 
@@ -28,11 +29,11 @@ public class UDFTestTopology {
 						"value"), new IOperator() {
 					private static final long serialVersionUID = 1L;
 
-					public List<List<Object>> execute(List<List<Object>> param) {
+					public List<Values> execute(List<Values> param, Context context) {
 						String newKey = param.get(0).get(0) + " mapped";
 						int newValue = myExistingFunction((Integer) param
 								.get(0).get(1));
-						List<List<Object>> result = new ArrayList<List<Object>>(
+						List<Values> result = new ArrayList<Values>(
 								1);
 						result.add(new Values(newKey, newValue));
 						return result;
@@ -50,8 +51,8 @@ public class UDFTestTopology {
 						"value"), new IOperator() {
 					private static final long serialVersionUID = 1L;
 
-					public List<List<Object>> execute(List<List<Object>> param) {
-						List<List<Object>> result = new ArrayList<List<Object>>();
+					public List<Values> execute(List<Values> param, Context context) {
+						List<Values> result = new ArrayList<Values>();
 						String inputKey = (String) param.get(0).get(0);
 						int inputValue = (Integer) param.get(0).get(1);
 						result.add(new Values(inputKey + "flatmapped1",
@@ -77,7 +78,7 @@ public class UDFTestTopology {
 						new FilterOperator(new FilterUDF() {
 							private static final long serialVersionUID = 1L;
 
-							public Boolean execute(List<Object> param) {
+							public Boolean execute(Values param, Context context ) {
 								return (Integer) param.get(0) > 0;
 							}
 						})), 1).shuffleGrouping("flatmap");
@@ -89,12 +90,12 @@ public class UDFTestTopology {
 						new IOperator() {
 							private static final long serialVersionUID = 1L;
 
-							public List<List<Object>> execute(
-									List<List<Object>> param) {
+							public List<Values> execute(
+									List<Values> param, Context context) {
 								int reduced = 0;
-								List<List<Object>> result = new ArrayList<List<Object>>(
+								List<Values> result = new ArrayList<Values>(
 										0);
-								for (List<Object> tupel : param) {
+								for (Values tupel : param) {
 									reduced += (Integer) tupel.get(0);
 								}
 								result.add(new Values(reduced));

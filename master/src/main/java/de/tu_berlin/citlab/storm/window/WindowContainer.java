@@ -1,18 +1,20 @@
 package de.tu_berlin.citlab.storm.window;
 
+import java.util.List;
 import java.io.Serializable;
 
-public class WindowContainer<K, I, O> implements Serializable, Cloneable 
+public class WindowContainer<I> implements Serializable, Cloneable 
 {
 	private static final long serialVersionUID = 1L;
-	
-	
-	public final K key;
-	public final Window<I, O> window;
+		
+	private final List<I> window;
 
-	public WindowContainer(K key, Window<I, O> window)
-	{
-		this.key = key;
-		this.window = window;
+	
+	public WindowContainer(List<I> w){
+		this.window = w;
+	}
+	
+	public List<I> getWindow(){
+		return window;
 	}
 }

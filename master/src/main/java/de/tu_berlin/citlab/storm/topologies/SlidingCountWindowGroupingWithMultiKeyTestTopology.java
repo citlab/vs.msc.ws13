@@ -17,9 +17,10 @@ import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.udf.Context;
 
 public class SlidingCountWindowGroupingWithMultiKeyTestTopology {
-	private static final int windowSize = 4;
+	private static final int windowSize = 10;
 	private static final int slidingOffset = 2;
 
 	@SuppressWarnings("serial")
@@ -72,7 +73,7 @@ public class SlidingCountWindowGroupingWithMultiKeyTestTopology {
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key1", "key2", "value"), null, new IOperator() {
 					
-					public List<List<Object>> execute(List<List<Object>> param) {
+					public List<Values> execute(List<Values> param, Context context) {
 						System.out.println(param);
 						return null;
 					}

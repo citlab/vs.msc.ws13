@@ -57,7 +57,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 			if(keyConfig == null)
 				key = input.select(keyFields);
 			else
-				key = keyConfig.sortWithKey(input, keyFields);
+				key = keyConfig.sortWithKey(input.getFields(), keyFields);
 		}
 		if ( ! windows.containsKey(key)) {
 			windows.put(key, stub.clone());

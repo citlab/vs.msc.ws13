@@ -16,6 +16,7 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 
 public class SlidingTimeWindowTestTopology {
@@ -68,7 +69,7 @@ public class SlidingTimeWindowTestTopology {
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
 
-					public List<List<Object>> execute(List<List<Object>> param) {
+					public List<Values> execute(List<Values> param, Context context) {
 						System.out.println(param);
 						return null;
 					}

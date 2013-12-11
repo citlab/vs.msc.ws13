@@ -18,13 +18,15 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.operators.JoinOperator;
+import de.tu_berlin.citlab.storm.operators.NLJoin;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.udf.Context;
 
 
-public class SlidingCountWindowGroupingTestTopology {
+public class SlidingCountWindowJoinTestTopology {
 	private static final int windowSize = 4;
 	private static final int slidingOffset = 2;
 
@@ -74,26 +76,22 @@ public class SlidingCountWindowGroupingTestTopology {
 		}, 1);
 		
 		
+		
+		IKeyConfig groupKey = new IKeyConfig(){
+			public List<Object> sortWithKey( Fields input, Fields keyFields) {
+		        List<Object> ret = new ArrayList<Object>(keyFields.size());
+		        Iterator<String> it = keyFields.iterator();
+				while( it.hasNext() ){
+					ret.add( input.get( input.fieldIndex( it.next() ) ) );
+				}
+				return ret;
+			}
+		};
+		
+		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
-
-					public List<Values> execute(List<Values> param, Context context) {
-						System.out.println(param);
-						return null;
-					}
-				}, 
-				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
-
-					public List<Object> sortWithKey( Fields input, Fields keyFields) {
-				        List<Object> ret = new ArrayList<Object>(keyFields.size());
-				        Iterator<String> it = keyFields.iterator();
-						while( it.hasNext() ){
-							ret.add( input.get( input.fieldIndex( it.next() ) ) );
-						}
-						return ret;
-					}
-					
-				}), 1)
+				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), groupKey ), 
+				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
 				.shuffleGrouping("spout");
 
 		

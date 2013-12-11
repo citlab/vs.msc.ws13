@@ -11,7 +11,9 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
+import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
@@ -110,12 +112,14 @@ public class UDFBolt extends BaseRichBolt {
 /* ================ */
 	
 	private void executeBatches(List<List<Tuple>> windows) {
+		Context context = new Context();
 		for (List<Tuple> window : windows) {
-			List<List<Object>> inputValues = new ArrayList<List<Object>>();
+			List<Values> inputValues = new ArrayList<Values>();
 			for (Tuple tuple : window) {
-				inputValues.add(tuple.select(inputFields));
+				inputValues.add( new Values(tuple.select(inputFields)) );
 			}
-			List<List<Object>> outputValues = operator.execute(inputValues);
+			
+			List<Values> outputValues = operator.execute(inputValues, context );
 			if (outputValues != null) {
 				for (List<Object> outputValue : outputValues) {
 					collector.emit(outputValue);
