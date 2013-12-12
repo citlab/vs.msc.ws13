@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.spouts;
+package de.tu_berlin.citlab.storm.topologies;
 
 import java.util.Properties;
 
@@ -6,11 +6,12 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
+import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
-public class TwitterSpoutTest {
+public class TwitterLocalTestTopology {
 	public static void main(String[] args) {
 
 		// Setup up Twitter configuration
@@ -38,5 +39,7 @@ public class TwitterSpoutTest {
 		Utils.sleep(30000);
 		cluster.killTopology("test");
 		cluster.shutdown();
+		
+		
 	}
 }

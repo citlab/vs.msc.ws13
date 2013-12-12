@@ -1,0 +1,11 @@
+<project name="TwitterJob" basedir="." default="main">
+
+	<target name="main" >
+		<jar destfile="job.jar" basedir="./target/classes">
+			<manifest>
+				<attribute name="Main-Class" value="de.tu_berlin.citlab.storm.topologies.TwitterClusterTestTopology" />
+			</manifest>
+		</jar>
+	</target>
+</project>
+
