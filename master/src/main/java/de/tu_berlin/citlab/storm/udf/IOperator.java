@@ -2,9 +2,9 @@ package de.tu_berlin.citlab.storm.udf;
 
 import java.util.List;
 
-import backtype.storm.tuple.Values;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 
 public interface IOperator extends
-		ISerializiableExecutable<List<Values>, List<Values>> {
+		ISerializiableExecutable<List<DataTuple>, List<DataTuple>> {
 
 }

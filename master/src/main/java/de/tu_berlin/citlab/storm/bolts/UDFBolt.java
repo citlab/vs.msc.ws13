@@ -17,6 +17,7 @@ import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
@@ -94,7 +95,6 @@ public class UDFBolt extends BaseRichBolt {
 
 	
 	public void execute(Tuple input) {
-		System.out.println(input.getSourceComponent() );
 		if (TupleHelper.isTickTuple(input)) {
 			executeBatches(windowHandler.flush());
 		}
@@ -114,18 +114,19 @@ public class UDFBolt extends BaseRichBolt {
 	
 	private void executeBatches(List<List<Tuple>> windows) {
 		for (List<Tuple> window : windows) {
-			List<Values> inputValues = new ArrayList<Values>();
+			List<DataTuple> inputValues = new ArrayList<DataTuple>();
 			String source="";
 			for (Tuple tuple : window) {
-				inputValues.add( new Values(tuple.select(inputFields)) );
+				DataTuple t = new DataTuple( new Values(tuple.select(inputFields).toArray() ), inputFields );
+				inputValues.add( t );
 				source=tuple.getSourceComponent();
 			}
 			Context context = new Context(source);
 			
-			List<Values> outputValues = operator.execute(inputValues, context );
+			List<DataTuple> outputValues = operator.execute(inputValues, context );
 			if (outputValues != null) {
-				for (List<Object> outputValue : outputValues) {
-					collector.emit(outputValue);
+				for (DataTuple outputValue : outputValues) {
+					collector.emit(outputValue.getValues());
 				}
 			}
 			for (Tuple tuple : window) {

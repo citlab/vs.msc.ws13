@@ -1,11 +1,8 @@
 package de.tu_berlin.citlab.storm.operators;
 
-import java.util.List;
-
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.ISerializiableExecutable;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 
-public interface FilterUDF extends
-		ISerializiableExecutable<Values, Boolean> {
+public interface FilterUDF extends ISerializiableExecutable<DataTuple, Boolean> {
 
 }

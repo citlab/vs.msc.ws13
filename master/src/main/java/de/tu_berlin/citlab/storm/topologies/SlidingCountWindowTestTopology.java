@@ -12,6 +12,7 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.udf.Context;
 
 public class SlidingCountWindowTestTopology {
@@ -52,7 +53,7 @@ public class SlidingCountWindowTestTopology {
 						}
 					}
 
-					public List<Values> execute(List<Values> param, Context context) {
+					public List<DataTuple> execute(List<DataTuple> param, Context context) {
 						
 						prepareCompare();
 						if (param.isEmpty()) {

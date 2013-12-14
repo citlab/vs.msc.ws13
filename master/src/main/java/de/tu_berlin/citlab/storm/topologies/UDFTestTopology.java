@@ -14,6 +14,7 @@ import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.udf.Context;
 
 public class UDFTestTopology {
@@ -29,13 +30,13 @@ public class UDFTestTopology {
 						"value"), new IOperator() {
 					private static final long serialVersionUID = 1L;
 
-					public List<Values> execute(List<Values> param, Context context) {
-						String newKey = param.get(0).get(0) + " mapped";
+					public List<DataTuple> execute(List<DataTuple> param, Context context) {
+						String newKey = param.get(0).getValues().get(0) + " mapped";
 						int newValue = myExistingFunction((Integer) param
-								.get(0).get(1));
-						List<Values> result = new ArrayList<Values>(
+								.get(0).getValues().get(1));
+						List<DataTuple> result = new ArrayList<DataTuple>(
 								1);
-						result.add(new Values(newKey, newValue));
+						result.add(new DataTuple(new Values(newKey, newValue), new Fields("0", "1")) );
 						return result;
 					}
 
@@ -51,14 +52,15 @@ public class UDFTestTopology {
 						"value"), new IOperator() {
 					private static final long serialVersionUID = 1L;
 
-					public List<Values> execute(List<Values> param, Context context) {
-						List<Values> result = new ArrayList<Values>();
-						String inputKey = (String) param.get(0).get(0);
-						int inputValue = (Integer) param.get(0).get(1);
-						result.add(new Values(inputKey + "flatmapped1",
-								myExistingFunction1(inputValue)));
-						result.add(new Values(inputKey + "flatmapped2",
-								myExistingFunction2(inputValue)));
+					public List<DataTuple> execute(List<DataTuple> param, Context context) {
+						List<DataTuple> result = new ArrayList<DataTuple>();
+						String inputKey = (String) param.get(0).getValues().get(0);
+						int inputValue = (Integer) param.get(0).getValues().get(1);
+						result.add(new DataTuple( new Values(inputKey + "flatmapped1",
+								myExistingFunction1(inputValue)), new Fields("key","value")) );
+						
+						result.add(new DataTuple( new Values(inputKey + "flatmapped2",
+								myExistingFunction2(inputValue)), new Fields("key", "value") ));
 						return result;
 					}
 
@@ -78,8 +80,8 @@ public class UDFTestTopology {
 						new FilterOperator(new FilterUDF() {
 							private static final long serialVersionUID = 1L;
 
-							public Boolean execute(Values param, Context context ) {
-								return (Integer) param.get(0) > 0;
+							public Boolean execute(DataTuple param, Context context ) {
+								return (Integer) param.getValues().get(0) > 0;
 							}
 						})), 1).shuffleGrouping("flatmap");
 		
@@ -90,15 +92,15 @@ public class UDFTestTopology {
 						new IOperator() {
 							private static final long serialVersionUID = 1L;
 
-							public List<Values> execute(
-									List<Values> param, Context context) {
+							public List<DataTuple> execute(
+									List<DataTuple> param, Context context) {
 								int reduced = 0;
-								List<Values> result = new ArrayList<Values>(
+								List<DataTuple> result = new ArrayList<DataTuple>(
 										0);
-								for (Values tupel : param) {
-									reduced += (Integer) tupel.get(0);
+								for (DataTuple tupel : param) {
+									reduced += (Integer) tupel.getValues().get(0);
 								}
-								result.add(new Values(reduced));
+								result.add(new DataTuple( new Values(reduced), new Fields("key", "value")));
 								return result;
 							}
 						}, new CountWindow<Tuple>(2)), 1).fieldsGrouping(

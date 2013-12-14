@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.storm.topologies;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,13 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.operators.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
+import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
+import de.tu_berlin.citlab.storm.operators.join.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 
 class DataSource extends BaseRichSpout {
 	
@@ -70,23 +74,43 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 	public static void main(String[] args) throws Exception {
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("spout1", new DataSource(), 1);
-		builder.setSpout("spout2", new DataSource(), 1);
+		builder.setSpout("s1", new DataSource(), 1);
+		builder.setSpout("s2", new DataSource(), 1);
 		
 		
 		
 		IKeyConfig groupKey = new IKeyConfig(){
 			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				return tuple.select(keyFields);
+				List<Object> key=new ArrayList<Object>();
+				key.add( tuple.getSourceComponent() );
+				return key;
+			}
+		};
+		
+		JoinPredicate joinPredicate = new JoinPredicate() {
+			@Override
+			public boolean evaluate(DataTuple t1, DataTuple t2) {
+				return ((String)t1.get("key")).compareTo( (String)t2.get("key") ) == 0;
 			}
 		};
 		
 		
+		TupleProjection projection = new TupleProjection(){
+			@Override
+			public DataTuple project(DataTuple left, DataTuple right) {
+				DataTuple out = new DataTuple();
+				out.set("key", left.get("key"));
+				out.set("value", left.get("value") );
+				out.set("keyR", right.get("key") );
+				return out;
+			}
+		};
+		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), groupKey ), 
+				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
 				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
-				.shuffleGrouping("spout1")
-				.shuffleGrouping("spout2");
+				.shuffleGrouping("s1")
+				.shuffleGrouping("s2");
 
 		
 		Config conf = new Config();

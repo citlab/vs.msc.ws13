@@ -19,11 +19,12 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.ValuesHelper;
-import de.tu_berlin.citlab.storm.operators.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
+import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.udf.Context;
 
 
@@ -76,26 +77,23 @@ public class SlidingCountWindowGroupingTestTopology {
 			}
 		}, 1);
 		
-		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), null) {
-
-					/*
-					public List<Values> execute(List<Values> param, Context context) {
+				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
+					
+					public List<DataTuple> execute(List<DataTuple> param, Context context) {
 						System.out.println(param);
 						return null;
-					}*/
-				}, 
-				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
-
-					public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-						return tuple.select(keyFields);
 					}
 					
-				}), 1)
-				.shuffleGrouping("spout");
+				}, new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
 
-		
+			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
+				return tuple.select(keyFields);
+			}
+			
+		}), 1).shuffleGrouping("spout");
+
+				
 		Config conf = new Config();
 		conf.setDebug(true);
 

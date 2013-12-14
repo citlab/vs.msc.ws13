@@ -8,7 +8,6 @@ import java.util.Map;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 
 public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
