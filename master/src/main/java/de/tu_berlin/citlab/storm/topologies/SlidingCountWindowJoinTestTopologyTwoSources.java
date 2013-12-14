@@ -102,6 +102,7 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 				out.set("key", left.get("key"));
 				out.set("value", left.get("value") );
 				out.set("keyR", right.get("key") );
+				out.set("valueR", right.get("value") );
 				return out;
 			}
 		};
