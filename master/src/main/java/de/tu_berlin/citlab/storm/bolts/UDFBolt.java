@@ -94,6 +94,7 @@ public class UDFBolt extends BaseRichBolt {
 
 	
 	public void execute(Tuple input) {
+		System.out.println(input.getSourceComponent() );
 		if (TupleHelper.isTickTuple(input)) {
 			executeBatches(windowHandler.flush());
 		}
@@ -117,7 +118,7 @@ public class UDFBolt extends BaseRichBolt {
 			String source="";
 			for (Tuple tuple : window) {
 				inputValues.add( new Values(tuple.select(inputFields)) );
-				source=tuple.getSourceStreamId();
+				source=tuple.getSourceComponent();
 			}
 			Context context = new Context(source);
 			
@@ -130,7 +131,7 @@ public class UDFBolt extends BaseRichBolt {
 			for (Tuple tuple : window) {
 				collector.ack(tuple);
 			}
-		}
+		}//for
 	}
 
 }

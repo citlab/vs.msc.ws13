@@ -23,7 +23,7 @@ public class JoinOperator implements IOperator {
 	
 	private Fields keys;
 	
-	HashMap<Values, List<WindowContainer<Values>>> activeWindows = new HashMap<Values, List<WindowContainer<Values>>> ();
+	HashMap<String, List<WindowContainer<Values>>> activeWindows = new HashMap<String, List<WindowContainer<Values>>> ();
 
 	public JoinOperator(JoinUDF join, IKeyConfig keyConfig) {
 		this.join = join;
@@ -31,9 +31,17 @@ public class JoinOperator implements IOperator {
 	}
 
 	public List<Values> execute(List<Values> tuples, Context context ) {
-		// output data
-		List<Values> result = null;
+		String vstr="";
+		for( Values v : tuples ){
+			vstr+=v.toString();
+		}//for
+		
+		List<Values> result = new ArrayList<Values>();
+		System.out.println("batch-processing: "+context.getSource()+": "+vstr );
+		
 		
 		return result;
 	}
+	
+	
 }

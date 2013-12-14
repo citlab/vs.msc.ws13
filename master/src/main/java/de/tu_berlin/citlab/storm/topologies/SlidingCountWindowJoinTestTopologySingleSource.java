@@ -26,7 +26,7 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.udf.Context;
 
 
-public class SlidingCountWindowJoinTestTopology {
+public class SlidingCountWindowJoinTestTopologySingleSource {
 	private static final int windowSize = 4;
 	private static final int slidingOffset = 2;
 
