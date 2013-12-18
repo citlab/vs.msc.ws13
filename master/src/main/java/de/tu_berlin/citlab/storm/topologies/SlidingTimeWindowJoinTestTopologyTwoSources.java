@@ -22,8 +22,6 @@ import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
 import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 
 class DataSource1 extends BaseRichSpout {
@@ -78,8 +76,6 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		builder.setSpout("s1", new DataSource1(), 1);
 		builder.setSpout("s2", new DataSource1(), 1);
 		
-		
-		
 		IKeyConfig groupKey = new IKeyConfig(){
 			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
 				List<Object> key=new ArrayList<Object>();
@@ -90,23 +86,25 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		
 		JoinPredicate joinPredicate = new JoinPredicate() {
 			@Override
-			public boolean evaluate(DataTuple t1, DataTuple t2) {
-				return ((String)t1.get("key")).compareTo( (String)t2.get("key") ) == 0;
+			public boolean evaluate(Tuple t1, Tuple t2) {
+				return ((String)t1.getValueByField("key")).compareTo( (String)t2.getValueByField("key") ) == 0;
 			}
 		};
 		
 		
 		TupleProjection projection = new TupleProjection(){
 			@Override
-			public DataTuple project(DataTuple left, DataTuple right) {
-				DataTuple out = new DataTuple();
-				out.set("key", left.get("key"));
-				out.set("value", left.get("value") );
-				out.set("keyR", right.get("key") );
-				out.set("valueR", right.get("value") );
-				return out;
+			public Values project(Tuple left, Tuple right) {
+				
+				return new Values(  left.getValueByField("key"),
+									left.getValueByField("value"),
+									right.getValueByField("key"),
+									right.getValueByField("value")
+									
+								);
 			}
 		};
+		
 		
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 

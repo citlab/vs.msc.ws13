@@ -1,22 +1,20 @@
 package de.tu_berlin.citlab.storm.operators.join;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.exceptions.InvalidJoinPairCountException;
 import de.tu_berlin.citlab.storm.exceptions.JoinException;
 import de.tu_berlin.citlab.storm.exceptions.JoinSourceNotFoundException;
-import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.window.WindowContainer;
 
 public class JoinOperator implements IOperator {
-	public static List<DataTuple> EMPTY_OUTPUT = new ArrayList<DataTuple>();
-
+	
 	private static final long serialVersionUID = -1921795142772743781L;
 
 	protected JoinUDF joinUDF;
@@ -29,7 +27,7 @@ public class JoinOperator implements IOperator {
 	
 	private String outerSource;
 		
-	HashMap<String, Queue<WindowContainer<DataTuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<DataTuple>>> ();
+	HashMap<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
 	public JoinOperator(JoinUDF join, JoinPredicate predicate, TupleProjection projection, String inner, String outer ) {
 		this.joinUDF = join;
@@ -39,25 +37,24 @@ public class JoinOperator implements IOperator {
 		this.projection = projection;
 		prepare();
 	}
-	
+
 
 	private void prepare(){
-		activeWindows.put(innerSource, new LinkedList<WindowContainer<DataTuple>>() );
-		activeWindows.put(outerSource, new LinkedList<WindowContainer<DataTuple>>() );
+		activeWindows.put(innerSource, new LinkedList<WindowContainer<Tuple>>() );
+		activeWindows.put(outerSource, new LinkedList<WindowContainer<Tuple>>() );
 		
 	}
 
-	public List<DataTuple> execute(List<DataTuple> tuples, Context context ) {
-		List<DataTuple> joinedTuples = null;;
+	public void execute(List<Tuple> tuples, OutputCollector collector ) {
 		try {
-			String source=context.getSource();
+			String source="";
+			if(tuples.size() > 0 ) source = tuples.get(0).getSourceComponent();
 			
 			if( activeWindows.containsKey(source) ){
-				Queue<WindowContainer<DataTuple>> windows = activeWindows.get(source);
-				windows.add(new WindowContainer<DataTuple>(tuples));				
+				Queue<WindowContainer<Tuple>> windows = activeWindows.get(source);
+				windows.add(new WindowContainer<Tuple>(tuples));				
 			}
 			else {
-				return null;
 			}
 			
 			// find join pairs
@@ -66,16 +63,12 @@ public class JoinOperator implements IOperator {
 			// pairs found?
 			if(pair != null ){
 				// join strategy
-				joinedTuples = joinUDF.executeJoin(pair, joinPredicate, projection );
-				System.out.println("created tuple pairs "+joinedTuples.size() );
-				return joinedTuples;
+				joinUDF.executeJoin(pair, joinPredicate, projection, collector );
 			}
 			else {
-				return EMPTY_OUTPUT;
 			}
 		}catch(JoinException e) {
 			System.out.println("error");
-			return joinedTuples;
 		}
 	}
 
@@ -83,8 +76,8 @@ public class JoinOperator implements IOperator {
 		if(activeWindows.keySet().size() > 2 ){
 			throw new InvalidJoinPairCountException();
 		} else {
-			Queue<WindowContainer<DataTuple>> innerList=activeWindows.get(innerSource);
-			Queue<WindowContainer<DataTuple>> outerList=activeWindows.get(outerSource);
+			Queue<WindowContainer<Tuple>> innerList=activeWindows.get(innerSource);
+			Queue<WindowContainer<Tuple>> outerList=activeWindows.get(outerSource);
 			
 			if( innerList == null || outerList == null ){
 				throw new JoinSourceNotFoundException();

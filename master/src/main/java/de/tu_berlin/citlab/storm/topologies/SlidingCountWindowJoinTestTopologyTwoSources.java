@@ -23,8 +23,6 @@ import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.DataTuple;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
 
 class DataSource extends BaseRichSpout {
 	
@@ -70,7 +68,7 @@ class DataSource extends BaseRichSpout {
 public class SlidingCountWindowJoinTestTopologyTwoSources {
 	private static final int windowSize = 4;
 	private static final int slidingOffset = 2;
-
+	
 	@SuppressWarnings("serial")
 	public static void main(String[] args) throws Exception {
 
@@ -90,21 +88,22 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 		
 		JoinPredicate joinPredicate = new JoinPredicate() {
 			@Override
-			public boolean evaluate(DataTuple t1, DataTuple t2) {
-				return ((String)t1.get("key")).compareTo( (String)t2.get("key") ) == 0;
+			public boolean evaluate(Tuple t1, Tuple t2) {
+				return ((String)t1.getValueByField("key")).compareTo( (String)t2.getValueByField("key") ) == 0;
 			}
 		};
 		
 		
 		TupleProjection projection = new TupleProjection(){
 			@Override
-			public DataTuple project(DataTuple left, DataTuple right) {
-				DataTuple out = new DataTuple();
-				out.set("key", left.get("key"));
-				out.set("value", left.get("value") );
-				out.set("keyR", right.get("key") );
-				out.set("valueR", right.get("value") );
-				return out;
+			public Values project(Tuple left, Tuple right) {
+				
+				return new Values(  left.getValueByField("key"),
+									left.getValueByField("value"),
+									right.getValueByField("key"),
+									right.getValueByField("value")
+									
+								);
 			}
 		};
 		

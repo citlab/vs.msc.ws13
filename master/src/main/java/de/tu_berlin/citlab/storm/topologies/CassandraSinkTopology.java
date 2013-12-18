@@ -1,13 +1,11 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
@@ -17,15 +15,10 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.helpers.ValuesHelper;
-import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.sinks.DataSink;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.DataTuple;
-import de.tu_berlin.citlab.storm.udf.Context;
 
 
 class ExampleDataSourceBolt extends BaseRichSpout {
@@ -76,16 +69,20 @@ class CassandraSink implements IOperator {
 		// load cassandra connection 
 	}
 	
-	public List<DataTuple> execute(List<DataTuple> tuples, Context context) {
+	public void execute(List<Tuple> tuples, OutputCollector collector ) {
 
 		// prepare update
 		
 		// do the update
-		System.out.println("nice i am working concurrently:" + tuples.size() );
+		System.out.println("okay i store now:" + tuples.size() );
 
 		
-		// shutdown
-		return null;
+		// shutdown cassandra connection or remember
+		
+		// forward tuples
+		for( Tuple t : tuples ) {
+			collector.emit( t.getValues() );
+		}
 	}
 }
 

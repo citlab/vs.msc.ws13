@@ -1,11 +1,10 @@
 package de.tu_berlin.citlab.storm.operators;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.tu_berlin.citlab.storm.udf.Context;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.DataTuple;
 
 public class FilterOperator implements IOperator {
 
@@ -17,13 +16,10 @@ public class FilterOperator implements IOperator {
 		this.filter = filter;
 	}
 
-	public List<DataTuple> execute(List<DataTuple> param, Context context ) {
-		List<DataTuple> result = null;
-		if (filter.execute(param.get(0), context )) {
-			result = new ArrayList<DataTuple>(1);
-			result.add(param.get(0));
+	public void execute(List<Tuple> param, OutputCollector emitter ) {
+		if (filter.evaluate( param.get(0) )) {
+			emitter.emit(param.get(0).getValues());
 		}
-		return result;
 	}
 
 }

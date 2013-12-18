@@ -2,8 +2,9 @@ package de.tu_berlin.citlab.storm.operators.join;
 
 import java.io.Serializable;
 
-import de.tu_berlin.citlab.storm.window.DataTuple;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 public interface TupleProjection extends Serializable {
-	public DataTuple project(DataTuple left, DataTuple right);
+	public Values project(Tuple left, Tuple right);
 }

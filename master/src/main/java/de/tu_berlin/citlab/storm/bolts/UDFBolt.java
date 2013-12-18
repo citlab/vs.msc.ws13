@@ -17,7 +17,6 @@ import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
@@ -114,21 +113,9 @@ public class UDFBolt extends BaseRichBolt {
 	
 	private void executeBatches(List<List<Tuple>> windows) {
 		for (List<Tuple> window : windows) {
-			List<DataTuple> inputValues = new ArrayList<DataTuple>();
-			String source="";
-			for (Tuple tuple : window) {
-				DataTuple t = new DataTuple( new Values(tuple.select(inputFields).toArray() ), inputFields );
-				inputValues.add( t );
-				source=tuple.getSourceComponent();
-			}
-			Context context = new Context(source);
-			
-			List<DataTuple> outputValues = operator.execute(inputValues, context );
-			if (outputValues != null) {
-				for (DataTuple outputValue : outputValues) {
-					collector.emit(outputValue.getValues());
-				}
-			}
+			operator.execute(window, collector );
+
+			// if succeed i can always say i processed it
 			for (Tuple tuple : window) {
 				collector.ack(tuple);
 			}

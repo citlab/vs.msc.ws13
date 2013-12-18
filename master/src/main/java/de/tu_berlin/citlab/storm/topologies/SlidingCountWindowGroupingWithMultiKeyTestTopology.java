@@ -17,8 +17,7 @@ import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.DataTuple;
-import de.tu_berlin.citlab.storm.udf.Context;
+import backtype.storm.task.OutputCollector;
 
 public class SlidingCountWindowGroupingWithMultiKeyTestTopology {
 	private static final int windowSize = 10;
@@ -74,9 +73,8 @@ public class SlidingCountWindowGroupingWithMultiKeyTestTopology {
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key1", "key2", "value"), null, new IOperator() {
 					
-					public List<DataTuple> execute(List<DataTuple> param, Context context) {
+					public void execute(List<Tuple> param, OutputCollector collector ) {
 						System.out.println(param);
-						return null;
 					}
 					
 				}, new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key1", "key2")), 1)
