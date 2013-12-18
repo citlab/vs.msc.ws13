@@ -1,7 +1,7 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,16 +17,18 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.helpers.ValuesHelper;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
 import de.tu_berlin.citlab.storm.operators.join.NLJoin;
-import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.sinks.DataSink;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.DataTuple;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
+import de.tu_berlin.citlab.storm.udf.Context;
 
-class DataSource extends BaseRichSpout {
+
+class ExampleDataSourceBolt extends BaseRichSpout {
 	
 	private static final long serialVersionUID = -7374814904789368773L;
 	
@@ -67,7 +69,27 @@ class DataSource extends BaseRichSpout {
 	}
 }
 
-public class SlidingCountWindowJoinTestTopologyTwoSources {
+class CassandraSink implements IOperator {
+	private static final long serialVersionUID = -6328347404112474790L;
+	
+	public CassandraSink(){
+		// load cassandra connection 
+	}
+	
+	public List<DataTuple> execute(List<DataTuple> tuples, Context context) {
+
+		// prepare update
+		
+		// do the update
+		System.out.println("nice i am working concurrently:" + tuples.size() );
+
+		
+		// shutdown
+		return null;
+	}
+}
+
+public class CassandraSinkTopology {
 	private static final int windowSize = 4;
 	private static final int slidingOffset = 2;
 
@@ -75,46 +97,20 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 	public static void main(String[] args) throws Exception {
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("s1", new DataSource(), 1);
-		builder.setSpout("s2", new DataSource(), 1);
-		
-		
-		
-		IKeyConfig groupKey = new IKeyConfig(){
-			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				List<Object> key=new ArrayList<Object>();
-				key.add( tuple.getSourceComponent() );
-				return key;
-			}
-		};
-		
-		JoinPredicate joinPredicate = new JoinPredicate() {
-			@Override
-			public boolean evaluate(DataTuple t1, DataTuple t2) {
-				return ((String)t1.get("key")).compareTo( (String)t2.get("key") ) == 0;
-			}
-		};
-		
-		
-		TupleProjection projection = new TupleProjection(){
-			@Override
-			public DataTuple project(DataTuple left, DataTuple right) {
-				DataTuple out = new DataTuple();
-				out.set("key", left.get("key"));
-				out.set("value", left.get("value") );
-				out.set("keyR", right.get("key") );
-				out.set("valueR", right.get("value") );
-				return out;
-			}
-		};
+		builder.setSpout("spout", new ExampleDataSourceBolt(), 1);
 		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
-				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
-				.shuffleGrouping("s1")
-				.shuffleGrouping("s2");
+				new UDFBolt(new Fields("key", "value"), null, 
+					new DataSink( new CassandraSink() ),
+							 new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
 
-		
+			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
+				return tuple.select(keyFields);
+			}
+			
+		}), 1).shuffleGrouping("spout");
+
+				
 		Config conf = new Config();
 		conf.setDebug(true);
 

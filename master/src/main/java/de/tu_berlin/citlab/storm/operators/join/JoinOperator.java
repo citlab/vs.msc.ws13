@@ -67,6 +67,7 @@ public class JoinOperator implements IOperator {
 			if(pair != null ){
 				// join strategy
 				joinedTuples = joinUDF.executeJoin(pair, joinPredicate, projection );
+				System.out.println("created tuple pairs "+joinedTuples.size() );
 				return joinedTuples;
 			}
 			else {

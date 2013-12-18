@@ -50,7 +50,7 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 		if (!slots.isEmpty()) {
 			long aquiredTimeSlot = slots.get(slots.size() - 1).getTimestamp()
 					- slots.get(0).getTimestamp();
-			result = aquiredTimeSlot >= (long) (timeSlot * 1000);
+			result = aquiredTimeSlot >= (long) (timeSlot);
 		}
 		return result;
 	}
@@ -67,7 +67,7 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 		for(TimeEntity<I> slot : slots) {
 			result.add(slot.getEntity());
 		}
-		long youngestAcceptableTimestamp = slots.get(0).getTimestamp() + (long) (offset * 1000);
+		long youngestAcceptableTimestamp = slots.get(0).getTimestamp() + (long) (offset);
 		boolean clean = false;
 		while (!clean) {
 			if(slots.get(0).getTimestamp() < youngestAcceptableTimestamp) {

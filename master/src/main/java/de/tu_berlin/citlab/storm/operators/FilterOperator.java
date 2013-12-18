@@ -3,7 +3,6 @@ package de.tu_berlin.citlab.storm.operators;
 import java.util.ArrayList;
 import java.util.List;
 
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.DataTuple;

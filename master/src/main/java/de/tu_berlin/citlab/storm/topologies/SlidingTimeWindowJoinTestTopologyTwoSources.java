@@ -26,7 +26,7 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.DataTuple;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 
-class DataSource extends BaseRichSpout {
+class DataSource1 extends BaseRichSpout {
 	
 	private static final long serialVersionUID = -7374814904789368773L;
 	
@@ -52,7 +52,7 @@ class DataSource extends BaseRichSpout {
 	}
 
 	public void nextTuple() {
-		Utils.sleep(500);
+		Utils.sleep(1);
 		_collector.emit(new Values(ids[currentId++ % ids.length], _id));
 		_id++;
 	}
@@ -67,16 +67,16 @@ class DataSource extends BaseRichSpout {
 	}
 }
 
-public class SlidingCountWindowJoinTestTopologyTwoSources {
-	private static final int windowSize = 4;
-	private static final int slidingOffset = 2;
+public class SlidingTimeWindowJoinTestTopologyTwoSources {
+	private static final int windowSize = 1000;
+	private static final int slidingOffset = 500;
 
 	@SuppressWarnings("serial")
 	public static void main(String[] args) throws Exception {
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("s1", new DataSource(), 1);
-		builder.setSpout("s2", new DataSource(), 1);
+		builder.setSpout("s1", new DataSource1(), 1);
+		builder.setSpout("s2", new DataSource1(), 1);
 		
 		
 		
@@ -110,7 +110,7 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 		
 		builder.setBolt("slide",
 				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
-				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
+				new TimeWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
 				.shuffleGrouping("s1")
 				.shuffleGrouping("s2");
 
