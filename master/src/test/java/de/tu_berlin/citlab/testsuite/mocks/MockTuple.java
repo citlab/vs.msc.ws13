@@ -56,7 +56,7 @@ public final class MockTuple
 	        return tuple;
 	    }
 	    
-	    private static String toString(Tuple mockTuple)
+	    public static String toString(Tuple mockTuple)
 	    {
 	    	String tupleString = "Tuple <Vals: (";
 	    	int valSize = mockTuple.getValues().size();

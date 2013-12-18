@@ -10,7 +10,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
-public class DataTest
+public final class TestSetup
 {
 	
 /* Global Settings: */
@@ -23,65 +23,27 @@ public class DataTest
 	
 	private static Fields inputFields = new Fields("key", "value");
 	private static Fields keyFields = new Fields("key1");
+	private static List<Object> defaultKey = new ArrayList<Object>();
 	
 	
 	public static void setupFields(Fields inputFields, Fields keyFields)
 	{
-		DataTest.inputFields = inputFields;
-		DataTest.keyFields = keyFields;
+		TestSetup.inputFields = inputFields;
+		TestSetup.keyFields = keyFields;
 	}
 	
 	public static void setupTestParams(int keyIDCount, int keyListCount, int maxValueCount, int bufSize)
 	{
-		DataTest.keyIDCount = keyIDCount;
-		DataTest.keyListCount = keyListCount;
-		DataTest.maxValueCount = maxValueCount;
-		DataTest.bufSize = bufSize;
+		TestSetup.keyIDCount = keyIDCount;
+		TestSetup.keyListCount = keyListCount;
+		TestSetup.maxValueCount = maxValueCount;
+		TestSetup.bufSize = bufSize;
 	}
 	
 /* Global Variables: */
 /* ================= */
 	
-	//protected static List<List<Object>> keyCombinations;
-	private static List<Object> keyIDBuffer = new ArrayList<Object>();
-	
-	//protected static List<Tuple> tupleInputBuffer;
-	
-	
-	
-	
-/* Public JUnit-Methods: */
-/* ===================== */
-	
-//	@BeforeClass
-//	public static void setUpBeforeClass() throws Exception
-//	{
-//		keyCombinations = new ArrayList<List<Object>>(keyCombinCount);
-//		keyIDBuffer = new ArrayList<Object>(keyCount);
-//		
-//		for(int n = 0 ; n < keyCombinCount ; n++){
-//			keyCombinations.add(generateKey());
-//		}
-//	
-//	//Buffer Generation:
-//		tupleInputBuffer = new ArrayList<Tuple>(inputIterations);
-//		for(int i = 0 ; i <= inputIterations ; i++){
-//			int randKeyComb = (int) Math.round((Math.random() * (keyCombinCount-1)));
-////			keyInputBuffer.add(keyCombinations.get(randKeyComb));
-////			valInputBuffer.add(new Values("Value "+ i));
-//			
-//			List<Object> key = keyCombinations.get(randKeyComb);
-//			
-//			Tuple inputTuple = DataTest.generateTuple(key, inputFields, keyFields);
-//			tupleInputBuffer.add(inputTuple);
-//		}
-//	}
-//
-//	@AfterClass
-//	public static void tearDownAfterClass() throws Exception
-//	{
-//	}
-	
+	private static List<Object> keyIDBuffer = new ArrayList<Object>();	
 	
 	
 /* Public Testing-Methods: */
@@ -89,7 +51,7 @@ public class DataTest
 	
 	public static List<Object> generateKey()
 	{
-		return DataTest.generateKey(keyListCount);
+		return TestSetup.generateKey(keyListCount);
 	}
 	
 	public static List<Object> generateKey(int keyListCount)
@@ -115,7 +77,7 @@ public class DataTest
 	
 	public static List<List<Object>> generateKeyBuffer()
 	{
-		return DataTest.generateKeyBuffer(bufSize, keyIDCount, keyListCount);
+		return TestSetup.generateKeyBuffer(bufSize, keyIDCount, keyListCount);
 	}
 	
 	public static List<List<Object>> generateKeyBuffer(int bufSize,
@@ -131,9 +93,14 @@ public class DataTest
 	}
 	
 	
+	public static Tuple generateTuple()
+	{
+		return TestSetup.generateTuple(defaultKey);
+	}
+	
 	public static Tuple generateTuple(List<Object> key)
 	{
-		return DataTest.generateTuple(key, inputFields, keyFields, maxValueCount);
+		return TestSetup.generateTuple(key, inputFields, keyFields, maxValueCount);
 	}
 	
 	public static Tuple generateTuple(List<Object> key, 
@@ -153,7 +120,7 @@ public class DataTest
 	
 	public static List<Tuple> generateTupleBuffer(int tickInterval)
 	{
-		return DataTest.generateTupleBuffer(bufSize, keyIDCount, keyListCount, inputFields, keyFields, maxValueCount, tickInterval);
+		return TestSetup.generateTupleBuffer(bufSize, keyIDCount, keyListCount, inputFields, keyFields, maxValueCount, tickInterval);
 	}
 	
 	public static List<Tuple> generateTupleBuffer(int bufSize, 
@@ -170,11 +137,23 @@ public class DataTest
 			
 			List<Object> key = keyListBuffer.get(randKeyComb);
 			
-			Tuple inputTuple = DataTest.generateTuple(key, inputFields, keyFields, maxValueCount);
+			Tuple inputTuple = TestSetup.generateTuple(key, inputFields, keyFields, maxValueCount);
 			tupleBuffer.add(inputTuple);
 		}
 		
 		return tupleBuffer;
+	}
+	
+	
+	
+	public static List<Values> generateValueList(Values... vals)
+	{
+		List<Values> valList = new ArrayList<Values>(vals.length);
+		for(Values actVal : vals){
+				valList.add(actVal);
+		}
+		
+		return valList;
 	}
 
 }
