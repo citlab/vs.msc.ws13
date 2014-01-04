@@ -16,9 +16,10 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import backtype.storm.task.OutputCollector;
 
 public class SlidingCountWindowGroupingTestTopology {
@@ -71,19 +72,20 @@ public class SlidingCountWindowGroupingTestTopology {
 		}, 1);
 		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
-					
+			new UDFBolt(
+				null, // no outputFields
+				new IOperator() {
 					public void execute(List<Tuple> param, OutputCollector collector ) {
-						System.out.println(param);
+						for(Tuple tuple : param) {
+							System.out.println(tuple.getValues());
+						}
+						
 					}
-					
-				}, new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
-
-			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				return tuple.select(keyFields);
-			}
-			
-		}), 1).shuffleGrouping("spout");
+				},
+				new CountWindow<Tuple>(windowSize, slidingOffset),
+				KeyConfigFactory.ByFields("key")
+			),
+		1).shuffleGrouping("spout");
 
 				
 		Config conf = new Config();

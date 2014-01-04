@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.storm.topologies;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,8 @@ import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
 import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 
 class DataSource extends BaseRichSpout {
 	
@@ -79,15 +80,13 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 		
 		
 		IKeyConfig groupKey = new IKeyConfig(){
-			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				List<Object> key=new ArrayList<Object>();
-				key.add( tuple.getSourceComponent() );
+			public Serializable getKeyOf( Tuple tuple) {
+				Serializable key = tuple.getSourceComponent();
 				return key;
 			}
 		};
 		
 		JoinPredicate joinPredicate = new JoinPredicate() {
-			@Override
 			public boolean evaluate(Tuple t1, Tuple t2) {
 				return ((String)t1.getValueByField("key")).compareTo( (String)t2.getValueByField("key") ) == 0;
 			}
@@ -95,7 +94,6 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 		
 		
 		TupleProjection projection = new TupleProjection(){
-			@Override
 			public Values project(Tuple left, Tuple right) {
 				
 				return new Values(  left.getValueByField("key"),
@@ -108,10 +106,14 @@ public class SlidingCountWindowJoinTestTopologyTwoSources {
 		};
 		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
-				new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
-				.shuffleGrouping("s1")
-				.shuffleGrouping("s2");
+			new UDFBolt(
+				null, // no outputFields
+				new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
+				new CountWindow<Tuple>(windowSize, slidingOffset),
+				groupKey
+			),
+		1)	.shuffleGrouping("s1")
+			.shuffleGrouping("s2");
 
 		
 		Config conf = new Config();

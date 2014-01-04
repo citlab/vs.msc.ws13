@@ -16,41 +16,40 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import backtype.storm.task.OutputCollector;
 public class UDFTestTopology {
 
+	@SuppressWarnings("serial")
 	public static void main(String[] args) throws Exception {
 
 		TopologyBuilder builder = new TopologyBuilder();
 
 		builder.setSpout("spout", new CounterProducer(), 1);
 		builder.setBolt(
-				"map",
-				new UDFBolt(new Fields("key", "value"), new Fields("key",
-						"value"), new IOperator() {
-					private static final long serialVersionUID = 1L;
-
+			"map",
+			new UDFBolt(
+				new Fields("key", "value"),
+				new IOperator() {
 					public void execute(List<Tuple> param, OutputCollector collector ) {
-						String newKey = param.get(0).getValues().get(0) + " mapped";
+						String newKey = param.get(0).getStringByField("key") + " mapped";
 						int newValue = myExistingFunction((Integer) param
 								.get(0).getValues().get(1));
 
 						collector.emit( new Values(newKey, newValue));
 
 					}
-
 					public int myExistingFunction(int param) {
 						return param + 10;
 					}
-				}), 1).shuffleGrouping("spout");
+				}
+			),
+			1
+		).shuffleGrouping("spout");
 		
 		
 		builder.setBolt(
-				"flatmap",
-				new UDFBolt(new Fields("key", "value"), new Fields("key",
-						"value"), new IOperator() {
-					private static final long serialVersionUID = 1L;
-
+			"flatmap",
+			new UDFBolt(
+				new Fields("key", "value"),
+				new IOperator() {
 					public void execute(List<Tuple> param, OutputCollector collector ) {
-
-						
 						String inputKey = (String) param.get(0).getValues().get(0);
 						int inputValue = (Integer) param.get(0).getValues().get(1);
 						collector.emit( new Values(inputKey + "flatmapped1",
@@ -67,36 +66,45 @@ public class UDFTestTopology {
 					private int myExistingFunction2(int param) {
 						return param *= -1;
 					}
-				}), 1).shuffleGrouping("map");
+				}
+			),
+		1).shuffleGrouping("map");
 		
 		
 		builder.setBolt(
-				"filter",
-				new UDFBolt(new Fields("value"), new Fields("value"),
-						new FilterOperator(new FilterUDF() {
-							private static final long serialVersionUID = 1L;
-
-							public Boolean evaluate(Tuple param) {
-								return (Integer) param.getValues().get(0) > 0;
-							}
-						})), 1).shuffleGrouping("flatmap");
+			"filter",
+			new UDFBolt(
+				new Fields("value"), // output
+				new FilterOperator(
+					new Fields("value"), // input
+					new FilterUDF() {
+						public Boolean evaluate(Tuple param) {
+							return (Integer) param.getValueByField("value") > 0;
+						}
+					}
+				)
+			),
+			1
+		).shuffleGrouping("flatmap");
 		
 		
 		builder.setBolt(
-				"reducer",
-				new UDFBolt(new Fields("value"), new Fields("value"),
-						new IOperator() {
-							private static final long serialVersionUID = 1L;
-
-							public void execute(List<Tuple> param, OutputCollector collector ) {
-								int reduced = 0;
-								for (Tuple tupel : param) {
-									reduced += (Integer) tupel.getValues().get(0);
-								}
-								collector.emit( new Values(reduced) );
-							}
-						}, new CountWindow<Tuple>(2)), 1).fieldsGrouping(
-				"filter", new Fields("value"));
+			"reducer",
+			new UDFBolt(
+				new Fields("value"),
+				new IOperator() {
+					public void execute(List<Tuple> param, OutputCollector collector ) {
+						int reduced = 0;
+						for (Tuple tupel : param) {
+							reduced += (Integer) tupel.getValueByField("value");
+						}
+						collector.emit( new Values(reduced) );
+					}
+				},
+				new CountWindow<Tuple>(2)
+			),
+			1
+		).fieldsGrouping("filter", new Fields("value"));
 
 		
 		Config conf = new Config();

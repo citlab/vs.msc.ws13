@@ -16,7 +16,6 @@ public class DataSink implements IOperator {
 		this.op = op;
 	}
 	
-	@Override
 	public void execute(List<Tuple> tuples, OutputCollector collector) {
 		op.execute( tuples, collector);
 	}

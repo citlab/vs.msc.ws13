@@ -1,6 +1,5 @@
 package de.tu_berlin.citlab.storm.bolts;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,12 +10,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.udf.Context;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
@@ -33,7 +31,6 @@ public class UDFBolt extends BaseRichBolt {
 /* Global Constants: */
 /* ================= */
 	
-	final protected Fields inputFields;
 	final protected Fields outputFields;
 
 	final protected IOperator operator;
@@ -45,26 +42,20 @@ public class UDFBolt extends BaseRichBolt {
 /* Constructors: */
 /* ============= */
 	
-	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator) {
-		this(inputFields, outputFields, operator, new CountWindow<Tuple>(1));
+	public UDFBolt(Fields outputFields, IOperator operator) {
+		this(outputFields, operator, new CountWindow<Tuple>(1));
 	}
 
-	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator,
+	public UDFBolt(Fields outputFields, IOperator operator,
 			Window<Tuple, List<Tuple>> window) {
-		this(inputFields, outputFields, operator, window, null, null);
-	}
-
-	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, Fields keyFields) {
-		this(inputFields, outputFields, operator, window, keyFields, null);
+		this(outputFields, operator, window, KeyConfigFactory.DefaultKey());
 	}
 	
-	public UDFBolt(Fields inputFields, Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, Fields keyFields, IKeyConfig keyConfig) {
-		this.inputFields = inputFields;
+	public UDFBolt(Fields outputFields, IOperator operator,
+			Window<Tuple, List<Tuple>> window, IKeyConfig keyConfig) {
 		this.outputFields = outputFields;
 		this.operator = operator;
-		windowHandler = new WindowHandler(window, keyFields, keyConfig);
+		windowHandler = new WindowHandler(window, keyConfig);
 	}
 	
 	

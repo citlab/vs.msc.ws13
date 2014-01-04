@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.storm.topologies;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
 import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 
 class DataSource1 extends BaseRichSpout {
@@ -77,15 +78,13 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		builder.setSpout("s2", new DataSource1(), 1);
 		
 		IKeyConfig groupKey = new IKeyConfig(){
-			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				List<Object> key=new ArrayList<Object>();
-				key.add( tuple.getSourceComponent() );
+			public Serializable getKeyOf( Tuple tuple) {
+				Serializable key = tuple.getSourceComponent();
 				return key;
 			}
 		};
 		
 		JoinPredicate joinPredicate = new JoinPredicate() {
-			@Override
 			public boolean evaluate(Tuple t1, Tuple t2) {
 				return ((String)t1.getValueByField("key")).compareTo( (String)t2.getValueByField("key") ) == 0;
 			}
@@ -93,7 +92,6 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		
 		
 		TupleProjection projection = new TupleProjection(){
-			@Override
 			public Values project(Tuple left, Tuple right) {
 				
 				return new Values(  left.getValueByField("key"),
@@ -107,8 +105,8 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		
 		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
-				new TimeWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), groupKey), 1)
+				new UDFBolt(null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
+				new TimeWindow<Tuple>(windowSize, slidingOffset), groupKey), 1)
 				.shuffleGrouping("s1")
 				.shuffleGrouping("s2");
 

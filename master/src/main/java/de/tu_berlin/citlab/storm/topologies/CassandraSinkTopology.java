@@ -2,6 +2,7 @@ package de.tu_berlin.citlab.storm.topologies;
 
 import java.util.List;
 import java.util.Map;
+
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -15,10 +16,11 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.sinks.DataSink;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 
 
 class ExampleDataSourceBolt extends BaseRichSpout {
@@ -97,15 +99,13 @@ public class CassandraSinkTopology {
 		builder.setSpout("spout", new ExampleDataSourceBolt(), 1);
 		
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, 
-					new DataSink( new CassandraSink() ),
-							 new CountWindow<Tuple>(windowSize, slidingOffset), new Fields("key"), new IKeyConfig(){
-
-			public List<Object> sortWithKey( Tuple tuple, Fields keyFields) {
-				return tuple.select(keyFields);
-			}
-			
-		}), 1).shuffleGrouping("spout");
+			new UDFBolt(
+				null, 
+				new DataSink( new CassandraSink() ),
+				new CountWindow<Tuple>(windowSize, slidingOffset),
+				KeyConfigFactory.ByFields("key")
+			)
+		, 1).shuffleGrouping("spout");
 
 				
 		Config conf = new Config();

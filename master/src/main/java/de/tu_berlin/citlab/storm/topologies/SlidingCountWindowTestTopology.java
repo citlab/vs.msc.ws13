@@ -25,7 +25,9 @@ public class SlidingCountWindowTestTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("spout", new CounterProducer(), 1);
 		builder.setBolt("slide", 
-				new UDFBolt(new Fields("value"), null, new IOperator() {
+			new UDFBolt(
+				null, // no output
+				new IOperator() {
 
 					private int lastId = 0;
 					ArrayList<List<Integer>> compare = new ArrayList<List<Integer>>();

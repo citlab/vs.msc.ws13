@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.udf;
+package de.tu_berlin.citlab.storm.window;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,12 +6,7 @@ import java.util.List;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public interface IKeyConfig extends AbstractKeyConfig<List<Object>, Tuple, Fields>
+public interface IKeyConfig extends Serializable
 {
-	public List<Object> sortWithKey(Tuple input, Fields keyFields);
-}
-
-abstract interface AbstractKeyConfig<K, I, J> extends Serializable
-{
-	abstract public K sortWithKey(I input, J keyFields);
+	public Serializable getKeyOf(Tuple input);
 }
