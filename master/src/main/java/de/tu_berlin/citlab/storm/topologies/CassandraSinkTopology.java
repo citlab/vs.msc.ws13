@@ -20,7 +20,6 @@ import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.sinks.DataSink;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 
 
 class ExampleDataSourceBolt extends BaseRichSpout {

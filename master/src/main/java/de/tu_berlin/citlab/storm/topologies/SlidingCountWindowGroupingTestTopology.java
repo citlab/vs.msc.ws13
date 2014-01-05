@@ -19,7 +19,6 @@ import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import backtype.storm.task.OutputCollector;
 
 public class SlidingCountWindowGroupingTestTopology {
