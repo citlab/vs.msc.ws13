@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.testsuite.tests;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import backtype.storm.tuple.Values;
@@ -48,10 +49,9 @@ public class FilterOperatorTest extends OperatorTest
 	@Override
 	protected List<Values> assertOutput(List<Values> inputVals)
 	{
-//		List<Values> outputVals = new ArrayList<Values>(1);
-//		outputVals.add(inputVals.get(1));
-//		return outputVals;
-		return inputVals;
+		List<Values> outputVals = new ArrayList<Values>(1);
+		outputVals.add(inputVals.get(0));
+		return outputVals;
 	}
 
 

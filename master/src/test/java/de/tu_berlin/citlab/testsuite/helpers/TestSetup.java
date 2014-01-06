@@ -4,12 +4,42 @@ package de.tu_berlin.citlab.testsuite.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
+
 import de.tu_berlin.citlab.testsuite.mocks.MockTuple;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
+/**
+ * <h2>A final class that provides static methods for Test-Setup generation
+ * in a CIT-Storm related environment. </h2>
+ * <p>
+ * <h3>The provided methods are classified in two groups:</h3>
+ * <ul>
+ * 	<li>Via the <em>setup-methods</em>, you are able to initialize the global</li>
+ * 	setting variables. <br>
+ * 	<b>There are two setup-methods: </b>
+ * 	<ul>
+ * 		<li><code>setupFields(..)</code> sets the input- and key-fields of the Storm environment.</li>
+ * 		<li><code>setupTestParams(..)</code> sets more testing-dependent variables. </li>
+ * 		<em>If you don't use one or both setup-methods, the default variable values will be used in the test-run.</em><br>
+ * 	</ul>
+ * 	<li>Via the <em>generate-methods</em>, you are able to generate CIT-Storm related datatypes, using Mockito Mock-ups, if needed.</li>
+ * 	<b>There are several generate-method-types for each datatype:</b>
+ * 	<ul>
+ * 		<li><code>generate<em>Datatype</em>(..)</code> is an overloaded method for a given CIT-Storm related Datatype, 
+ * 			which generates and returns exactly one value of <em>Datatype</em>.</li>
+ * 		<li><code>generate<em>Datatype</em>Buffer(..)</code> is a method that generates and returns
+ * 			 a <code>List<<em>Datatype</em>></code> of the given <em>Datatype</em>.</li>
+ *  </ul>
+ * </ul>
+ * </p>
+ * 
+ * 
+ * @author Constantin
+ */
 public final class TestSetup
 {
 	
@@ -118,6 +148,13 @@ public final class TestSetup
 	}
 	
 	
+	public static Tuple generateTickTuple()
+	{
+		Tuple mockTickTuple = MockTuple.mockTickTuple();
+		return mockTickTuple;
+	}
+	
+	
 	public static List<Tuple> generateTupleBuffer(int tickInterval)
 	{
 		return TestSetup.generateTupleBuffer(bufSize, keyIDCount, keyListCount, inputFields, keyFields, maxValueCount, tickInterval);
@@ -137,8 +174,14 @@ public final class TestSetup
 			
 			List<Object> key = keyListBuffer.get(randKeyComb);
 			
-			Tuple inputTuple = TestSetup.generateTuple(key, inputFields, keyFields, maxValueCount);
-			tupleBuffer.add(inputTuple);
+			if(i % tickInterval != 0){
+				Tuple inputTuple = TestSetup.generateTuple(key, inputFields, keyFields, maxValueCount);
+				tupleBuffer.add(inputTuple);
+			}
+			else{ //Add a Tick-Tuple to the tupleBuffer:
+				Tuple tickTuple = TestSetup.generateTickTuple();
+				tupleBuffer.add(tickTuple);
+			}
 		}
 		
 		return tupleBuffer;

@@ -4,6 +4,7 @@ package de.tu_berlin.citlab.testsuite.tests.skeletons;
 import java.util.List;
 
 import static org.junit.Assert.*;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +33,42 @@ abstract public class OperatorTest
 	@Test
 	public void testOperator()
 	{
+		AssertionError failureTrace = null;
+		
+		System.out.println("================================================");
+		System.out.println("=========== Starting Operator Test... ========== \n");
+		
+		
+		long startTime = System.currentTimeMillis();
+		
 		List<Values> result = operator.execute(inputValues, context);
 		List<Values> assertRes = assertOutput(inputValues);
-		assertTrue("Operator.execute(..) result is not equal to asserted Output! \n"+
-				   "Operator Result: "+ DebugPrinter.toString(result) +"\n"+
-				   "Asserted Output: "+ DebugPrinter.toString(assertRes), result.equals(assertRes));
+		
+		try{
+			assertTrue("Operator.execute(..) result is not equal to asserted Output! \n"+
+					   "Operator Result: "+ DebugPrinter.toString(result) +"\n"+
+					   "Asserted Output: "+ DebugPrinter.toString(assertRes), result.equals(assertRes));
+			
+			System.out.println("Success!");
+		}
+		catch (AssertionError e){
+			System.out.println("Operator Test failed. For more infos, check the JUnit Failure Trace.");
+			failureTrace = e;
+		}
+		
+		long endTime = System.currentTimeMillis();
+		long inputTimeDiff = endTime - startTime;
+		
+		
+		System.out.println("\nSummary:");
+		System.out.println("Number of Input-Values: "+ inputValues.size());
+		System.out.println("Time to execute input:"+ inputTimeDiff +" ms.");
+		
+		System.out.println("=========== Finished Operator Test! ===========");
+		System.out.println("===============================================");
+		
+		if(failureTrace != null)
+			throw failureTrace;
 	}
 	
 	

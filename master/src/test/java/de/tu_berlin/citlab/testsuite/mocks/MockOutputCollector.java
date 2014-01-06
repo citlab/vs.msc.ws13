@@ -18,7 +18,7 @@ public final class MockOutputCollector
 	    {
 	    	OutputCollector oColl = mock(OutputCollector.class);
 	        when(oColl.emit(anyObjectList())).thenReturn(null); //TODO: save any output in an own list.
-	        //stub(oColl.ack(anyTuple())) or use spy for ack() fetching.
+	        doNothing().when(oColl.ack(anyTuple())); //Why is that?
 	        return oColl;
 	    }
 

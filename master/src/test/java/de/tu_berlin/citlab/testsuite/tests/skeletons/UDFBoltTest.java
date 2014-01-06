@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.testsuite.mocks.UDFBoltMock;
+
 
 abstract public class UDFBoltTest
 {
@@ -67,6 +67,7 @@ abstract public class UDFBoltTest
 		System.out.println("================================================");
 		System.out.println("=========== Starting UDFBolt Test... =========== \n");
 		
+		
 		long startTime = System.currentTimeMillis();
 		
 		for(Tuple actTuple : inputTuples){
@@ -78,11 +79,13 @@ abstract public class UDFBoltTest
 		
 		//TODO: assertTrue on OutputCollectorMock here.
 		
-		System.out.println("\nSummary:");
-		System.out.println("Number of Input-Tuples: "+ inputTuples.size());
-		System.out.println("Time to execute input:"+ inputTimeDiff +" ms.");
 		
-		System.out.println("=========== Finished UDFBolt Test! ===========");
+		System.out.println("\nSummary:");
+		System.out.println("\t Number of Input-Tuples: "+ inputTuples.size());
+		System.out.println("\t Number of Tick-Tuples: "); //TODO: implement
+		System.out.println("\t Time to execute input:"+ inputTimeDiff +" ms.");
+		
+		System.out.println("\n=========== Finished UDFBolt Test! ===========");
 		System.out.println("==============================================");
 	}
 	
