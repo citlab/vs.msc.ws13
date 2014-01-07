@@ -27,7 +27,14 @@ public final class MockTuple
 	        Tuple tuple = mock(Tuple.class);
 	        when(tuple.getSourceComponent()).thenReturn(componentId);
 	        when(tuple.getSourceStreamId()).thenReturn(streamId);
-	        
+	        when(tuple.toString()).thenAnswer(new Answer<String>(){
+	        	
+	        	public String answer(InvocationOnMock invocation)
+						throws Throwable {
+	        		String toString = MockTuple.toComponentTupleString((Tuple) invocation.getMock());
+					return toString;
+				}
+	        });
 	        return tuple;
 	    }
 	    
@@ -47,7 +54,7 @@ public final class MockTuple
 
 				public String answer(InvocationOnMock invocation)
 						throws Throwable {
-					String toString = MockTuple.toString((Tuple) invocation.getMock());
+					String toString = MockTuple.toValueTupleString((Tuple) invocation.getMock());
 					return toString;
 				}
 	        	
@@ -56,7 +63,22 @@ public final class MockTuple
 	        return tuple;
 	    }
 	    
-	    public static String toString(Tuple mockTuple)
+	    private static String toComponentTupleString(Tuple mockTuple)
+	    {
+	    	//If the mockTuple is a TickTuple, simply return this as a String-output:
+	    	if(mockTuple.getSourceStreamId().equals(Constants.SYSTEM_TICK_STREAM_ID)){
+	    		return "TickTuple";
+	    	}
+	    	else{
+	    		String tupleString = "Component-String "+
+	    				 			  "(Comp-ID: "+ mockTuple.getSourceComponent() +", "+
+	    							  "Stream-ID: "+ mockTuple.getSourceStreamId() +")";
+	    		return tupleString;
+	    	}
+	    	
+	    }
+	    
+	    private static String toValueTupleString(Tuple mockTuple)
 	    {
 	    	String tupleString = "Tuple <Vals: (";
 	    	int valSize = mockTuple.getValues().size();

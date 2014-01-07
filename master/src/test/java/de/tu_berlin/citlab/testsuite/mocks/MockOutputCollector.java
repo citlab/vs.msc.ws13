@@ -1,10 +1,9 @@
 package de.tu_berlin.citlab.testsuite.mocks;
 
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import backtype.storm.task.OutputCollector;
@@ -13,12 +12,15 @@ import backtype.storm.tuple.Tuple;
 
 public final class MockOutputCollector
 {	
-
+		private static List<List<Object>> output;
+		
 	    public static OutputCollector mockOutputCollector() 
 	    {
 	    	OutputCollector oColl = mock(OutputCollector.class);
-	        when(oColl.emit(anyObjectList())).thenReturn(null); //TODO: save any output in an own list.
-	        doNothing().when(oColl.ack(anyTuple())); //Why is that?
+	    	output = new ArrayList<List<Object>>();
+	    	
+	        when(oColl.emit(anyObjectList())).thenReturn(null); //TODO: save any output in output list.
+	        doNothing().when(oColl).ack(anyTuple());
 	        return oColl;
 	    }
 

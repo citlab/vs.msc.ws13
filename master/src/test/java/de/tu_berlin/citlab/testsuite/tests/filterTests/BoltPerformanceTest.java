@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests;
+package de.tu_berlin.citlab.testsuite.tests.filterTests;
 
 
 import static org.junit.Assert.*;
@@ -23,7 +23,7 @@ import backtype.storm.tuple.Values;
 
 
 //TODO: implement class with new Test-Suite
-public class SimpleUDFBoltTest extends UDFBoltTest
+public class BoltPerformanceTest extends UDFBoltTest
 {
 
 /* Global Test Params: */
@@ -57,17 +57,28 @@ public class SimpleUDFBoltTest extends UDFBoltTest
 	}
 
 	@Override
-	protected IOperator initOperator()
+	protected IOperator initOperator(final List<Tuple> inputTuples)
 	{
 		FilterOperator testFilterOp = new FilterOperator(new FilterUDF()
 		{
 			private static final long	serialVersionUID	= 1L;
-
+			private int count = 0;
+			
 			public Boolean execute(Values param, Context context)
 			{
-				if(param.contains(1))
-					return true;
-				else return false;
+				//Filter out every tenth input:
+				if(inputTuples.size() > count){
+					System.out.println("InputTuples have size: "+ inputTuples.size());
+					System.out.println("param Value: "+ param.get(0));
+					System.out.println("inputTuples: "+ inputTuples.get(count));
+					count ++;
+					if(param.equals(inputTuples.get(count).getValue(0))){
+						count += 10;
+						System.out.println("Filter successful!");
+						return true;
+					}
+				}
+				return false;
 			}			
 		});
 		return testFilterOp;

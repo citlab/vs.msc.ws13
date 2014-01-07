@@ -50,7 +50,7 @@ abstract public class UDFBoltTest
 	{
 		inputTuples = this.generateInputTuples();
 		udfFields = this.initUDFFields();
-		operator = this.initOperator();
+		operator = this.initOperator(inputTuples);
 		window = this.initWindow();
 		keyConfig = this.initKeyConfig();
 		
@@ -105,7 +105,7 @@ abstract public class UDFBoltTest
 	abstract protected List<Tuple> generateInputTuples();
 	
 	abstract protected UDFFields initUDFFields();
-	abstract protected IOperator initOperator();
+	abstract protected IOperator initOperator(final List<Tuple> inputTuples);
 	abstract protected Window<Tuple, List<Tuple>> initWindow();
 	abstract protected IKeyConfig initKeyConfig();
 	

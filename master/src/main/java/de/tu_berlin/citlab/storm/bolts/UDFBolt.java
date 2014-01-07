@@ -125,6 +125,7 @@ public class UDFBolt extends BaseRichBolt {
 			if (outputValues != null) {
 				for (List<Object> outputValue : outputValues) {
 					collector.emit(outputValue);
+					System.out.println("Emmitted!");
 				}
 			}
 			for (Tuple tuple : window) {

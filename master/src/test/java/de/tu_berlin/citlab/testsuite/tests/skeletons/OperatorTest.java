@@ -26,7 +26,7 @@ abstract public class OperatorTest
 	public void initTestSetup()
 	{
 		inputValues = this.generateInputValues();
-		operator = this.initOperator();
+		operator = this.initOperator(inputValues);
 	}
 	
 	
@@ -84,7 +84,7 @@ abstract public class OperatorTest
 	
 	abstract protected List<Values> generateInputValues();
 	abstract protected Context initContext();
-	abstract protected IOperator initOperator();
+	abstract protected IOperator initOperator(final List<Values> inputValues);
 	
-	abstract protected List<Values> assertOutput(List<Values> inputValues);
+	abstract protected List<Values> assertOutput(final List<Values> inputValues);
 }

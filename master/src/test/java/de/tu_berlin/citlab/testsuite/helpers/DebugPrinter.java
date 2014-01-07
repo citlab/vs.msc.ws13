@@ -35,10 +35,4 @@ public final class DebugPrinter
 		
 		return output;
 	}
-	
-	
-	public static String toString(Tuple tuple)
-	{
-		return MockTuple.toString(tuple);
-	}
 }

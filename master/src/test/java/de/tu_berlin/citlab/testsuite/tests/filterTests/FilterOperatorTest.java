@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests;
+package de.tu_berlin.citlab.testsuite.tests.filterTests;
 
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import de.tu_berlin.citlab.testsuite.tests.skeletons.OperatorTest;
 
 public class FilterOperatorTest extends OperatorTest
 {
-
+	
 	@Override
 	protected List<Values> generateInputValues()
 	{
@@ -24,7 +24,7 @@ public class FilterOperatorTest extends OperatorTest
 	}
 
 	@Override
-	protected IOperator initOperator()
+	protected IOperator initOperator(final List<Values> inputValues)
 	{
 		FilterOperator testFilterOp = new FilterOperator(new FilterUDF()
 		{
@@ -47,10 +47,10 @@ public class FilterOperatorTest extends OperatorTest
 	}
 
 	@Override
-	protected List<Values> assertOutput(List<Values> inputVals)
+	protected List<Values> assertOutput(final List<Values> inputValues)
 	{
 		List<Values> outputVals = new ArrayList<Values>(1);
-		outputVals.add(inputVals.get(0));
+		outputVals.add(inputValues.get(0));
 		return outputVals;
 	}
 

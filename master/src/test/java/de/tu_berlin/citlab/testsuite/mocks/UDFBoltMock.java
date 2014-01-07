@@ -43,6 +43,7 @@ public class UDFBoltMock extends UDFBolt
 			Window<Tuple, List<Tuple>> window, Fields keyFields, IKeyConfig keyConfig) 
 	{
 		super(inputFields, outputFields, operator, window, keyFields, keyConfig);
+		this.prepare(null, null, null); //TODO: maybe adjust this?
 	}
 	
 	
@@ -51,7 +52,9 @@ public class UDFBoltMock extends UDFBolt
 	
 	@Override
 	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
-			TopologyContext context, OutputCollector collector) {
+			TopologyContext context, OutputCollector collector) 
+	{
+		super.prepare(stormConf, context, collector);
 		this.collector = MockOutputCollector.mockOutputCollector();
 	}
 
