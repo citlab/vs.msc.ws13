@@ -11,8 +11,7 @@ import org.junit.Test;
 
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
-import de.tu_berlin.citlab.storm.udf.Context;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.testsuite.helpers.TestSetup;

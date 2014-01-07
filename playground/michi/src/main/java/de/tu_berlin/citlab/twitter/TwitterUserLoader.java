@@ -6,6 +6,7 @@ package de.tu_berlin.citlab.twitter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class TwitterUserLoader {
@@ -29,6 +30,34 @@ public class TwitterUserLoader {
 			if (fis != null) {
 				try {
 					fis.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+
+		return prop;
+	}
+
+	/**
+	 * 
+	 * @param path
+	 *            The path to the properties file inside the jar archive
+	 * @return The properties object containing the loaded twitter credentials
+	 */
+	public static Properties loadUserFromJar(String path) {
+		Properties prop = new Properties();
+		InputStream is = null;
+
+		try {
+			is = TwitterUserLoader.class.getResourceAsStream("/" + path);
+			prop.load(is);
+
+		} catch (IOException e) {
+			System.err.println("Could not load properties file from Jar archive: " + path);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
 				} catch (IOException e) {
 				}
 			}

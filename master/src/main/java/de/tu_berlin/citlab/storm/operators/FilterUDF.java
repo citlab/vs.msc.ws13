@@ -1,11 +1,9 @@
 package de.tu_berlin.citlab.storm.operators;
 
-import java.util.List;
+import java.io.Serializable;
 
-import backtype.storm.tuple.Values;
-import de.tu_berlin.citlab.storm.udf.ISerializiableExecutable;
+import backtype.storm.tuple.Tuple;
 
-public interface FilterUDF extends
-		ISerializiableExecutable<Values, Boolean> {
-
+public interface FilterUDF extends Serializable {
+	Boolean evaluate(Tuple t);
 }

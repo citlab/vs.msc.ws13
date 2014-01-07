@@ -15,8 +15,13 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 public class TwitterClusterTestTopology {
 	public static void main(String[] args) {
 
+		if (args.length != 1) {
+			System.err.println("You must pass the topology name as argument");
+			System.exit(-1);
+		}
+
 		// Setup up Twitter configuration
-		Properties user = TwitterUserLoader.loadUser("twitter.config");
+		Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
 		String[] keywords = new String[] { "the", "it", "der", "die", "das" };
 		String[] languages = new String[] { "en", "de" };
 		String[] outputFields = new String[] { "user", "tweet", "date", "lang" };
@@ -36,7 +41,7 @@ public class TwitterClusterTestTopology {
 		conf.setNumWorkers(2);
 		conf.setMaxSpoutPending(5000);
 		try {
-			StormSubmitter.submitTopology("test", conf,
+			StormSubmitter.submitTopology(args[0], conf,
 					builder.createTopology());
 		} catch (AlreadyAliveException e) {
 			e.printStackTrace();

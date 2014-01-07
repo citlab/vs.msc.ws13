@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.Window;
@@ -22,27 +23,21 @@ public class UDFBoltMock extends UDFBolt
 /* Constructors: */
 /* ============= */
 	
-	public UDFBoltMock(Fields inputFields, Fields outputFields, IOperator operator) 
+	public UDFBoltMock(Fields outputFields, IOperator operator) 
 	{
-		this(inputFields, outputFields, operator, new CountWindow<Tuple>(1));
+		this(outputFields, operator, new CountWindow<Tuple>(1));
 	}
 
-	public UDFBoltMock(Fields inputFields, Fields outputFields, IOperator operator,
+	public UDFBoltMock(Fields outputFields, IOperator operator,
 			Window<Tuple, List<Tuple>> window) 
 	{
-		this(inputFields, outputFields, operator, window, null, null);
+		this(outputFields, operator, window, KeyConfigFactory.DefaultKey());
 	}
 
-	public UDFBoltMock(Fields inputFields, Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, Fields keyFields) 
+	public UDFBoltMock(Fields outputFields, IOperator operator,
+			Window<Tuple, List<Tuple>> window, IKeyConfig keyConfig) 
 	{
-		this(inputFields, outputFields, operator, window, keyFields, null);
-	}
-	
-	public UDFBoltMock(Fields inputFields, Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, Fields keyFields, IKeyConfig keyConfig) 
-	{
-		super(inputFields, outputFields, operator, window, keyFields, keyConfig);
+		super(outputFields, operator, window, keyConfig);
 		this.prepare(null, null, null); //TODO: maybe adjust this?
 	}
 	

@@ -15,9 +15,10 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.udf.Context;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
+import backtype.storm.task.OutputCollector;
 
 public class SlidingTimeWindowTestTopology {
 	private static final int windowSize = 3;
@@ -67,13 +68,14 @@ public class SlidingTimeWindowTestTopology {
 			}
 		}, 1);
 		builder.setBolt("slide",
-				new UDFBolt(new Fields("key", "value"), null, new IOperator() {
+				new UDFBolt(null, new IOperator() {
 
-					public List<Values> execute(List<Values> param, Context context) {
+					private static final long serialVersionUID = -1021639915362964000L;
+
+					public void execute(List<Tuple> param, OutputCollector collector ) {
 						System.out.println(param);
-						return null;
 					}
-				}, new TimeWindow<Tuple>(windowSize, slidingOffset), new Fields("key")), 1)
+				}, new TimeWindow<Tuple>(windowSize, slidingOffset), KeyConfigFactory.ByFields("key")), 1)
 				.shuffleGrouping("spout");
 
 		Config conf = new Config();

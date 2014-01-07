@@ -15,7 +15,7 @@ public class TwitterLocalTestTopology {
 	public static void main(String[] args) {
 
 		// Setup up Twitter configuration
-		Properties user = TwitterUserLoader.loadUser("twitter.config");
+		Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
 		String[] keywords = new String[] { "the", "it", "der", "die", "das" };
 		String[] languages = new String[] { "en", "de" };
 		String[] outputFields = new String[] { "user", "tweet", "date", "lang" };

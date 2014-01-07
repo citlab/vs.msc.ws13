@@ -6,13 +6,12 @@ import java.util.List;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.udf.Context;
+
+import backtype.storm.task.OutputCollector;
 
 public class SlidingCountWindowTestTopology {
 
@@ -25,7 +24,9 @@ public class SlidingCountWindowTestTopology {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("spout", new CounterProducer(), 1);
 		builder.setBolt("slide", 
-				new UDFBolt(new Fields("value"), null, new IOperator() {
+			new UDFBolt(
+				null, // no output
+				new IOperator() {
 
 					private int lastId = 0;
 					ArrayList<List<Integer>> compare = new ArrayList<List<Integer>>();
@@ -52,7 +53,7 @@ public class SlidingCountWindowTestTopology {
 						}
 					}
 
-					public List<Values> execute(List<Values> param, Context context) {
+					public void execute(List<Tuple> param, OutputCollector collector ) {
 						
 						prepareCompare();
 						if (param.isEmpty()) {
@@ -66,7 +67,6 @@ public class SlidingCountWindowTestTopology {
 											+ compare + "\nReceived: "
 											+ param);
 						}
-						return null;
 					}
 				}, new CountWindow<Tuple>(windowSize, slidingOffset)), 1).shuffleGrouping("spout");
 

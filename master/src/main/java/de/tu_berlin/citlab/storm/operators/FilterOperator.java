@@ -1,29 +1,30 @@
 package de.tu_berlin.citlab.storm.operators;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import backtype.storm.tuple.Values;
-import de.tu_berlin.citlab.storm.udf.Context;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class FilterOperator implements IOperator {
 
 	private static final long serialVersionUID = -1921795142772743781L;
 
+	protected Fields inputFields;
 	protected FilterUDF filter;
 
-	public FilterOperator(FilterUDF filter) {
+	public FilterOperator(Fields inputFields, FilterUDF filter) {
+		this.inputFields = inputFields;
 		this.filter = filter;
 	}
 
-	public List<Values> execute(List<Values> param, Context context ) {
-		List<Values> result = null;
-		if (filter.execute(param.get(0), context )) {
-			result = new ArrayList<Values>(1);
-			result.add(param.get(0));
+	public void execute(List<Tuple> input, OutputCollector emitter ) {
+		for(Tuple param : input) {
+			if (filter.evaluate( param )) {
+				emitter.emit(param.select(inputFields));
+			}
 		}
-		return result;
 	}
 
 }

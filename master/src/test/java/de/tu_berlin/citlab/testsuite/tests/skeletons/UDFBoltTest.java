@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import de.tu_berlin.citlab.storm.udf.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.testsuite.mocks.UDFBoltMock;
@@ -55,9 +55,11 @@ abstract public class UDFBoltTest
 		keyConfig = this.initKeyConfig();
 		
 		if (window == null)
-			udfBolt = new UDFBoltMock(udfFields.inputFields, udfFields.outputFields, operator);
+			udfBolt = new UDFBoltMock(udfFields.outputFields, operator);
+		else if(keyConfig == null)
+			udfBolt = new UDFBoltMock(udfFields.outputFields, operator, window);
 		else
-			udfBolt = new UDFBoltMock(udfFields.inputFields, udfFields.outputFields, operator, window, udfFields.keyFields, keyConfig);
+			udfBolt = new UDFBoltMock(udfFields.outputFields, operator, window, keyConfig);
 	}
 	
 	

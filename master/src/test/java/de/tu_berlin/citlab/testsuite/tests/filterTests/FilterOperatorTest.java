@@ -4,6 +4,7 @@ package de.tu_berlin.citlab.testsuite.tests.filterTests;
 import java.util.ArrayList;
 import java.util.List;
 
+import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
@@ -41,18 +42,16 @@ public class FilterOperatorTest extends OperatorTest
 	}
 
 	@Override
-	protected Context initContext()
+	protected List<Object> assertOutput(final List<Tuple> inputTuples)
 	{
-		return null;
-	}
-
-	@Override
-	protected List<Values> assertOutput(final List<Values> inputValues)
-	{
-		List<Values> outputVals = new ArrayList<Values>(1);
-		outputVals.add(inputValues.get(0));
+		List<Object> outputVals = new ArrayList<Object>(1);
+		outputVals.add(inputTuples.get(0));//TODO: check.
 		return outputVals;
 	}
 
-
+	@Override
+	protected IOperator initOperator(final List<Tuple> inputTuples) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
