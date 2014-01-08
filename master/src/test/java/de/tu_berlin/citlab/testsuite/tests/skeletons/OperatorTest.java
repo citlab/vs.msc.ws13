@@ -11,6 +11,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.mocks.MockOutputCollector;
+import de.tu_berlin.citlab.testsuite.mocks.MockTuple;
 
 
 abstract public class OperatorTest
@@ -23,7 +24,12 @@ abstract public class OperatorTest
 	public void initTestSetup()
 	{
 		inputTuples = this.generateInputValues();
+		if(inputTuples == null)
+			throw new NullPointerException("InputTuples must not be null! \n Return them in generateInputValues().");
+		
 		operator = this.initOperator(inputTuples);
+		if(operator == null)
+			throw new NullPointerException("Operator must not be null! Return it in initOperator(..)");
 	}
 	
 	
@@ -40,6 +46,7 @@ abstract public class OperatorTest
 		
 		OutputCollector outputCollector = MockOutputCollector.mockOutputCollector();
 		operator.execute(inputTuples, outputCollector);
+		List<List<Object>> outputVals = MockOutputCollector.output;
 		List<Object> assertRes = assertOutput(inputTuples);
 		
 		try{//TODO: refactor.
@@ -60,7 +67,8 @@ abstract public class OperatorTest
 		
 		System.out.println("\nSummary:");
 		System.out.println("Number of Input-Values: "+ inputTuples.size());
-		System.out.println("Time to execute input:"+ inputTimeDiff +" ms.");
+		System.out.println("Number of Ouput-Values: "+ outputVals.size());
+		System.out.println("Time to execute input:"+ inputTimeDiff +" ms. \n");
 		
 		System.out.println("=========== Finished Operator Test! ===========");
 		System.out.println("===============================================");

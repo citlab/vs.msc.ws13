@@ -41,7 +41,7 @@ public class BoltOperatorTest extends UDFBoltTest
 	@Override
 	protected List<Tuple> generateInputTuples()
 	{
-		TestSetup.setupFields(inputFields, keyFields);
+		TestSetup.setupFields(inputFields, keyFields); //TODO: change
 		TestSetup.setupTestParams(keyIDCount, keyListCount, maxValueCount, iterations);
 		
 		List<Tuple> tupleBuffer = TestSetup.generateTupleBuffer(tickInterval);
@@ -51,35 +51,32 @@ public class BoltOperatorTest extends UDFBoltTest
 	@Override
 	protected UDFFields initUDFFields()
 	{
-		UDFFields udfFields = new UDFFields(inputFields, outputFields, keyFields);
+		UDFFields udfFields = new UDFFields(inputFields, outputFields);
 		return udfFields;
 	}
 
 	@Override
 	protected IOperator initOperator(final List<Tuple> inputTuples)
 	{
-		FilterOperator testFilterOp = new FilterOperator(new FilterUDF()
-		{
+		Fields inputFields = new Fields("key", "value");
+		
+		FilterUDF filter= new FilterUDF(){
 			private static final long	serialVersionUID	= 1L;
 			private int count = 0;
 			
-			public Boolean execute(Values param, Context context)
+			public Boolean evaluate(Tuple t)
 			{
-				//Filter out every tenth input:
-				if(inputTuples.size() > count){
-					System.out.println("InputTuples have size: "+ inputTuples.size());
-					System.out.println("param Value: "+ param.get(0));
-					System.out.println("inputTuples: "+ inputTuples.get(count));
+				//Test that inputTuples and Tuple t is the same for each iteration:
+				if(t.equals(inputTuples.get(count))){
 					count ++;
-					if(param.equals(inputTuples.get(count).getValue(0))){
-						count += 10;
-						System.out.println("Filter successful!");
-						return true;
-					}
+					System.out.println("Evaluation successful!");
+					return true;
 				}
-				return false;
-			}			
-		});
+				else return false;
+			}
+		};
+		
+		FilterOperator testFilterOp = new FilterOperator(inputFields, filter);
 		return testFilterOp;
 	}
 

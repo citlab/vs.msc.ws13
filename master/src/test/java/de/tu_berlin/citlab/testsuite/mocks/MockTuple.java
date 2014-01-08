@@ -18,6 +18,12 @@ import backtype.storm.tuple.Values;
 public final class MockTuple
 {	
 
+		public static Tuple mockPlaceholder()
+		{
+			Tuple tuple = mock(Tuple.class);
+			return tuple;
+		}
+	
 	    public static Tuple mockTickTuple() 
 	    {
 	        return mockTuple(Constants.SYSTEM_COMPONENT_ID, Constants.SYSTEM_TICK_STREAM_ID);

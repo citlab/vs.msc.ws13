@@ -20,18 +20,18 @@ abstract public class UDFBoltTest
 	{
 		public final Fields inputFields;
 		public final Fields outputFields;
-		public final Fields keyFields;
+//		public final Fields keyFields;
 		
-		public UDFFields(Fields inputFields, Fields outputFields)
-		{
-			this(inputFields, outputFields, null);
-		}
+//		public UDFFields(Fields inputFields, Fields outputFields)
+//		{
+//			this(inputFields, outputFields);
+//		}
 		
-		public UDFFields(Fields inputFields, Fields outputFields, Fields keyFields)
+		public UDFFields(Fields inputFields, Fields outputFields /*Fields keyFields*/)
 		{
 			this.inputFields = inputFields;
 			this.outputFields = outputFields;
-			this.keyFields = keyFields;
+//			this.keyFields = keyFields;
 		}
 	}
 	
@@ -85,9 +85,9 @@ abstract public class UDFBoltTest
 		System.out.println("\nSummary:");
 		System.out.println("\t Number of Input-Tuples: "+ inputTuples.size());
 		System.out.println("\t Number of Tick-Tuples: "); //TODO: implement
-		System.out.println("\t Time to execute input:"+ inputTimeDiff +" ms.");
+		System.out.println("\t Time to execute input:"+ inputTimeDiff +" ms. \n");
 		
-		System.out.println("\n=========== Finished UDFBolt Test! ===========");
+		System.out.println("=========== Finished UDFBolt Test! ===========");
 		System.out.println("==============================================");
 	}
 	
