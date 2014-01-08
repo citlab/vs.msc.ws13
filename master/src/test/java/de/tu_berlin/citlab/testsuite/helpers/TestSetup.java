@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Before;
 
-import de.tu_berlin.citlab.testsuite.mocks.MockTuple;
+import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -133,6 +133,7 @@ public final class TestSetup
 		return TestSetup.generateTuple(key, inputFields, keyFields, maxValueCount);
 	}
 	
+	//TODO: rewrite.
 	public static Tuple generateTuple(List<Object> key, 
 									  Fields inputFields, Fields keyFields, 
 									  int maxValueCount)
@@ -143,14 +144,14 @@ public final class TestSetup
 		for(int n = 0 ; n < valCount ; n++){
 			vals.add(new String("Value "+ n));
 		}
-		Tuple mockTuple = MockTuple.mockTuple(key, vals, inputFields, keyFields);
+		Tuple mockTuple = TupleMock.mockTuple(key, vals, inputFields, keyFields);
 		return mockTuple;
 	}
 	
 	
 	public static Tuple generateTickTuple()
 	{
-		Tuple mockTickTuple = MockTuple.mockTickTuple();
+		Tuple mockTickTuple = TupleMock.mockTickTuple();
 		return mockTickTuple;
 	}
 	

@@ -26,7 +26,7 @@ public abstract class BaseRichBoltMock extends BaseRichBolt
 	public void prepare(@SuppressWarnings("rawtypes") Map stormConf, TopologyContext context,
 			OutputCollector collector)
 	{
-		collector = MockOutputCollector.mockOutputCollector();
+		collector = OutputCollectorMock.mockOutputCollector();
 	}
 
 	abstract public void execute(Tuple input);

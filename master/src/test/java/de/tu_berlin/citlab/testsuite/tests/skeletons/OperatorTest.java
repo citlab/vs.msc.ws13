@@ -10,8 +10,8 @@ import org.junit.Test;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.testsuite.mocks.MockOutputCollector;
-import de.tu_berlin.citlab.testsuite.mocks.MockTuple;
+import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
+import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 
 
 abstract public class OperatorTest
@@ -44,9 +44,9 @@ abstract public class OperatorTest
 		
 		long startTime = System.currentTimeMillis();
 		
-		OutputCollector outputCollector = MockOutputCollector.mockOutputCollector();
+		OutputCollector outputCollector = OutputCollectorMock.mockOutputCollector();
 		operator.execute(inputTuples, outputCollector);
-		List<List<Object>> outputVals = MockOutputCollector.output;
+		List<List<Object>> outputVals = OutputCollectorMock.output;
 		List<Object> assertRes = assertOutput(inputTuples);
 		
 		try{//TODO: refactor.

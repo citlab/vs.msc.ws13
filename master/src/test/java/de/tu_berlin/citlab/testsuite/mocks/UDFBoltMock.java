@@ -50,7 +50,7 @@ public class UDFBoltMock extends UDFBolt
 			TopologyContext context, OutputCollector collector) 
 	{
 		super.prepare(stormConf, context, collector);
-		this.collector = MockOutputCollector.mockOutputCollector();
+		this.collector = OutputCollectorMock.mockOutputCollector();
 	}
 
 

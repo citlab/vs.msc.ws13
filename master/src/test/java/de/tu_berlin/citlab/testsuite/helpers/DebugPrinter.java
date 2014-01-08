@@ -3,7 +3,7 @@ package de.tu_berlin.citlab.testsuite.helpers;
 
 import java.util.List;
 
-import de.tu_berlin.citlab.testsuite.mocks.MockTuple;
+import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 

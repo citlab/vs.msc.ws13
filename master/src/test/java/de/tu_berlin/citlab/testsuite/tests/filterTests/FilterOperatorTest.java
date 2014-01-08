@@ -26,7 +26,7 @@ public class FilterOperatorTest extends OperatorTest
 	
 	@Override
 	protected IOperator initOperator(final List<Tuple> inputTuples) {
-		Fields inputFields = new Fields("key", "value");
+		Fields inputFields = new Fields("key", "value"); //TODO: should be declared somewhere else...
 		
 		FilterUDF filter= new FilterUDF(){
 			private static final long	serialVersionUID	= 1L;
