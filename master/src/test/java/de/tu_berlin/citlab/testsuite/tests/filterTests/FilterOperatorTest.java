@@ -6,21 +6,31 @@ import java.util.List;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.helpers.TestSetup;
+import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.tests.skeletons.OperatorTest;
 
 
 public class FilterOperatorTest extends OperatorTest
 {
 	@Override
+	protected void configureDebugLogger() 
+	{
+		//TODO: implement.
+		
+	}
+	
+	@Override
 	protected List<Tuple> generateInputValues()
 	{
 		List<Tuple> inputTuples = new ArrayList<Tuple>(2);
-		inputTuples.add(TestSetup.generateTuple());
-		inputTuples.add(TestSetup.generateTickTuple());
+		inputTuples.add(TupleMock.mockTuple(new Values(1,2,3)));
+		inputTuples.add(TupleMock.mockTickTuple());
+		inputTuples.add(TupleMock.mockTuple(new Values(4,5,6)));
 		return inputTuples;
 	}
 	

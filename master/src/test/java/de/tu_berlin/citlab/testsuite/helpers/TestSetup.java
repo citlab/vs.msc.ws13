@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.Before;
 
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -46,14 +48,14 @@ public final class TestSetup
 /* Global Settings: */
 /* ================ */
 	
-	private static int keyIDCount = 5;
-	private static int keyListCount = 10;
-	private static int maxValueCount = 10;
-	private static int bufSize = 10000;
+//	private static int keyIDCount = 5;
+//	private static int keyListCount = 10;
+//	private static int maxValueCount = 10;
+//	private static int bufSize = 10000;
 	
-	private static Fields inputFields = new Fields("key", "value");
-	private static Fields keyFields = new Fields("key1");
-	private static List<Object> defaultKey = new ArrayList<Object>();
+//	private static Fields inputFields = new Fields("key", "value");
+//	private static Fields keyFields = new Fields("key1");
+//	private static IKeyConfig defaultKey = KeyConfigFactory.DefaultKey();
 	
 	
 	public static void setupFields(Fields inputFields, Fields keyFields)
@@ -79,30 +81,30 @@ public final class TestSetup
 /* Public Testing-Methods: */
 /* ======================= */
 	
-	public static List<Object> generateKey()
-	{
-		return TestSetup.generateKey(keyListCount);
-	}
-	
-	public static List<Object> generateKey(int keyListCount)
-	{
-		int keyCombSize = (int) Math.round(Math.random() * keyListCount);
-		ArrayList<Object> keyComb = new ArrayList<Object>(keyCombSize);
-		
-		//Initialization of Keys that can be combined in a List later:
-		while(keyIDBuffer.size() < keyListCount){
-			Integer randKey = (int) Math.round(Math.random() * 1000);
-			keyIDBuffer.add(randKey);
-		}
-		
-		//Combine some Keys to a Key-Combination, later used for a Value grouping:
-		for(int n = 0 ; n < keyCombSize ; n++){
-			int keySelector = (int) Math.round(Math.random() * (keyListCount-1));
-			keyComb.add(keyIDBuffer.get(keySelector)); 
-		}
-		
-		return keyComb;
-	}
+//	public static List<Object> generateKey()
+//	{
+//		return TestSetup.generateKey(keyListCount);
+//	}
+//	
+//	public static List<Object> generateKey(int keyListCount)
+//	{
+//		int keyCombSize = (int) Math.round(Math.random() * keyListCount);
+//		ArrayList<Object> keyComb = new ArrayList<Object>(keyCombSize);
+//		
+//		//Initialization of Keys that can be combined in a List later:
+//		while(keyIDBuffer.size() < keyListCount){
+//			Integer randKey = (int) Math.round(Math.random() * 1000);
+//			keyIDBuffer.add(randKey);
+//		}
+//		
+//		//Combine some Keys to a Key-Combination, later used for a Value grouping:
+//		for(int n = 0 ; n < keyCombSize ; n++){
+//			int keySelector = (int) Math.round(Math.random() * (keyListCount-1));
+//			keyComb.add(keyIDBuffer.get(keySelector)); 
+//		}
+//		
+//		return keyComb;
+//	}
 	
 	
 	public static List<List<Object>> generateKeyBuffer()
@@ -125,7 +127,8 @@ public final class TestSetup
 	
 	public static Tuple generateTuple()
 	{
-		return TestSetup.generateTuple(defaultKey);
+		Values vals = //TODO: go on.
+		return TupleMock.mockTuple(vals);
 	}
 	
 	public static Tuple generateTuple(List<Object> key)
