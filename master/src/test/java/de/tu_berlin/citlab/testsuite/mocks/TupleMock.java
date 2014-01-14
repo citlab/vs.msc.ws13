@@ -3,13 +3,16 @@ package de.tu_berlin.citlab.testsuite.mocks;
 
 import static org.mockito.Mockito.*;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
-
 import backtype.storm.Constants;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -55,7 +58,7 @@ public final class TupleMock
 	     * @param keyConfig
 	     * @return The Mockup as a {@link Tuple}
 	     */
-	    public static Tuple mockTuple(String componentID, String streamID, Values vals, IKeyConfig keyConfig, String... keyFields) 
+	    public static Tuple mockTuple(String componentID, String streamID, Values vals, IKeyConfig keyConfig, AbstractMap.SimpleEntry<String, List<Object>> keyFields) 
 	    {
 	        Tuple tuple = mock(Tuple.class);
 	        
@@ -96,7 +99,7 @@ public final class TupleMock
 	        	//TODO: see how that should work...
 	        }
 	        else if(keyConfig.equals(KeyConfigFactory.ByFields(keyFields))){
-	        	//TODO: implement
+	        	when(tuple.select(new Fields(keyFields))).thenReturn()
 	        }
 	        
 	        
