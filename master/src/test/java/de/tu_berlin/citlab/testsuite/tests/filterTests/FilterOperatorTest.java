@@ -10,17 +10,24 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.TestSetup;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.tests.skeletons.OperatorTest;
 
 
 public class FilterOperatorTest extends OperatorTest
 {
+	public static final String TAG = "OperatorTest";
+	
 	@Override
 	protected void configureDebugLogger() 
 	{
-		//TODO: implement.
+		DebugLogger.setEnabled(true);
+		DebugLogger.setConsoleOutput(LoD.DEFAULT, true);
+		DebugLogger.appendTimeToOutput(true);
+		DebugLogger.appendCounterToOutput(true);
 		
 	}
 	
@@ -29,7 +36,6 @@ public class FilterOperatorTest extends OperatorTest
 	{
 		List<Tuple> inputTuples = new ArrayList<Tuple>(2);
 		inputTuples.add(TupleMock.mockTuple(new Values(1,2,3)));
-		inputTuples.add(TupleMock.mockTickTuple());
 		inputTuples.add(TupleMock.mockTuple(new Values(4,5,6)));
 		return inputTuples;
 	}
@@ -47,7 +53,7 @@ public class FilterOperatorTest extends OperatorTest
 				//Test that inputTuples and Tuple t is the same for each iteration:
 				if(t.equals(inputTuples.get(count))){
 					count ++;
-					System.out.println("Evaluation successful!");
+					DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Evaluation for FilterUDF returned true!", "Evaluated Tuple: "+ t.toString());
 					return true;
 				}
 				else return false;
@@ -59,10 +65,13 @@ public class FilterOperatorTest extends OperatorTest
 	}
 	
 	@Override
-	protected List<Object> assertOutput(final List<Tuple> inputTuples)
+	protected List<List<Object>> assertOutput(final List<Tuple> inputTuples)
 	{
-		List<Object> outputVals = new ArrayList<Object>(1);
-		outputVals.add(inputTuples.get(0));//TODO: check.
+		List<List<Object>> outputVals = new ArrayList<List<Object>>();
+		for(Tuple actTuple : inputTuples){
+			outputVals.add(actTuple.getValues());
+		}
+
 		return outputVals;
 	}
 }

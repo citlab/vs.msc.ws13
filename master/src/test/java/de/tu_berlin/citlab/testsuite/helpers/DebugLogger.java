@@ -90,10 +90,10 @@ public final class DebugLogger
 	
 	private DebugLogger()
 	{
-		DebugLogger.homeDir = new File("Debug-LogFiles");
+		DebugLogger.homeDir = new File("Logs");
 		
-		DebugLogger.hasConsoleOutput = false;
-		DebugLogger.hasLoggingOutput = false;
+		DebugLogger.hasConsoleOutput = true;
+		DebugLogger.hasLoggingOutput = true;
 		DebugLogger.hasErrorOutput = true;
 		
 		DebugLogger.appendTime = false;
@@ -235,15 +235,31 @@ public final class DebugLogger
 	 */
 	public static synchronized File addFileLogging(String fileName, LoD loggingLevel, String logType)
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasLoggingOutput)
 		{
-			constructionRequest();
 			
 			File logFileDir = DebugLogger.homeDir;
-			if(logFileDir.exists() == false) logFileDir.mkdir();
+			if(logFileDir.exists() == false) {
+				try{
+					logFileDir.mkdir();
+				}
+				catch (SecurityException e){
+					System.err.println("DebugLogger ERROR: No permission to create a directory at "+ DebugLogger.homeDir.toString());
+					e.printStackTrace();
+				}
+			}
 			
 			File logFile = new File(logFileDir.getAbsolutePath() + File.separatorChar + fileName);
-			if(logFile.exists()) logFile.delete();
+			if(logFile.exists()) {
+				try{
+					logFile.delete();
+				}
+				catch (SecurityException e){
+					System.err.println("DebugLogger ERROR: No permission to delete a file at "+ DebugLogger.homeDir.toString());
+					e.printStackTrace();
+				}
+			}
 			try
 			{
 				logFile.createNewFile();
@@ -279,9 +295,9 @@ public final class DebugLogger
 	 */
 	public static synchronized File addFileLogging(String relFilePath, String fileName, LoD loggingLevel, String logType)
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasLoggingOutput)
 		{
-			constructionRequest();
 			File debugDir = DebugLogger.homeDir;
 			if(debugDir.exists() == false) debugDir.mkdirs();
 			
@@ -328,6 +344,7 @@ public final class DebugLogger
 	 */
 	public static synchronized String print_Header(String headText, char lineSymbol)
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
 			String header = print_Header(LoD.DEFAULT, headText, lineSymbol);
@@ -351,10 +368,9 @@ public final class DebugLogger
 	 */
 	public static synchronized String print_Header(LoD levelOfDetail, String headText, char lineSymbol)
 	{
+		constructionRequest();
 		if(isEnabled)
-		{
-			constructionRequest();
-			
+		{			
 			if((DebugLogger.console_LoD.compareTo(levelOfDetail) >= 0) && DebugLogger.hasConsoleOutput)
 			{
 				//Line-Generators:
@@ -397,6 +413,7 @@ public final class DebugLogger
 	 */
 	public static synchronized String print_Footer(String headText, char lineSymbol)
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
 			String footer = print_Footer(LoD.DEFAULT, headText, lineSymbol);
@@ -418,10 +435,9 @@ public final class DebugLogger
 	 */
 	public static synchronized String print_Footer(LoD levelOfDetail, String headText, char lineSymbol)
 	{
+		constructionRequest();
 		if(isEnabled)
-		{ 
-			constructionRequest();
-					
+		{ 					
 			if((DebugLogger.console_LoD.compareTo(levelOfDetail) >= 0) && DebugLogger.hasConsoleOutput)
 			{
 				//Line-Generators:
@@ -466,6 +482,7 @@ public final class DebugLogger
 	 */
 	public static synchronized void print_Message(String msgBody, String...appendedStrings)
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
 			print_Message(LoD.DEFAULT, msgBody, appendedStrings);
@@ -486,10 +503,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void print_Message(LoD levelOfDetail, String msgBody, String...appendedStrings)
 	{
+		constructionRequest();
 		if(isEnabled)
-		{
-			constructionRequest();
-			
+		{			
 			if((DebugLogger.console_LoD.compareTo(levelOfDetail) >= 0) && DebugLogger.hasConsoleOutput)
 			{
 				//The following code writes the message-Body and the following input-Data-Strings to the console:
@@ -502,10 +518,9 @@ public final class DebugLogger
 	
 	public static synchronized void print_Error(String msgBody, String...appendedStrings)
 	{
+		constructionRequest();
 		if(isEnabled)
-		{
-			constructionRequest();
-			
+		{			
 			if(DebugLogger.hasErrorOutput)
 			{
 				String message = generate_Message(msgBody, appendedStrings);
@@ -531,9 +546,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void log_Message(LoD levelOfDetail, String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasLoggingOutput)
 		{
-			constructionRequest();
 			
 			if(logFileMap.containsKey(logType))
 			{
@@ -581,9 +596,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void multiLog_Message(LoD levelOfDetail, String[] logTypes, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasLoggingOutput)
 		{
-			constructionRequest();
 			for(String logType : logTypes)
 			{
 				if(logFileMap.containsKey(logType))
@@ -628,10 +643,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void printAndLog_Message(LoD levelOfDetail, String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
-			constructionRequest();
-			
 			print_Message(levelOfDetail, msgBody, appendedStrings);
 			log_Message(levelOfDetail, logType, msgBody, appendedStrings);
 		}
@@ -647,10 +661,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void printAndMultiLog_Message(LoD levelOfDetail, String[] logTypes, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
-			constructionRequest();
-			
 			print_Message(levelOfDetail, msgBody, appendedStrings);
 			multiLog_Message(levelOfDetail, logTypes, msgBody, appendedStrings);
 		}
@@ -664,12 +677,11 @@ public final class DebugLogger
 	 * @param appendedStrings
 	 * @throws NoSuchElementException
 	 */
-	public static synchronized void log_Error(String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
+	public static synchronized String log_Error(String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasErrorOutput)
 		{
-			constructionRequest();
-			
 			if(logFileMap.containsKey(logType))
 			{
 				SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
@@ -678,15 +690,18 @@ public final class DebugLogger
 					
 					FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
 					
-					String message = "<ERROR: "+ generate_Message(msgBody, appendedStrings) +"ERROR/>";
+					String message = "ERROR: "+ generate_Message(msgBody, appendedStrings);
 					fileWriter.write(message);
 					
 					fileWriter.close();
+					
+					return message;
 				}
 				catch (IOException e)
 				{
 					System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
 					e.printStackTrace();
+					return null;
 				}
 			}
 			else
@@ -695,6 +710,7 @@ public final class DebugLogger
 				throw noElemExcept;
 			}
 		}
+		else return null;
 	}
 	
 	/**
@@ -706,9 +722,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void multiLog_Error(String[] logTypes, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasErrorOutput)
 		{
-			constructionRequest();
 			for(String logType : logTypes)
 			{
 				if(logFileMap.containsKey(logType))
@@ -747,10 +763,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void printAndLog_Error(String logType, String msgBody, String...appendedStrings)
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasErrorOutput)
 		{
-			constructionRequest();
-			
 			print_Error(msgBody, appendedStrings);
 			log_Message(LoD.BASIC, logType, msgBody, appendedStrings);
 		}
@@ -766,10 +781,9 @@ public final class DebugLogger
 	 */
 	public static synchronized void printAndMultiLog_Error(String[] logTypes, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
+		constructionRequest();
 		if(isEnabled && DebugLogger.hasErrorOutput)
 		{
-			constructionRequest();
-			
 			print_Error(msgBody, appendedStrings);
 			multiLog_Error(logTypes, msgBody, appendedStrings);
 		}
@@ -778,10 +792,9 @@ public final class DebugLogger
 	
 	public static synchronized PrintWriter get_LogFilePrinter(String logType)
 	{
+		constructionRequest();
 		if(isEnabled)
 		{
-			constructionRequest();
-			
 			if(logFileMap.containsKey(logType))
 			{
 				SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
@@ -816,10 +829,9 @@ public final class DebugLogger
 	
 	private static synchronized String generate_Message(String msgBody, String... appendedStrings)
 	{	
+		constructionRequest();
 		if(isEnabled)
 		{
-			constructionRequest();
-			
 			String appendix ="";
 			
 			if(appendedStrings.length > 0)

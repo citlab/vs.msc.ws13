@@ -1,6 +1,8 @@
 package de.tu_berlin.citlab.testsuite.tests.skeletons;
 
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import org.junit.After;
@@ -20,7 +22,7 @@ import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 
 abstract public class OperatorTest
 {
-	private final static String TAG = "OperatorTest";
+	public final static String TAG = "OperatorTest";
 	
 	private List<Tuple> inputTuples;
 	private IOperator operator;
@@ -29,10 +31,15 @@ abstract public class OperatorTest
 	@Before	
 	public void initTestSetup()
 	{
+		//Will be overridden from configureDebugLogger() if set there explicitly:
+		DebugLogger.addFileLogging("mocks", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
+		DebugLogger.addFileLogging("mocks", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
+		DebugLogger.addFileLogging("OperatorTest.log", LoD.DETAILED, TAG);
 		this.configureDebugLogger();
 		
 		
-		DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, DebugLogger.print_Header("Initializing Operator-Test Setup...", '-'));
+		String header = DebugLogger.print_Header("Initializing Operator-Test Setup...", '-');
+		DebugLogger.log_Message(LoD.DEFAULT, TAG, header);
 		
 		try{
 			inputTuples = this.generateInputValues();
@@ -62,7 +69,8 @@ abstract public class OperatorTest
 	{
 		AssertionError failureTrace = null;
 		
-		DebugLogger.printAndLog_Message(LoD.BASIC, TAG, DebugLogger.print_Header("Starting Operator Test...", '='));
+		String header = DebugLogger.print_Header(LoD.BASIC, "Starting Operator Test...", '=');
+		DebugLogger.log_Message(LoD.BASIC, TAG, header);
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -70,19 +78,20 @@ abstract public class OperatorTest
 		operator.execute(inputTuples, outputCollector);
 		List<List<Object>> outputVals = OutputCollectorMock.output;
 		
-		List<Object> assertRes = assertOutput(inputTuples);
+		List<List<Object>> assertRes = assertOutput(inputTuples);
 		
-		try{//TODO: refactor.
-//			assertTrue("Operator.execute(..) result is not equal to asserted Output! \n"+
-//					   "Operator Result: "+ DebugPrinter.toString(result) +"\n"+
-//					   "Asserted Output: "+ DebugPrinter.toString(assertRes), result.equals(assertRes));
+		try{
+			assertTrue("Operator.execute(..) result is not equal to asserted Output! \n", assertRes.equals(outputVals));
 			
 			DebugLogger.printAndLog_Message(LoD.BASIC, TAG, "Operator Test succeded!", 
 					"Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
-					"Asserted Results: "+ "TODO.");
+					"Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes));
 		}
 		catch (AssertionError e){
-			DebugLogger.printAndLog_Error(TAG, "Operator Test failed. For more infos, check the JUnit Failure Trace.", e.toString());
+			DebugLogger.printAndLog_Error(TAG, "Operator Test failed. For more infos, check the JUnit Failure Trace.",
+					"Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
+					"Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes),
+					e.toString());
 			failureTrace = e;
 		}
 		
@@ -93,10 +102,11 @@ abstract public class OperatorTest
 		DebugLogger.printAndLog_Message(LoD.BASIC, TAG, "Summary:",
 										"Number of Input-Values: "+ inputTuples.size(),
 										"Number of Ouput-Values: "+ outputVals.size(),
-										"Time to execute input:"+ inputTimeDiff +" ms. \n");
+										"Time to execute input:"+ inputTimeDiff +" ms.");
 		
 		
-		DebugLogger.printAndLog_Message(LoD.BASIC, TAG, DebugLogger.print_Header("Finished Operator Test!.", '='));
+		String footer = DebugLogger.print_Footer("Finished Operator Test!", '=');
+		DebugLogger.log_Message(LoD.BASIC, TAG, footer);
 		
 		if(failureTrace != null)
 			throw failureTrace;
@@ -116,5 +126,5 @@ abstract public class OperatorTest
 	abstract protected List<Tuple> generateInputValues();
 	abstract protected IOperator initOperator(final List<Tuple> inputTuples);
 	
-	abstract protected List<Object> assertOutput(final List<Tuple> inputTuples);
+	abstract protected List<List<Object>> assertOutput(final List<Tuple> inputTuples);
 }

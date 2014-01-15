@@ -2,9 +2,14 @@ package de.tu_berlin.citlab.testsuite.mocks;
 
 
 import static org.mockito.Mockito.*;
+
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
+import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +20,7 @@ import backtype.storm.tuple.Tuple;
 
 public final class OutputCollectorMock
 {	
+		public final static String TAG = "OutputCollectorMock";
 		public static List<List<Object>> output;
 		
 		
@@ -28,10 +34,8 @@ public final class OutputCollectorMock
 	 			@Override
 	 			public boolean matches(Object argument)
 	 			{
-	 				System.out.println("Matching?");
 	 				List<Object> objList = (List) argument;
 	 				if(argument.getClass().equals(objList.getClass())){
-	 					System.out.println("Matches!");
 	 					return true;
 	 				}
 	 				else return false;
@@ -58,7 +62,7 @@ public final class OutputCollectorMock
 					//the objectList which was emitted by the Output-Coll Mock:
 					List<Object> emissionList = (List<Object>) invocation.getArguments()[0];
 					output.add(emissionList);
-					System.out.println("Emitted "+ emissionList.size() +" values.");
+					DebugLogger.printAndLog_Message(LoD.DETAILED, TAG, "Outputcollector emitted: ", DebugPrinter.toObjectListString(emissionList));
 					return emissionList;
 				}
 	    	});

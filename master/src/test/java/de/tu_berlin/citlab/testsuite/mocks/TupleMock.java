@@ -20,7 +20,7 @@ import backtype.storm.tuple.Values;
 
 public final class TupleMock
 {	
-		private final static String TAG = "TupleMock";
+		public final static String TAG = "TupleMock";
 	
 	    public static Tuple mockTickTuple() 
 	    {
@@ -99,20 +99,23 @@ public final class TupleMock
 	 	    }
 	        
 	        
-	        if(componentID == null)
-	        	when(tuple.getSourceComponent()).thenThrow(new RuntimeException("No SourceComponent available for that MockTuple!"));
+	        if(componentID == null){
+	        	when(tuple.getSourceComponent()).thenThrow(new RuntimeException("Trying to call getSourceComponent() on a MockTuple, that has no componentID!"));
+	        }
 	        else
 	        	when(tuple.getSourceComponent()).thenReturn(componentID);
 	        
-	        if(streamID == null)
-	        	when(tuple.getSourceStreamId()).thenThrow(new RuntimeException("No SourceStreamID available for that MockTuple!"));
+	        if(streamID == null){
+	        	when(tuple.getSourceStreamId()).thenThrow(new RuntimeException("Trying to call getSourceStreamId() on a MockTuple, that has no streamID!"));
+	        }
 	        else
 	        	when(tuple.getSourceStreamId()).thenReturn(streamID);
 	        
 	        
 	        if(vals == null){
-	        	when(tuple.getValues()).thenThrow(new RuntimeException("No Values available for that MockTuple!"));
-	        	when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenThrow(new RuntimeException("No Values available for that MockTuple!"));
+	        	
+	        	when(tuple.getValues()).thenThrow(new RuntimeException("Trying to call getValues() on a MockTuple, that has no values!"));
+	        	when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenThrow(new RuntimeException("Trying to call select() on a MockTuple, that has no values!"));
 	        }
         	else{
 	        	when(tuple.getValues()).thenReturn(vals);
@@ -121,10 +124,10 @@ public final class TupleMock
 	        
 	        
 	        if(keyConfig.equals(KeyConfigFactory.DefaultKey())){
-		        when(tuple.getFields()).thenThrow(new RuntimeException("No Fields available for that MockTuple!"));
+		        when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
 	        }
 	        else if(keyConfig.equals(KeyConfigFactory.BySource())){
-	        	when(tuple.getFields()).thenThrow(new RuntimeException("No Fields available for that MockTuple!"));
+	        	when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
 	        }
 	        else if(keyConfig.equals(KeyConfigFactory.ByFields(keyFields))){
 	        	when(tuple.getFields()).thenReturn(new Fields(keyFields));
@@ -175,7 +178,7 @@ public final class TupleMock
 	    	String tupleString = "Tuple <Vals: (";
 	    	int valSize = mockTuple.getValues().size();
 	    	for(int n = 0 ; n < valSize ; n++){
-	    		String actVal = (String) mockTuple.getValues().get(n);
+	    		String actVal = mockTuple.getValues().get(n).toString();
 	    		tupleString += actVal;
 	    		if(n+1 != valSize)
 	    			tupleString += ", ";
