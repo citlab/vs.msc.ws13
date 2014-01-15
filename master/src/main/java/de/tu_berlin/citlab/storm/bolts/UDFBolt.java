@@ -36,6 +36,10 @@ public class UDFBolt extends BaseRichBolt {
 	final protected IOperator operator;
 
 	final protected WindowHandler windowHandler;
+	
+//	private static int instanceIdCounter = 0;
+//	
+//	public int instanceId = instanceIdCounter++;
 
 	
 	
@@ -56,6 +60,7 @@ public class UDFBolt extends BaseRichBolt {
 		this.outputFields = outputFields;
 		this.operator = operator;
 		windowHandler = new WindowHandler(window, keyConfig);
+//		System.out.println("UDFBolt '" + instanceId + "' instanciated WindowHandler '" + windowHandler.instanceId + "'");
 	}
 	
 	
@@ -89,9 +94,9 @@ public class UDFBolt extends BaseRichBolt {
 			executeBatches(windowHandler.flush());
 		}
 		else {
-			windowHandler.add(input);
-			if (windowHandler.isSatisfied()) {
-				executeBatches(windowHandler.flush());
+			List<List<Tuple>> window = windowHandler.addSafely(input);
+			if(window != null) {
+				executeBatches(window);
 			}
 		}
 

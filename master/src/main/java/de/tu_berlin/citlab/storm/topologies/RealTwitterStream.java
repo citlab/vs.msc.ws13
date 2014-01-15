@@ -64,7 +64,6 @@ public class RealTwitterStream {
 				new UDFBolt(
 					new Fields("user_id", "word", "id"),  // output fields
 					new IOperator(){
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String[] words = t.getValueByField("msg").toString().split(" ");
@@ -84,7 +83,6 @@ public class RealTwitterStream {
 					new Fields("user_id", "word", "id", "significance"),  // output fields
 					new IOperator(){
 						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String word = t.getValueByField("word").toString().toLowerCase();
@@ -107,7 +105,6 @@ public class RealTwitterStream {
 				new UDFBolt(
 					new Fields("user_id" ),  // output fields
 					new IOperator(){						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							
 							for(Tuple t : input){
@@ -135,7 +132,6 @@ public class RealTwitterStream {
 				new UDFBolt(
 					new Fields("user_id", "total_significance" ),  // output fields
 					new IOperator(){						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String userid = t.getValueByField("user_id").toString();

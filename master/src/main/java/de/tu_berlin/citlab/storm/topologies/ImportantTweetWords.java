@@ -143,7 +143,7 @@ public class ImportantTweetWords {
 		
 
 		
-		Window<Tuple, List<Tuple>> WINDOW_TYPE =new CountWindow<Tuple>(windowSize, slidingOffset);
+		Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(windowSize, slidingOffset);
 		//new TimeWindow<Tuple>(windowSize, slidingOffset);
 		
 		
@@ -155,7 +155,6 @@ public class ImportantTweetWords {
 				new UDFBolt(
 					new Fields("user_id", "word", "id"),  // output fields
 					new IOperator(){
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String[] words = t.getValueByField("msg").toString().split(" ");
@@ -174,8 +173,6 @@ public class ImportantTweetWords {
 				new UDFBolt(
 					new Fields("user_id", "word", "id", "significance"),  // output fields
 					new IOperator(){
-						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String word = t.getValueByField("word").toString().toLowerCase();
@@ -198,7 +195,6 @@ public class ImportantTweetWords {
 				new UDFBolt(
 					new Fields("user_id" ),  // output fields
 					new IOperator(){						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							
 							for(Tuple t : input){
@@ -223,7 +219,6 @@ public class ImportantTweetWords {
 				new UDFBolt(
 					new Fields("user_id", "total_significance" ),  // output fields
 					new IOperator(){						
-						@Override
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String userid = t.getValueByField("user_id").toString();
@@ -301,8 +296,8 @@ public class ImportantTweetWords {
 
 		
 		Config conf = new Config();
-		conf.setDebug(true);
-
+		conf.setDebug(false);
+		
 		conf.setMaxTaskParallelism(1);
 		conf.setMaxSpoutPending(1);
 
