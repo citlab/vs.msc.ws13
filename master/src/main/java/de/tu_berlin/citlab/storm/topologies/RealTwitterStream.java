@@ -115,6 +115,9 @@ public class RealTwitterStream {
 								String word = t.getValueByField("word").toString().toLowerCase();
 								int significance = Integer.parseInt( t.getValueByField("significance").toString() );
 								
+								// user update in cassandra
+								// user do not exists => add
+								//    otherwise update
 								STORAGE.updateUser(userid, word, significance);
 								
 								collector.emit( new Values( userid  ) );
@@ -137,6 +140,9 @@ public class RealTwitterStream {
 							for(Tuple t : input){
 								String userid = t.getValueByField("user_id").toString();
 								Integer total_significance = 0;
+								
+								
+								// user exists in cassandra ? => find
 								if( STORAGE.users.containsKey(userid) ){
 									total_significance = STORAGE.users.get(userid).total_significance;
 								}
@@ -206,7 +212,25 @@ public class RealTwitterStream {
 		.shuffleGrouping("significant_users");
 
 		
-		
+		builder.setBolt("cassandra_save_tweets",
+				new UDFBolt(
+						new Fields("user_id", "msg", "total_significance" ), 
+					new IOperator() {
+						public void execute(List<Tuple> tuples, OutputCollector collector ) {
+
+							for( Tuple tweet: tuples) {
+								// store in cassandra
+								
+								
+								collector.emit(tweet.getValues() );
+								
+							}//for
+						}
+					},
+					new CountWindow<Tuple>(windowSize, slidingOffset),
+					KeyConfigFactory.ByFields("key1", "key2")
+				),
+			1).shuffleGrouping("spout");
 
 		
 		Config conf = new Config();
