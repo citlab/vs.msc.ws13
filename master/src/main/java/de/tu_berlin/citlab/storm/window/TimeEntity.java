@@ -6,12 +6,16 @@ import java.util.List;
 
 public class TimeEntity<I> implements Comparable<TimeEntity<I>> {
 	
+	public static long getcurrentTime() {
+		return System.currentTimeMillis();
+	}
+	
 	final long timestamp;
 	
 	final I entity;
 	
 	public TimeEntity(I entity) {
-		this(entity, System.currentTimeMillis());
+		this(entity, TimeEntity.getcurrentTime());
 	}
 	
 	public TimeEntity(I entity, long timestamp) {

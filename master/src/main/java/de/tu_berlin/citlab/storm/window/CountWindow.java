@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.storm.window;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CountWindow<I> implements Window<I, List<I>> {
@@ -72,6 +73,15 @@ public class CountWindow<I> implements Window<I, List<I>> {
 	@Override
 	public String toString() {
 		return slots.toString();
+	}
+
+	public List<I> addSafely(I input) {
+		List<I> result = null;
+		if (isSatisfied()) {
+			result = flush();
+		}
+		add(input);
+		return result;
 	}
 
 }

@@ -20,6 +20,11 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 	final protected IKeyConfig keyConfig;
 	
 	
+	private static int instanceIdCounter = 0;
+	
+	public int instanceId = instanceIdCounter++;
+	
+	
 
 /* Constructors: */
 /* ============= */
@@ -44,6 +49,8 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 		Serializable key = keyConfig.getKeyOf( input );
 		if ( ! windows.containsKey(key)) {
 			windows.put(key, stub.clone());
+//			if(windows.get(key) instanceof TimeWindow)
+//			System.out.println("WindowHandler '" + instanceId + "' instanciated Window '" + ((TimeWindow) windows.get(key)).instanceId + "' for key '" + key.toString() + "'");
 		}
 		Window<Tuple, List<Tuple>> window = windows.get(key);
 		window.add(input);
@@ -79,6 +86,16 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
 	public WindowHandler clone() {
 		return null;
+	}
+
+	public List<List<Tuple>> addSafely(Tuple input) {
+		List<List<Tuple>> result = null;
+		if (isSatisfied()) {
+			System.out.println("WindowHandler '" + instanceId + "' is satisfied");
+			result = flush();
+		}
+		add(input);
+		return result;
 	}
 
 }
