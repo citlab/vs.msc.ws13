@@ -89,6 +89,7 @@ public class RealTwitterStream {
 							for(Tuple t : input){
 								String word = t.getValueByField("word").toString().toLowerCase();
 								
+								// do not change
 								if( STORAGE.badWords.containsKey(word) ){
 									BadWord badWord = STORAGE.badWords.get(word);
 									collector.emit( new Values( t.getValueByField("user_id"), word, t.getValueByField("id"), ""+badWord.significance ) );
