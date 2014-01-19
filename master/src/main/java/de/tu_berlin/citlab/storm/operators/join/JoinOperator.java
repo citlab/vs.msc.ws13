@@ -11,6 +11,7 @@ import de.tu_berlin.citlab.storm.exceptions.InvalidJoinPairCountException;
 import de.tu_berlin.citlab.storm.exceptions.JoinException;
 import de.tu_berlin.citlab.storm.exceptions.JoinSourceNotFoundException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
 import de.tu_berlin.citlab.storm.window.WindowContainer;
 
 public class JoinOperator implements IOperator {
@@ -19,7 +20,7 @@ public class JoinOperator implements IOperator {
 
 	protected JoinUDF joinUDF;
 	
-	private JoinPredicate joinPredicate;
+	private TupleComparator joinComparator;
 	
 	private TupleProjection projection;
 
@@ -29,9 +30,9 @@ public class JoinOperator implements IOperator {
 		
 	HashMap<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
-	public JoinOperator(JoinUDF join, JoinPredicate predicate, TupleProjection projection, String inner, String outer ) {
+	public JoinOperator(JoinUDF join, TupleComparator joinComparator, TupleProjection projection, String inner, String outer ) {
 		this.joinUDF = join;
-		this.joinPredicate = predicate;
+		this.joinComparator = joinComparator;
 		this.innerSource = inner;
 		this.outerSource = outer;
 		this.projection = projection;
@@ -63,7 +64,7 @@ public class JoinOperator implements IOperator {
 			// pairs found?
 			if(pair != null ){
 				// join strategy
-				joinUDF.executeJoin(pair, joinPredicate, projection, collector );
+				joinUDF.executeJoin(pair, joinComparator, projection, collector );
 			}
 			else {
 			}

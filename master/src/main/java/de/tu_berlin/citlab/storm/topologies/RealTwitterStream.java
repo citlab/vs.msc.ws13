@@ -1,36 +1,25 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
+import de.tu_berlin.citlab.storm.operators.join.JoinFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
-import de.tu_berlin.citlab.storm.operators.join.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 
 public class RealTwitterStream {
@@ -172,14 +161,7 @@ public class RealTwitterStream {
 		).shuffleGrouping("user_total_signifiance");
 		
 		
-		
-		
-		JoinPredicate joinPredicate = new JoinPredicate() {
-			public boolean evaluate(Tuple t1, Tuple t2) {
-				return ((String)t1.getValueByField("user_id")).compareTo( (String)t2.getValueByField("user_id") ) == 0;
-			}
-		};
-		
+	
 		
 		TupleProjection projection = new TupleProjection(){
 			public Values project(Tuple left, Tuple right) {
@@ -197,8 +179,8 @@ public class RealTwitterStream {
 		builder.setBolt("significance_user_with_tweets",
 				new UDFBolt(
 					new Fields("user_id", "msg", "total_significance" ) , // no outputFields
-					new JoinOperator( 	new NLJoin(), 
-										joinPredicate, 
+					new JoinOperator( 	new NestedLoopJoin(), 
+										KeyConfigFactory.compareByFields(new Fields("user_id")), 
 										projection, 
 										"significant_users", "tweets" ), 
 					WINDOW_TYPE,

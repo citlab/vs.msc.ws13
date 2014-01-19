@@ -11,8 +11,7 @@ import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.operators.join.JoinFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
-import de.tu_berlin.citlab.storm.operators.join.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
@@ -126,7 +125,7 @@ class TweetSource extends BaseRichSpout {
 }
 
 
-public class AggregatedTweetsWithHeterogenWindows {
+public class TweetsFilterUsersWithBadWordsTopology {
 	private static final int windowSize = 10;
 	private static final int slidingOffset = 10;
 	
@@ -283,8 +282,8 @@ public class AggregatedTweetsWithHeterogenWindows {
 		builder.setBolt("significance_user_with_tweets",
 				new UDFBolt(
 					new Fields("user_id", "msg", "total_significance" ) , // no outputFields
-					new JoinOperator( 	new NLJoin(), 
-										JoinFactory.joinByField("user_id"), 
+					new JoinOperator( 	new NestedLoopJoin(), 
+										KeyConfigFactory.compareByFields(new Fields("user_id")),
 										projection, 
 										"significant_users", "tweets" ), 
 					WINDOW_TYPE,

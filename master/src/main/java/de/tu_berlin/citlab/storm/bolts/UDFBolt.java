@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.storm.bolts;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
 
@@ -60,9 +62,14 @@ public class UDFBolt extends BaseRichBolt {
 		this.outputFields = outputFields;
 		this.operator = operator;
 		windowHandler = new WindowHandler(window, keyConfig);
-//		System.out.println("UDFBolt '" + instanceId + "' instanciated WindowHandler '" + windowHandler.instanceId + "'");
 	}
 	
+	public UDFBolt(Fields outputFields, IOperator operator,
+			Window<Tuple, List<Tuple>> window, IKeyConfig keyConfig, TupleComparator sortByKey) {
+		this.outputFields = outputFields;
+		this.operator = operator;
+		windowHandler = new WindowHandler(window, keyConfig, sortByKey);
+	}
 	
 	
 /* Public Methods: */
