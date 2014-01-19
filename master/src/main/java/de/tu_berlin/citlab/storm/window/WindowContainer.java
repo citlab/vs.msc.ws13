@@ -8,7 +8,6 @@ public class WindowContainer<I> implements Serializable, Cloneable
 	private static final long serialVersionUID = 1L;
 		
 	private final List<I> window;
-
 	
 	public WindowContainer(List<I> w){
 		this.window = w;
@@ -16,5 +15,9 @@ public class WindowContainer<I> implements Serializable, Cloneable
 	
 	public List<I> getWindow(){
 		return window;
+	}
+	
+	public void sort(  ){
+		
 	}
 }
