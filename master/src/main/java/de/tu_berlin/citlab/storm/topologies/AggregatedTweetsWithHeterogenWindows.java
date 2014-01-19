@@ -4,16 +4,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
+import de.tu_berlin.citlab.storm.operators.join.JoinFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
 import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -123,7 +126,7 @@ class TweetSource extends BaseRichSpout {
 }
 
 
-public class ImportantTweetWords {
+public class AggregatedTweetsWithHeterogenWindows {
 	private static final int windowSize = 10;
 	private static final int slidingOffset = 10;
 	
@@ -143,7 +146,8 @@ public class ImportantTweetWords {
 
 		
 		//6Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(windowSize, slidingOffset);
-		Window<Tuple, List<Tuple>> WINDOW_TYPE =new CountWindow<Tuple>(windowSize, slidingOffset);
+		Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(windowSize, slidingOffset);
+		//Window<Tuple, List<Tuple>> WINDOWTYPE_TIME =new TimeWindow<Tuple>(windowSize, slidingOffset);
 
 		//new TimeWindow<Tuple>(windowSize, slidingOffset);
 		
@@ -264,16 +268,8 @@ public class ImportantTweetWords {
 		
 		
 		
-		JoinPredicate joinPredicate = new JoinPredicate() {
-			public boolean evaluate(Tuple t1, Tuple t2) {
-				return ((String)t1.getValueByField("user_id")).compareTo( (String)t2.getValueByField("user_id") ) == 0;
-			}
-		};
-		
-		
 		TupleProjection projection = new TupleProjection(){
 			public Values project(Tuple left, Tuple right) {
-				
 				return new Values(  left.getValueByField("user_id"),
 									left.getValueByField("msg"),
 									right.getValueByField("total_significance")									
@@ -288,7 +284,7 @@ public class ImportantTweetWords {
 				new UDFBolt(
 					new Fields("user_id", "msg", "total_significance" ) , // no outputFields
 					new JoinOperator( 	new NLJoin(), 
-										joinPredicate, 
+										JoinFactory.joinByField("user_id"), 
 										projection, 
 										"significant_users", "tweets" ), 
 					WINDOW_TYPE,
