@@ -124,6 +124,10 @@ public class TwitterSpout extends BaseRichSpout {
 			case "geolocation":
 				values[i] = ret.getGeoLocation();
 				break;
+				
+			case "id":
+				values[i] = ret.getId();
+				break;
 
 			default:
 				break;
