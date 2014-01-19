@@ -1,11 +1,9 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Random;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
@@ -16,8 +14,6 @@ import de.tu_berlin.citlab.storm.operators.join.NLJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
@@ -86,8 +82,6 @@ class TweetSource extends BaseRichSpout {
 													"storm ist interessant",
 													"wat für ne sexbombe",
 													"bomben bauen macht spass und kann ich jedem beibringen" };
-	private int currentId = 0;
-
 	int _id = 0;
 
 	SpoutOutputCollector _collector;
@@ -106,9 +100,14 @@ class TweetSource extends BaseRichSpout {
 	}
 
 	public void nextTuple() {
-		Utils.sleep(1);
-		_collector.emit(new Values(	user_ids[currentId++ % user_ids.length],
-									user_messages[currentId++ % user_messages.length],
+		Utils.sleep(100);
+		
+		Random random = new Random();
+		int rndUser=random.nextInt(user_ids.length);
+		int rndMsg=random.nextInt(user_messages.length);
+		
+		_collector.emit(new Values(	user_ids[rndUser],
+									user_messages[rndMsg],
 									_id));
 		_id++;
 	}
@@ -125,8 +124,8 @@ class TweetSource extends BaseRichSpout {
 
 
 public class ImportantTweetWords {
-	private static final int windowSize = 1000;
-	private static final int slidingOffset = 500;
+	private static final int windowSize = 10;
+	private static final int slidingOffset = 10;
 	
 
 	@SuppressWarnings("serial")
@@ -143,7 +142,9 @@ public class ImportantTweetWords {
 		
 
 		
-		Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(windowSize, slidingOffset);
+		//6Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(windowSize, slidingOffset);
+		Window<Tuple, List<Tuple>> WINDOW_TYPE =new CountWindow<Tuple>(windowSize, slidingOffset);
+
 		//new TimeWindow<Tuple>(windowSize, slidingOffset);
 		
 		
@@ -159,6 +160,7 @@ public class ImportantTweetWords {
 							for(Tuple t : input){
 								String[] words = t.getValueByField("msg").toString().split(" ");
 								for( String word : words ){
+									
 									collector.emit( new Values( t.getValueByField("user_id"), word, t.getValueByField("id") ) );
 								}//for
 							}//for
@@ -176,12 +178,20 @@ public class ImportantTweetWords {
 						public void execute(List<Tuple> input, OutputCollector collector) {
 							for(Tuple t : input){
 								String word = t.getValueByField("word").toString().toLowerCase();
-								
-								if( STORAGE.badWords.containsKey(word) ){
-									BadWord badWord = STORAGE.badWords.get(word);
+								boolean isBadWord = false;
+								String badWordKey="";
+								for( String bw : STORAGE.badWords.keySet() ){
+									if( word.contains(bw) ){
+										badWordKey=bw;
+										isBadWord=true;
+										break;
+									}
+								}
+								if( isBadWord ){
+									BadWord badWord = STORAGE.badWords.get(badWordKey);
 									collector.emit( new Values( t.getValueByField("user_id"), word, t.getValueByField("id"), ""+badWord.significance ) );
 								}//if
-																		
+								
 							}//for
 							
 						}// execute()
@@ -203,7 +213,6 @@ public class ImportantTweetWords {
 								int significance = Integer.parseInt( t.getValueByField("significance").toString() );
 								
 								STORAGE.updateUser(userid, word, significance);
-								
 								collector.emit( new Values( userid  ) );
 																		
 							}//for
@@ -227,7 +236,6 @@ public class ImportantTweetWords {
 									total_significance = STORAGE.users.get(userid).total_significance;
 								}
 								collector.emit( new Values( userid, total_significance ) );
-																		
 							}//for
 							
 						}// execute()
@@ -245,8 +253,7 @@ public class ImportantTweetWords {
 					new Fields("user_id", "total_significance" ), // input
 					new FilterUDF() {
 						public Boolean evaluate(Tuple tuple) {
-							
-							return (Integer) tuple.getValueByField("total_significance") > 1000001;
+							return (Integer) tuple.getValueByField("total_significance") > 100;
 						}
 					}
 				)
@@ -292,6 +299,19 @@ public class ImportantTweetWords {
 		.shuffleGrouping("significant_users");
 
 		
+		builder.setBolt("output",
+				new UDFBolt(
+						null,  // output fields
+						new IOperator(){						
+							public void execute(List<Tuple> input, OutputCollector collector) {
+								for(Tuple t : input){
+									System.out.println("joined output:"+t);
+								}//for
+								
+							}// execute()
+					}, 
+					WINDOW_TYPE ), 1 )
+					.shuffleGrouping("significance_user_with_tweets");
 		
 
 		

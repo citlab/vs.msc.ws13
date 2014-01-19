@@ -91,7 +91,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 	public List<List<Tuple>> addSafely(Tuple input) {
 		List<List<Tuple>> result = null;
 		if (isSatisfied()) {
-			System.out.println("WindowHandler '" + instanceId + "' is satisfied");
+			//System.out.println("WindowHandler '" + instanceId + "' is satisfied");
 			result = flush();
 		}
 		add(input);
