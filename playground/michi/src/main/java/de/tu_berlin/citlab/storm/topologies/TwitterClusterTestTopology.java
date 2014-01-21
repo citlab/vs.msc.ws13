@@ -24,7 +24,8 @@ public class TwitterClusterTestTopology {
 		Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
 		String[] keywords = new String[] { "the", "it", "der", "die", "das" };
 		String[] languages = new String[] { "en", "de" };
-		String[] outputFields = new String[] { "user", "tweet", "date", "lang" };
+		String[] outputFields = new String[] { "id", "user", "tweet", "date",
+				"lang" };
 		TwitterConfiguration config = new TwitterConfiguration(user, keywords,
 				languages, outputFields);
 
