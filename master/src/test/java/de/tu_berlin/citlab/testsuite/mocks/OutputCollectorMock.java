@@ -22,7 +22,12 @@ public final class OutputCollectorMock
 {	
 		public final static String TAG = "OutputCollectorMock";
 		public static List<List<Object>> output;
-		
+
+        public static void resetOutput()
+        {
+            output.clear();
+        }
+
 		
 	    public static OutputCollector mockOutputCollector() 
 	    {

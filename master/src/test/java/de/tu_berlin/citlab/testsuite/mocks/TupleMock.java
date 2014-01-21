@@ -100,13 +100,13 @@ public final class TupleMock
 	        
 	        
 	        if(componentID == null){
-	        	when(tuple.getSourceComponent()).thenThrow(new RuntimeException("Trying to call getSourceComponent() on a MockTuple, that has no componentID!"));
+	        	when(tuple.getSourceComponent()).thenReturn("__null");
 	        }
 	        else
 	        	when(tuple.getSourceComponent()).thenReturn(componentID);
 	        
 	        if(streamID == null){
-	        	when(tuple.getSourceStreamId()).thenThrow(new RuntimeException("Trying to call getSourceStreamId() on a MockTuple, that has no streamID!"));
+	        	when(tuple.getSourceStreamId()).thenReturn("__null");
 	        }
 	        else
 	        	when(tuple.getSourceStreamId()).thenReturn(streamID);

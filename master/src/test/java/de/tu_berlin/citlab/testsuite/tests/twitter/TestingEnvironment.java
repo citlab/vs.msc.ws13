@@ -1,7 +1,9 @@
-package de.tu_berlin.citlab.testsuite.tests.filterTests;
+package de.tu_berlin.citlab.testsuite.tests.twitter;
 
 import backtype.storm.tuple.Fields;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
+import de.tu_berlin.citlab.testsuite.tests.filterTests.FilterBoltTest;
+import de.tu_berlin.citlab.testsuite.tests.filterTests.FilterOperatorTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

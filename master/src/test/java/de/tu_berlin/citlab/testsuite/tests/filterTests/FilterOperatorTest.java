@@ -11,28 +11,24 @@ import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.TestSetup;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
-import de.tu_berlin.citlab.testsuite.tests.skeletons.OperatorTest;
+import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
+import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
 
 
-public class FilterOperatorTest extends OperatorTest
+public class FilterOperatorTest extends OperatorTest implements OperatorTestMethods
 {
 	public static final String TAG = "OperatorTest";
-	
-	@Override
-	protected void configureDebugLogger() 
-	{
-		DebugLogger.setEnabled(true);
-		DebugLogger.setConsoleOutput(LoD.DEFAULT, true);
-		DebugLogger.appendTimeToOutput(true);
-		DebugLogger.appendCounterToOutput(true);
-		
-	}
-	
-	@Override
-	protected List<Tuple> generateInputValues()
+
+
+    public FilterOperatorTest(Fields inputFields) {
+        super("FilterOperator", inputFields);
+    }
+
+
+    @Override
+	public List<Tuple> generateInputTuples()
 	{
 		List<Tuple> inputTuples = new ArrayList<Tuple>(2);
 		inputTuples.add(TupleMock.mockTuple(new Values(1,2,3)));
@@ -41,9 +37,8 @@ public class FilterOperatorTest extends OperatorTest
 	}
 	
 	@Override
-	protected IOperator initOperator(final List<Tuple> inputTuples) {
-		Fields inputFields = new Fields("key", "value"); //TODO: should be declared somewhere else...
-		
+	public IOperator initOperator(final Fields inputFields, final List<Tuple> inputTuples) {
+
 		FilterUDF filter= new FilterUDF(){
 			private static final long	serialVersionUID	= 1L;
 			private int count = 0;
@@ -65,12 +60,11 @@ public class FilterOperatorTest extends OperatorTest
 	}
 	
 	@Override
-	protected List<List<Object>> assertOutput(final List<Tuple> inputTuples)
+	public List<List<Object>> assertOutput(final List<Tuple> inputTuples)
 	{
-		List<List<Object>> outputVals = new ArrayList<List<Object>>();
-		for(Tuple actTuple : inputTuples){
-			outputVals.add(actTuple.getValues());
-		}
+        List<List<Object>> outputVals = new ArrayList<List<Object>>();
+        outputVals.add(new Values(1,2,3));
+        outputVals.add(new Values(4,5,6));
 
 		return outputVals;
 	}

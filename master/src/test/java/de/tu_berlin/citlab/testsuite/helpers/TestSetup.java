@@ -1,3 +1,4 @@
+/*
 package de.tu_berlin.citlab.testsuite.helpers;
 
 
@@ -14,6 +15,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
+*/
 /**
  * <h2>A final class that provides static methods for Test-Setup generation
  * in a CIT-Storm related environment. </h2>
@@ -41,12 +43,17 @@ import backtype.storm.tuple.Values;
  * 
  * 
  * @author Constantin
- */
+ *//*
+
 public final class TestSetup
 {
 	
-/* Global Settings: */
-/* ================ */
+*/
+/* Global Settings: *//*
+
+*/
+/* ================ *//*
+
 	
 //	private static int keyIDCount = 5;
 //	private static int keyListCount = 10;
@@ -72,14 +79,22 @@ public final class TestSetup
 		TestSetup.bufSize = bufSize;
 	}
 	
-/* Global Variables: */
-/* ================= */
+*/
+/* Global Variables: *//*
+
+*/
+/* ================= *//*
+
 	
 	private static List<Object> keyIDBuffer = new ArrayList<Object>();	
 	
 	
-/* Public Testing-Methods: */
-/* ======================= */
+*/
+/* Public Testing-Methods: *//*
+
+*/
+/* ======================= *//*
+
 	
 //	public static List<Object> generateKey()
 //	{
@@ -204,3 +219,4 @@ public final class TestSetup
 	}
 
 }
+*/

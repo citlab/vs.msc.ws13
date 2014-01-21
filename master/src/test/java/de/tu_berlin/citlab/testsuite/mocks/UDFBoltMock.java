@@ -20,6 +20,8 @@ public class UDFBoltMock extends UDFBolt
 	private static final long serialVersionUID = 1L;
 
 
+    public final OutputCollector getOutputCollectorMock() { return this.collector; };
+
 /* Constructors: */
 /* ============= */
 	
