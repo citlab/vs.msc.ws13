@@ -53,7 +53,7 @@ public class SlidingTimeWindowTestTopology {
 			}
 
 			public void nextTuple() {
-				Utils.sleep(500);
+				Utils.sleep(1);
 				_collector.emit(new Values(ids[currentId++ % ids.length], _id));
 				_id++;
 			}

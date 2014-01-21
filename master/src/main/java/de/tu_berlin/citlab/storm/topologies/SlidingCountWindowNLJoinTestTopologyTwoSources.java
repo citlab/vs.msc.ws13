@@ -20,10 +20,10 @@ import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
 
-class DataSource1 extends BaseRichSpout {
+class DataSource extends BaseRichSpout {
 	
 	private static final long serialVersionUID = -7374814904789368773L;
 	
@@ -49,7 +49,7 @@ class DataSource1 extends BaseRichSpout {
 	}
 
 	public void nextTuple() {
-		Utils.sleep(1);
+		Utils.sleep(500);
 		_collector.emit(new Values(ids[currentId++ % ids.length], _id));
 		_id++;
 	}
@@ -64,16 +64,18 @@ class DataSource1 extends BaseRichSpout {
 	}
 }
 
-public class SlidingTimeWindowJoinTestTopologyTwoSources {
-	private static final int windowSize = 1000;
-	private static final int slidingOffset = 500;
-
+public class SlidingCountWindowNLJoinTestTopologyTwoSources {
+	private static final int windowSize = 4;
+	private static final int slidingOffset = 2;
+	
 	@SuppressWarnings("serial")
 	public static void main(String[] args) throws Exception {
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("s1", new DataSource1(), 1);
-		builder.setSpout("s2", new DataSource1(), 1);
+		builder.setSpout("s1", new DataSource(), 1);
+		builder.setSpout("s2", new DataSource(), 1);
+		
+		
 		
 		IKeyConfig groupKey = new IKeyConfig(){
 			public Serializable getKeyOf( Tuple tuple) {
@@ -81,6 +83,7 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 				return key;
 			}
 		};
+		
 		
 		TupleProjection projection = new TupleProjection(){
 			public Values project(Tuple left, Tuple right) {
@@ -94,14 +97,18 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 			}
 		};
 		
-		
 		builder.setBolt("slide",
-				new UDFBolt(null, new JoinOperator( new NestedLoopJoin(),
-													KeyConfigFactory.compareByFields(new Fields("user_id")),
-													projection, "s1", "s2" ), 
-				new TimeWindow<Tuple>(windowSize, slidingOffset), groupKey), 1)
-				.shuffleGrouping("s1")
-				.shuffleGrouping("s2");
+			new UDFBolt(
+				null, // no outputFields
+				new JoinOperator( 	new NestedLoopJoin(), 
+									KeyConfigFactory.compareByFields(new Fields("key")), 
+									projection, 
+									"s1", "s2" ), 
+				new CountWindow<Tuple>(windowSize, slidingOffset),
+				groupKey
+			),
+		1)	.shuffleGrouping("s1")
+			.shuffleGrouping("s2");
 
 		
 		Config conf = new Config();

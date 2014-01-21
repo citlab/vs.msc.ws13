@@ -9,6 +9,8 @@ public interface Window<I, O> extends Serializable, Cloneable {
 	public boolean isSatisfied();
 
 	public O flush();
+	
+	public O addSafely(I input);
 
 	public Window<I, O> clone();
 

@@ -1,10 +1,14 @@
 package de.tu_berlin.citlab.storm.helpers;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
 
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 @SuppressWarnings("serial")
 public class KeyConfigFactory implements Serializable {
@@ -41,5 +45,30 @@ public class KeyConfigFactory implements Serializable {
 	public static IKeyConfig DefaultKey() {
 		return defaultKey;
 	}
+	
+	public static TupleComparator compareByFields(final Fields keyFields) {
+		return new TupleComparator () {
+		    @SuppressWarnings({ "unchecked", "rawtypes" })
+			public int compare(Tuple first, Tuple second) {
+		    	  if(keyFields.size() == 1 ){
+		    		  Comparable left = (Comparable)first.getValueByField(keyFields.get(0));
+		    		  Comparable right =(Comparable)second.getValueByField(keyFields.get(0));
+		    		  return left.compareTo(right);
+		    		  
+		    	  } else {
+		    		  int counter=1;
+		    		  int total_result=0;
+		    		  for( String key : keyFields ){
+		    			 int result = ((Comparable)first.getValueByField(key)) .compareTo( (Comparable)first.getValueByField(key));
+		    			 if(result != 0 ){
+		    				 total_result= counter * result;
+		    				 break;
+		    			 }
+		    		  }//for
+		    		  return total_result;
+		    	  }//if
+		      } // compare()
+		};
+	}	
 
 }
