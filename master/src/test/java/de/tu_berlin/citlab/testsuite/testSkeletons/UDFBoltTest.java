@@ -68,7 +68,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
             throw new NullPointerException(errorMsg);
         }
 
-		IOperator operator = opTest.initOperator(opTest.getInputFields(), inputTuples);
+		IOperator operator = opTest.initOperator(inputTuples);
 		window = this.initWindow();
 		keyConfig = this.initKeyConfig();
 		

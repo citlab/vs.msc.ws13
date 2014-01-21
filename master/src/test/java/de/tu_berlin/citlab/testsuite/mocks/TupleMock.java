@@ -60,7 +60,12 @@ public final class TupleMock
 	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by Fields.", 
 					"Vals: "+ DebugPrinter.toString(vals),
 					"Fields: "+ DebugPrinter.toString(fields));
-	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.ByFields(fields), (String[]) fields.toList().toArray());
+
+            String[] fieldsStr = new String[fields.size()];
+            for(int n = 0 ; n < fields.size() ; n++){
+                fieldsStr[n] = fields.get(n);
+            }
+	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.ByFields(fields), fieldsStr);
 	    }
 	    
 	    /**
@@ -83,7 +88,7 @@ public final class TupleMock
 	    
 
 	    
-	    private static Tuple mockTuple(String componentID, String streamID, Values vals, IKeyConfig keyConfig, String... keyFields) 
+	    private static Tuple mockTuple(final String componentID, final String streamID, final Values vals, final IKeyConfig keyConfig, final String... keyFields)
 	    {
 	        Tuple tuple = mock(Tuple.class);
 	        
@@ -97,6 +102,16 @@ public final class TupleMock
 	 				else return false;
 	 			}
 	 	    }
+
+            class IsAnyString extends ArgumentMatcher<String>
+            {
+                @Override
+                public boolean matches(Object argument){
+                    if(argument.getClass().equals(String.class))
+                        return true;
+                    else return false;
+                }
+            }
 	        
 	        
 	        if(componentID == null){
@@ -129,8 +144,30 @@ public final class TupleMock
 	        else if(keyConfig.equals(KeyConfigFactory.BySource())){
 	        	when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
 	        }
-	        else if(keyConfig.equals(KeyConfigFactory.ByFields(keyFields))){
+	        else if(keyConfig.equals(KeyConfigFactory.ByFields(keyFields))){//TODO: check if this equals is well defined.
 	        	when(tuple.getFields()).thenReturn(new Fields(keyFields));
+                when(tuple.getValueByField(argThat(new IsAnyString()))).thenAnswer(new Answer<Object>(){
+
+                    public Object answer(InvocationOnMock invocation)
+                            throws Throwable {
+                        String keyField = (String) invocation.getArguments()[0];
+                        DebugLogger.log_Message(LoD.DETAILED, TAG, "Searching for Tuple Value by Field.",
+                                "Key-Field: "+ keyField);
+
+                        for(int n = 0 ; n < keyFields.length ; n++){
+                            String actField = keyFields[n];
+                            if(keyField.equals(actField)){
+
+                                DebugLogger.log_Message(LoD.DETAILED, TAG, "Found Tuple Value by Field.",
+                                        "Value: "+ vals.get(n).toString(),
+                                        "Key-Field: "+ actField);
+                                return vals.get(n);
+                            }
+
+                        }
+                        return null;
+                    }
+                });
 	        }
 	        
 	        

@@ -10,8 +10,8 @@ import org.junit.Test;
 
 public class TestingEnvironment
 {
-    private static FilterOperatorTest tOp1;
-    private static FilterBoltTest tBolt1;
+    private static Op1_WordFlatMap tOp1;
+    private static Bolt1_WordFlatMap tBolt1;
 
 
     public static void initLogger()
@@ -22,14 +22,14 @@ public class TestingEnvironment
         DebugLogger.appendCounterToOutput(true);
     }
 
+
+
     @BeforeClass
     public static void initEnvironment()
     {
         initLogger();
-        Fields inputFields = new Fields("Key", "Value");
-        Fields outputFields = new Fields("Key", "Value");
-        tOp1 = new FilterOperatorTest(inputFields);
-        tBolt1 = new FilterBoltTest(tOp1, outputFields);
+        tOp1 = new Op1_WordFlatMap("OP1_WordsFlat", new Fields("msg"));
+        tBolt1 = new Bolt1_WordFlatMap("Bolt1_WordsFlat",tOp1, new Fields("user_id", "word", "id"));
     }
 
     @AfterClass

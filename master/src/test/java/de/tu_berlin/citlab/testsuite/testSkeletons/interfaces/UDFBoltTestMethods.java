@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons.interfaces;
 
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.Window;
@@ -17,5 +18,5 @@ public interface UDFBoltTestMethods
 
     public IKeyConfig initKeyConfig();
 
-    public List<List<Object>> assertOutput(List<Tuple> inputTuples);
+    public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
 }

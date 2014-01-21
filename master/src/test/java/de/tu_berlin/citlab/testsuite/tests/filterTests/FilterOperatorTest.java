@@ -37,7 +37,7 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 	}
 	
 	@Override
-	public IOperator initOperator(final Fields inputFields, final List<Tuple> inputTuples) {
+	public IOperator initOperator(final List<Tuple> inputTuples) {
 
 		FilterUDF filter= new FilterUDF(){
 			private static final long	serialVersionUID	= 1L;
@@ -55,7 +55,7 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 			}
 		};
 		
-		FilterOperator testFilterOp = new FilterOperator(inputFields, filter);
+		FilterOperator testFilterOp = new FilterOperator(this.getInputFields(), filter);
 		return testFilterOp;
 	}
 	

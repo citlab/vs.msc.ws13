@@ -13,7 +13,7 @@ public interface OperatorTestMethods
 {
     public List<Tuple> generateInputTuples();
 
-    public IOperator initOperator(final Fields inputFields, final List<Tuple> inputTuples);
+    public IOperator initOperator(final List<Tuple> inputTuples);
 
     public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
 }

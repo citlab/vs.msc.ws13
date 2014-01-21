@@ -64,7 +64,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 			
 		}			
 		try{
-			operator = this.initOperator(inputFields, inputTuples);
+			operator = this.initOperator(inputTuples);
 			DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Operator successfully initialized.");
 		}
 		catch (NullPointerException e){
@@ -143,7 +143,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 	abstract public List<Tuple> generateInputTuples();
 
-	abstract public IOperator initOperator(final Fields inputFields, final List<Tuple> inputTuples);
+	abstract public IOperator initOperator(final List<Tuple> inputTuples);
 	
 	abstract public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
 }
