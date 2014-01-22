@@ -25,7 +25,8 @@ public final class OutputCollectorMock
 
         public static void resetOutput()
         {
-            output.clear();
+            if(output != null)
+                output.clear();
         }
 
 		
@@ -67,7 +68,7 @@ public final class OutputCollectorMock
 					//the objectList which was emitted by the Output-Coll Mock:
 					List<Object> emissionList = (List<Object>) invocation.getArguments()[0];
 					output.add(emissionList);
-					DebugLogger.printAndLog_Message(LoD.DETAILED, TAG, "Outputcollector emitted: ", DebugPrinter.toObjectListString(emissionList));
+                    DebugLogger.printAndLog_Message(LoD.DETAILED, TAG, "Outputcollector emitted: ", DebugPrinter.toObjectListString(emissionList));
 					return emissionList;
 				}
 	    	});

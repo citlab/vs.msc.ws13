@@ -6,11 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -80,7 +77,7 @@ public final class DebugLogger
 	private static long counter;
 	
 	private static LoD console_LoD;
-	private static HashMap<String, SimpleEntry<LoD, File>> logFileMap;
+	private static HashMap<String, List<SimpleEntry<LoD, File>>> logFileMap;
 	
 	
 
@@ -101,7 +98,7 @@ public final class DebugLogger
 		DebugLogger.counter = 0;
 		
 		DebugLogger.console_LoD = LoD.DEFAULT;
-		logFileMap = new HashMap<String, SimpleEntry<LoD, File>>();
+		logFileMap = new HashMap<String, List<SimpleEntry<LoD, File>>>();
 	}
 	
 	/**
@@ -263,13 +260,23 @@ public final class DebugLogger
 			try
 			{
 				logFile.createNewFile();
-				
-				SimpleEntry<LoD, File> logFileEntry = new SimpleEntry<LoD, File>(loggingLevel, logFile);
-				DebugLogger.logFileMap.put(logType, logFileEntry);
+                SimpleEntry<LoD, File> logFileEntry = new SimpleEntry<LoD, File>(loggingLevel, logFile);
+
+                List<SimpleEntry<LoD, File>> logFileEntryList = DebugLogger.logFileMap.get(logType);
+                if(logFileEntryList != null){
+                    logFileEntryList.add(logFileEntry);
+                    DebugLogger.logFileMap.put(logType, logFileEntryList);
+                }
+                else{
+                    List<SimpleEntry<LoD, File>> newLogFileList = new ArrayList<SimpleEntry<LoD, File>>(5);
+                    newLogFileList.add(logFileEntry);
+                    DebugLogger.logFileMap.put(logType, newLogFileList);
+                }
+
 			}
 			catch (IOException e)
 			{
-				System.err.println("DebugLogger ERROR: Log-File could not be created: "+ fileName);
+				System.err.println("DebugLogger ERROR: Log-File could not be appended to List! LogFileName: "+ fileName);
 				e.printStackTrace();
 			}
 			
@@ -304,22 +311,7 @@ public final class DebugLogger
 			File logFileDir = new File(debugDir.getPath() + File.separatorChar + relFilePath);
 			if(logFileDir.exists() == false) logFileDir.mkdirs();
 			
-			File logFile = new File(logFileDir.getPath() + File.separatorChar + fileName);
-			if(logFile.exists()) logFile.delete();
-			try
-			{
-				logFile.createNewFile();
-				
-				SimpleEntry<LoD, File> logFileEntry = new SimpleEntry<LoD, File>(loggingLevel, logFile);
-				DebugLogger.logFileMap.put(logType, logFileEntry);
-			}
-			catch (IOException e)
-			{
-				System.err.println("DebugLogger ERROR: Log-File could not be created: "+ fileName);
-				e.printStackTrace();
-			}
-			
-			return logFile;
+			return DebugLogger.addFileLogging(relFilePath + File.separatorChar + fileName, loggingLevel, logType);
 		}
 		else return null;
 	}
@@ -334,7 +326,7 @@ public final class DebugLogger
 	 * Just for clear arrangement, this method will create a stand-out text-header for console-printing. <br>
 	 * This method creates a header, that defines a text-block beginning, combining the char-parameter "lineSymbol" to a line-separator.
 	 * <p>
-	 * <em>This is a convenience-method for {@link DebugLogger#print_Header(LOD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
+	 * <em>This is a convenience-method for {@link DebugLogger#print_Header(de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
 	 * 
 	 * @param headText : The {@link String}-Headline, that will be printed in the Console.
 	 * @param lineSymbol : A <b>char</b> that is repeatedly printed as a header-line. <em>Hint: Use '=', '-', '.' or something like that.</em>
@@ -403,7 +395,7 @@ public final class DebugLogger
 	 * Just for clear arrangement, this method will create a stand-out text-footer for console-printing.
 	 * This method creates a footer, that defines a text-block ending, combining the char-parameter "lineSymbol" to a line-separator.
 	 * <p>
-	 * <em>This is a convenience-method for {@link DebugLogger#print_Footer(LOD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
+	 * <em>This is a convenience-method for {@link DebugLogger#print_Footer(de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
 	 * 
 	 * @param headText : The {@link String}-Foot-Line, that will be printed in the Console.
 	 * @param lineSymbol : A <b>char</b> that is repeatedly printed as a header-line. <em>Hint: Use '=', '-', '.' or something like that.</em>
@@ -473,7 +465,7 @@ public final class DebugLogger
 	 * The message is split in two parts: The message-body, which should define the error or give additional information,
 	 * and the optional data-String input, which is printed on a comma-separated way in a new-line.
 	 * <p>
-	 * <em>This is a convenience-method for {@link DebugLogger#print_Message(LOD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
+	 * <em>This is a convenience-method for {@link DebugLogger#print_Message(de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD, String, String...)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
 	 * 
 	 * @param msgBody : The debug-information as a <b>String</b>
 	 * @param appendedStrings : The optional Data-String's, containing detailed debugging information on the objects, that are in touch with this debug-Message.
@@ -552,25 +544,28 @@ public final class DebugLogger
 			
 			if(logFileMap.containsKey(logType))
 			{
-				SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
-				if(fileEntry.getKey().compareTo(levelOfDetail) >= 0)
-				{
-					try
-					{
-						
-						FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
-						
-						String message = generate_Message(msgBody, appendedStrings);
-						fileWriter.write(message);
-						
-						fileWriter.close();
-					}
-					catch (IOException e)
-					{
-						System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
-						e.printStackTrace();
-					}
-				}
+				List<SimpleEntry<LoD, File>> fileEntryList = DebugLogger.logFileMap.get(logType);
+                for(SimpleEntry<LoD, File> fileEntry : fileEntryList)
+                {
+                    if(fileEntry.getKey().compareTo(levelOfDetail) >= 0)
+                    {
+                        try
+                        {
+
+                            FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
+
+                            String message = generate_Message(msgBody, appendedStrings);
+                            fileWriter.write(message);
+
+                            fileWriter.close();
+                        }
+                        catch (IOException e)
+                        {
+                            System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ fileEntry.getValue().getAbsolutePath());
+                            e.printStackTrace();
+                        }
+                    }
+                }
 			}
 			else
 			{
@@ -603,25 +598,28 @@ public final class DebugLogger
 			{
 				if(logFileMap.containsKey(logType))
 				{
-					SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
-					if(fileEntry.getKey().compareTo(levelOfDetail) >= 0)
-					{
-						try
-						{
-							
-							FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
-							
-							String message = generate_Message(msgBody, appendedStrings);
-							fileWriter.write(message);
-							
-							fileWriter.close();
-						}
-						catch (IOException e)
-						{
-							System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
-							e.printStackTrace();
-						}
-					}
+
+                    List<SimpleEntry<LoD, File>> fileEntryList = DebugLogger.logFileMap.get(logType);
+                    for(SimpleEntry<LoD, File> fileEntry : fileEntryList)
+                    {
+                        if(fileEntry.getKey().compareTo(levelOfDetail) >= 0)
+                        {
+                            try
+                            {
+                                FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
+
+                                String message = generate_Message(msgBody, appendedStrings);
+                                fileWriter.write(message);
+
+                                fileWriter.close();
+                            }
+                            catch (IOException e)
+                            {
+                                System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ fileEntry.getValue().getAbsolutePath());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
 				}
 				else
 				{
@@ -677,32 +675,31 @@ public final class DebugLogger
 	 * @param appendedStrings
 	 * @throws NoSuchElementException
 	 */
-	public static synchronized String log_Error(String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
+	public static synchronized void log_Error(String logType, String msgBody, String...appendedStrings) throws NoSuchElementException
 	{
 		constructionRequest();
 		if(isEnabled && DebugLogger.hasErrorOutput)
 		{
 			if(logFileMap.containsKey(logType))
 			{
-				SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
-				try
-				{
-					
-					FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
-					
-					String message = "ERROR: "+ generate_Message(msgBody, appendedStrings);
-					fileWriter.write(message);
-					
-					fileWriter.close();
-					
-					return message;
-				}
-				catch (IOException e)
-				{
-					System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
-					e.printStackTrace();
-					return null;
-				}
+                List<SimpleEntry<LoD, File>> fileEntryList = DebugLogger.logFileMap.get(logType);
+                for(SimpleEntry<LoD, File> fileEntry : fileEntryList)
+                {
+                    try
+                    {
+                        FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
+
+                        String message = "ERROR: "+ generate_Message(msgBody, appendedStrings);
+                        fileWriter.write(message);
+
+                        fileWriter.close();
+                    }
+                    catch (IOException e)
+                    {
+                        System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ fileEntry.getValue().getAbsolutePath());
+                        e.printStackTrace();
+                    }
+                }
 			}
 			else
 			{
@@ -710,7 +707,6 @@ public final class DebugLogger
 				throw noElemExcept;
 			}
 		}
-		else return null;
 	}
 	
 	/**
@@ -729,22 +725,25 @@ public final class DebugLogger
 			{
 				if(logFileMap.containsKey(logType))
 				{
-					SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
-					try
-					{
-						
-						FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
-						
-						String message = "<ERROR: "+ generate_Message(msgBody, appendedStrings) +"ERROR/>";
-						fileWriter.write(message);
-						
-						fileWriter.close();
-					}
-					catch (IOException e)
-					{
-						System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
-						e.printStackTrace();
-					}
+                    List<SimpleEntry<LoD, File>> fileEntryList = DebugLogger.logFileMap.get(logType);
+                    for(SimpleEntry<LoD, File> fileEntry : fileEntryList)
+                    {
+                        try
+                        {
+
+                            FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
+
+                            String message = "<ERROR: "+ generate_Message(msgBody, appendedStrings) +"ERROR/>";
+                            fileWriter.write(message);
+
+                            fileWriter.close();
+                        }
+                        catch (IOException e)
+                        {
+                            System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ fileEntry.getValue().getAbsolutePath());
+                            e.printStackTrace();
+                        }
+                    }
 				}
 				else
 				{
@@ -773,7 +772,6 @@ public final class DebugLogger
 	
 	/**
 	 * TODO: write javadoc.
-	 * @param levelOfDetail
 	 * @param logTypes
 	 * @param msgBody
 	 * @param appendedStrings
@@ -789,7 +787,8 @@ public final class DebugLogger
 		}
 	}
 
-	
+
+    //TODO: adjust by list handling?
 	public static synchronized PrintWriter get_LogFilePrinter(String logType)
 	{
 		constructionRequest();
@@ -797,20 +796,23 @@ public final class DebugLogger
 		{
 			if(logFileMap.containsKey(logType))
 			{
-				SimpleEntry<LoD, File> fileEntry = DebugLogger.logFileMap.get(logType);
-				try
-				{
-					FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
-					
-					PrintWriter printWriter = new PrintWriter(fileWriter);
-					return printWriter;
-				}
-				catch (IOException e)
-				{
-					System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ logFileMap.get(logType).getValue().getAbsolutePath());
-					e.printStackTrace();
-					return null;
-				}
+                List<SimpleEntry<LoD, File>> fileEntryList = DebugLogger.logFileMap.get(logType);
+                for(SimpleEntry<LoD, File> fileEntry : fileEntryList)
+                {
+                    try
+                    {
+                        FileWriter fileWriter = new FileWriter(fileEntry.getValue(), true);
+
+                        PrintWriter printWriter = new PrintWriter(fileWriter);
+                        return printWriter;
+                    }
+                    catch (IOException e)
+                    {
+                        System.err.println("DebugLogger ERROR: FileWriter has thrown an IOException, while connecting to the File: "+ fileEntry.getValue().getAbsolutePath());
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
 			}
 			else
 			{
@@ -818,7 +820,7 @@ public final class DebugLogger
 				throw noElemExcept;
 			}
 		}
-		else return null;
+		return null;
 	}
 	
 	

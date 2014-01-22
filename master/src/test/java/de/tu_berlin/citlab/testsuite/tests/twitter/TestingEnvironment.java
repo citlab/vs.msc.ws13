@@ -1,9 +1,12 @@
 package de.tu_berlin.citlab.testsuite.tests.twitter;
 
-import backtype.storm.tuple.Fields;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.tests.filterTests.FilterBoltTest;
-import de.tu_berlin.citlab.testsuite.tests.filterTests.FilterOperatorTest;
+import de.tu_berlin.citlab.testsuite.tests.twitter.boltTests.Bolt1_WordFlatMap;
+import de.tu_berlin.citlab.testsuite.tests.twitter.boltTests.Bolt2_BadWordsFilter;
+import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.BadWord;
+import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.STORAGE;
+import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op1_WordFlatMap;
+import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op2_BadWordsFilter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,6 +15,11 @@ public class TestingEnvironment
 {
     private static Op1_WordFlatMap tOp1;
     private static Bolt1_WordFlatMap tBolt1;
+
+    private static Op2_BadWordsFilter tOp2;
+    private static Bolt2_BadWordsFilter tBolt2;
+
+
 
 
     public static void initLogger()
@@ -28,8 +36,17 @@ public class TestingEnvironment
     public static void initEnvironment()
     {
         initLogger();
-        tOp1 = new Op1_WordFlatMap("OP1_WordsFlat", new Fields("msg"));
-        tBolt1 = new Bolt1_WordFlatMap("Bolt1_WordsFlat",tOp1, new Fields("user_id", "word", "id"));
+        tOp1 = new Op1_WordFlatMap("OP1_WordsFlat");
+        tBolt1 = new Bolt1_WordFlatMap("Bolt1_WordsFlat",tOp1);
+        tOp2 = new Op2_BadWordsFilter("OP2_BadWordsFilter");
+        tBolt2 = new Bolt2_BadWordsFilter("Bolt2_BadWordsFilter", tOp2);
+
+        STORAGE.badWords.put("bombe", new BadWord("bombe", 100));
+        STORAGE.badWords.put("nuklear", new BadWord("nuklear", 1000));
+        STORAGE.badWords.put("anschlag", new BadWord("anschlag", 200));
+        STORAGE.badWords.put("religion", new BadWord("religion", 100));
+        STORAGE.badWords.put("macht", new BadWord("macht", 300));
+        STORAGE.badWords.put("kampf", new BadWord("kampf", 300));
     }
 
     @AfterClass
@@ -37,13 +54,22 @@ public class TestingEnvironment
     {
         tOp1.terminateTestSetup();
         tBolt1.terminateTestSetup();
+        tOp2.terminateTestSetup();
+        tBolt2.terminateTestSetup();
     }
 
 
     @Test
-    public void testFilter()
+    public void testWordFlatMap()
     {
         tOp1.testOperator();
         tBolt1.testUDFBolt();
+    }
+
+    @Test
+    public void testBadWordsFilter()
+    {
+        tOp2.testOperator();
+        tBolt2.testUDFBolt();
     }
 }

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 abstract public class UDFBoltTest implements UDFBoltTestMethods
 {
-    public final static String TAG = "BoltTest";
+    public final String logTag;
 
     private final String testName;
     private final OperatorTest opTest;
@@ -31,40 +31,40 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 	private UDFBoltMock udfBolt;
 	
 	private List<Tuple> inputTuples;
-    public final List<Tuple> getOperatorInputTuples() { return opTest.generateInputTuples(); }
-//	private UDFFields udfFields;
 
-//	private IOperator operator;
 	private Window<Tuple, List<Tuple>> window;
 	private IKeyConfig keyConfig;
+
+
+    public final OperatorTest getOpTest() { return opTest; }
 	
 
     public UDFBoltTest(String testName, OperatorTest opTest, Fields outputFields)
     {
+        this.logTag = "BoltTest_"+testName;
         this.testName = testName;
         this.opTest = opTest;
         this.outputFields = outputFields;
-
-        this.initTestSetup();
     }
 
-//	@Before
-	public void initTestSetup()
+
+
+	private void initTestSetup()
 	{
         DebugLogger.addFileLogging(testName+"/bolt", "TupleMock.log", DebugLogger.LoD.DETAILED, TupleMock.TAG);
         DebugLogger.addFileLogging(testName+"/bolt", "OutputCollectorMock.log", DebugLogger.LoD.DETAILED, OutputCollectorMock.TAG);
-        DebugLogger.addFileLogging(testName, "BoltTest.log", DebugLogger.LoD.DETAILED, TAG);
+        DebugLogger.addFileLogging(testName, "BoltTest.log", DebugLogger.LoD.DETAILED, logTag);
 
-        String header = DebugLogger.print_Header("Initializing Bolt-Test Setup...", '-');
-        DebugLogger.log_Message(DebugLogger.LoD.DEFAULT, TAG, header);
+        String header = DebugLogger.print_Header("Initializing Bolt-Test Setup ["+testName +"]...", '-');
+        DebugLogger.log_Message(DebugLogger.LoD.DEFAULT, logTag, header);
 
         try{
             inputTuples = this.generateInputTuples();
-            DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Input-Tuples are: ", DebugPrinter.toTupleListString(inputTuples));
+            DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Input-Tuples are: ", DebugPrinter.toTupleListString(inputTuples));
         }
         catch (NullPointerException e){
             String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
-            DebugLogger.printAndLog_Error(TAG, errorMsg, e.toString());
+            DebugLogger.printAndLog_Error(logTag, errorMsg, e.toString());
             throw new NullPointerException(errorMsg);
         }
 
@@ -76,29 +76,36 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 			udfBolt = new UDFBoltMock(outputFields, operator);
 
             //Logging:
-            DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized windowless UDFBolt.");
+            DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized windowless UDFBolt.");
         }
 		else if(keyConfig == null){
 			udfBolt = new UDFBoltMock(outputFields, operator, window);
 
             //Logging:
             if(window.getClass().equals(CountWindow.class))
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with Count-Window.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with Count-Window.");
             else if(window.getClass().equals(TimeWindow.class))
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with Time-Window.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with Time-Window.");
             else
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with unknown Window type.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with unknown Window type.");
         }
 		else{
 			udfBolt = new UDFBoltMock(outputFields, operator, window, keyConfig);
 
             //Logging:
             if(window.getClass().equals(CountWindow.class))
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with Count-Window & KeyConfig.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with Count-Window & KeyConfig.");
             else if(window.getClass().equals(TimeWindow.class))
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with Time-Window & KeyConfig.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with Time-Window & KeyConfig.");
             else
-                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, TAG, "Initialized UDFBolt with unknown Window type & KeyConfig.");
+                DebugLogger.printAndLog_Message(DebugLogger.LoD.DEFAULT, logTag, "Initialized UDFBolt with unknown Window type & KeyConfig.");
+        }
+
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 	}
 	
@@ -106,10 +113,12 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 //	@Test
 	public void testUDFBolt()
 	{
+        this.initTestSetup();
+
         AssertionError failureTrace = null;
 
-        String header = DebugLogger.print_Header(DebugLogger.LoD.BASIC, "Starting Bolt Test...", '=');
-        DebugLogger.log_Message(DebugLogger.LoD.BASIC, TAG, header);
+        String header = DebugLogger.print_Header(DebugLogger.LoD.BASIC, "Starting Bolt Test ["+testName +"]...", '=');
+        DebugLogger.log_Message(DebugLogger.LoD.BASIC, logTag, header);
 
 
         OutputCollectorMock.resetOutput();
@@ -138,12 +147,12 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
         try{
             assertTrue("UDFBolt.execute(..) result is not equal to asserted Output from OperatorTest! \n", assertRes.equals(outputVals));
 
-            DebugLogger.printAndLog_Message(DebugLogger.LoD.BASIC, TAG, "Bolt Test succeded!",
+            DebugLogger.printAndLog_Message(DebugLogger.LoD.BASIC, logTag, "Bolt Test succeded!",
                     "Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
                     "Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes));
         }
         catch (AssertionError e){
-            DebugLogger.printAndLog_Error(TAG, "Bolt Test failed. For more infos, check the JUnit Failure Trace.",
+            DebugLogger.printAndLog_Error(logTag, "Bolt Test failed. For more infos, check the JUnit Failure Trace.",
                     "Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
                     "Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes),
                     e.toString());
@@ -151,7 +160,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
         }
 
 
-        DebugLogger.printAndLog_Message(DebugLogger.LoD.BASIC, TAG, "Summary:",
+        DebugLogger.printAndLog_Message(DebugLogger.LoD.BASIC, logTag, "Summary ["+testName +"]:",
                 "Number of Input-Tuples: "+ inputTuples.size(),
                 "Number of Tick-Tuples: "+ tickTupleCount,
                 "Number of Output-Values: "+ outputVals.size(),
@@ -159,7 +168,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
 
         String footer = DebugLogger.print_Footer("Finished Bolt Test!", '=');
-        DebugLogger.log_Message(DebugLogger.LoD.BASIC, TAG, footer);
+        DebugLogger.log_Message(DebugLogger.LoD.BASIC, logTag, footer);
 
         if(failureTrace != null)
             throw failureTrace;

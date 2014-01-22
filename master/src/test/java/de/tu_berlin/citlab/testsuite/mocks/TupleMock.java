@@ -19,53 +19,64 @@ import backtype.storm.tuple.Values;
 
 
 public final class TupleMock
-{	
+{
+
 		public final static String TAG = "TupleMock";
-	
-	    public static Tuple mockTickTuple() 
+
+
+        enum IKeyType {UNDEFINED, DEFAULT, BY_FIELDS, BY_SOURCE}
+
+
+
+	    public static Tuple mockTickTuple(String... logTags)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tick-Tuple Mock.", 
-	    							"SYS_COMP_ID: "+ Constants.SYSTEM_COMPONENT_ID,
-	    							"SYS_TICK-STREAM_ID: "+ Constants.SYSTEM_TICK_STREAM_ID);
-	        return TupleMock.mockSourceTuple(Constants.SYSTEM_COMPONENT_ID, Constants.SYSTEM_TICK_STREAM_ID);
+            TupleLogger.logTupleMessage("Created Tick-Tuple Mock.",
+                           new String[]{"SYS_COMP_ID: "+ Constants.SYSTEM_COMPONENT_ID,
+                                        "SYS_TICK-STREAM_ID: "+ Constants.SYSTEM_TICK_STREAM_ID},
+                                        logTags);
+	        return TupleMock.mockSysIDTuple(Constants.SYSTEM_COMPONENT_ID, Constants.SYSTEM_TICK_STREAM_ID);
 	    }
 	
-	    public static Tuple mockSourceTuple(String componentID, String streamID) 
+	    public static Tuple mockSysIDTuple(String componentID, String streamID, String... logTags)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Source-Tuple Mock.", 
-					"SYS_COMP_ID: "+ componentID,
-					"SYS_TICK-STREAM_ID: "+ streamID);
-	        return TupleMock.mockTuple(componentID, streamID, null, KeyConfigFactory.DefaultKey());
+	    	TupleLogger.logTupleMessage("Created Source-Tuple Mock.",
+                           new String[]{"SYS_COMP_ID: "+ componentID,
+                                        "SYS_TICK-STREAM_ID: "+ streamID},
+                                        logTags);
+	        return TupleMock.mockTuple(componentID, streamID, null, KeyConfigFactory.DefaultKey(), IKeyType.UNDEFINED);
 	    }
 	    
 	    
-	    public static Tuple mockTuple(Values vals)
+	    public static Tuple mockTuple(Values vals, String... logTags)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by DefaultKey.", 
-					"Vals: "+ DebugPrinter.toString(vals),
-					"IKeyConfig: "+ "DEFAULT-Key");
-	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.DefaultKey());
+	    	TupleLogger.logTupleMessage("Created Tuple Mock by DefaultKey.",
+                           new String[]{"Vals: "+ DebugPrinter.toString(vals),
+					                    "IKeyConfig: "+ "DEFAULT-Key"},
+                                        logTags);
+	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.DefaultKey(), IKeyType.DEFAULT);
 	    }
 	    
-	    public static Tuple mockTupleBySource(String componentID, Values vals)
+	    public static Tuple mockTupleBySource(String componentID, Values vals, String... logTags)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by Source.", 
-					"Vals: "+ DebugPrinter.toString(vals),
-					"SYS_COMP_ID: "+ componentID);
-	    	return TupleMock.mockTuple(componentID, null, vals, KeyConfigFactory.BySource());
+	    	TupleLogger.logTupleMessage("Created Tuple Mock by Source.",
+                           new String[]{"Vals: "+ DebugPrinter.toString(vals),
+					                    "SYS_COMP_ID: "+ componentID},
+                                        logTags);
+	    	return TupleMock.mockTuple(componentID, null, vals, KeyConfigFactory.BySource(), IKeyType.BY_SOURCE);
 	    }
 	    
-	    public static Tuple mockTupleByFields(Values vals, Fields fields)
+	    public static Tuple mockTupleByFields(Values vals, Fields fields, String... logTags)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by Fields.", 
-					"Vals: "+ DebugPrinter.toString(vals),
-					"Fields: "+ DebugPrinter.toString(fields));
+	    	TupleLogger.logTupleMessage("Created Tuple Mock by Fields.",
+                           new String[]{"Vals: "+ DebugPrinter.toString(vals),
+					                    "Fields: "+ DebugPrinter.toString(fields)},
+                                        logTags);
 
             String[] fieldsStr = new String[fields.size()];
             for(int n = 0 ; n < fields.size() ; n++){
                 fieldsStr[n] = fields.get(n);
             }
-	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.ByFields(fields), fieldsStr);
+	    	return TupleMock.mockTuple(null, null, vals, KeyConfigFactory.ByFields(fields), IKeyType.BY_FIELDS, fieldsStr);
 	    }
 	    
 	    /**
@@ -79,16 +90,17 @@ public final class TupleMock
 	     */
 	    public static Tuple mockTupleCompletely(String componentID, String streamID, Values vals, IKeyConfig keyConfig, String... keyFields)
 	    {
-	    	DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by complete assignment.", 
-					"Vals: "+ DebugPrinter.toString(vals),
-					"SYS_COMP_ID: "+ componentID,
-					"SYS_STREAM_ID: "+ streamID);
-	    	return TupleMock.mockTuple(componentID, streamID, vals, keyConfig, keyFields);
+            DebugLogger.log_Message(LoD.DETAILED, TAG, "Created Tuple Mock by complete assignment.",
+                                    "Vals: "+ DebugPrinter.toString(vals),
+                                    "SYS_COMP_ID: "+ componentID,
+                                    "SYS_STREAM_ID: "+ streamID);
+
+	    	return TupleMock.mockTuple(componentID, streamID, vals, keyConfig, IKeyType.UNDEFINED, keyFields);
 	    }
 	    
 
 	    
-	    private static Tuple mockTuple(final String componentID, final String streamID, final Values vals, final IKeyConfig keyConfig, final String... keyFields)
+	    private static Tuple mockTuple(final String componentID, final String streamID, final Values vals, final IKeyConfig keyConfig, final IKeyType keyType, final String... keyFields)
 	    {
 	        Tuple tuple = mock(Tuple.class);
 	        
@@ -136,31 +148,26 @@ public final class TupleMock
 	        	when(tuple.getValues()).thenReturn(vals);
 	        	when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenReturn(vals);
         	}
-	        
-	        
-	        if(keyConfig.equals(KeyConfigFactory.DefaultKey())){
-		        when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
-	        }
-	        else if(keyConfig.equals(KeyConfigFactory.BySource())){
-	        	when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
-	        }
-	        else if(keyConfig.equals(KeyConfigFactory.ByFields(keyFields))){//TODO: check if this equals is well defined.
+
+
+	        if(keyType.equals(IKeyType.BY_FIELDS)){
 	        	when(tuple.getFields()).thenReturn(new Fields(keyFields));
-                when(tuple.getValueByField(argThat(new IsAnyString()))).thenAnswer(new Answer<Object>(){
+                when(tuple.getValueByField(argThat(new IsAnyString()))).thenAnswer(new Answer<Object>() {
 
                     public Object answer(InvocationOnMock invocation)
                             throws Throwable {
                         String keyField = (String) invocation.getArguments()[0];
+                        //TODO: change to TupleLogger here:
                         DebugLogger.log_Message(LoD.DETAILED, TAG, "Searching for Tuple Value by Field.",
-                                "Key-Field: "+ keyField);
+                                "Key-Field: " + keyField);
 
-                        for(int n = 0 ; n < keyFields.length ; n++){
+                        for (int n = 0; n < keyFields.length; n++) {
                             String actField = keyFields[n];
-                            if(keyField.equals(actField)){
+                            if (keyField.equals(actField)) {
 
                                 DebugLogger.log_Message(LoD.DETAILED, TAG, "Found Tuple Value by Field.",
-                                        "Value: "+ vals.get(n).toString(),
-                                        "Key-Field: "+ actField);
+                                        "Value: " + vals.get(n).toString(),
+                                        "Key-Field: " + actField);
                                 return vals.get(n);
                             }
 
@@ -169,6 +176,10 @@ public final class TupleMock
                     }
                 });
 	        }
+            else{
+                when(tuple.getFields()).thenThrow(new RuntimeException("Trying to call getFields() on a MockTuple that has no fields!"));
+                when(tuple.getValueByField(argThat(new IsAnyString()))).thenThrow(new RuntimeException("Trying to call getValueByField(..) on a MockTuple that has no fields!"));
+            }
 	        
 	        
 	        
@@ -225,4 +236,59 @@ public final class TupleMock
 	    	return tupleString;
 	    }
 
+}
+
+final class TupleLogger
+{
+    public static void logTupleMessage(String logMsg, String[] logInfo, String... logTags)
+    {
+        //If no logTags are provided, use the static final TAG inside the TupleLogger.logTupleMessage():
+        if(logTags.length == 0){
+            if(logInfo.length == 0)
+                DebugLogger.log_Message(LoD.DETAILED, TupleMock.TAG, logMsg);
+            else
+                DebugLogger.log_Message(LoD.DETAILED, TupleMock.TAG, logMsg, logInfo);
+        }
+        //If only one logTag is provided, use this inside the TupleLogger.logTupleMessage():
+        else if(logTags.length == 1){
+            if(logInfo.length == 0)
+                DebugLogger.log_Message(LoD.DETAILED, logTags[0], logMsg);
+            else
+                DebugLogger.log_Message(LoD.DETAILED, logTags[0], logMsg, logInfo);
+        }
+        //If several logTags are provided, use these inside the DebugLogger.multiLog_Message():
+        else{
+            if(logInfo.length == 0)
+                DebugLogger.multiLog_Message(LoD.DETAILED, logTags, logMsg);
+            else
+                DebugLogger.multiLog_Message(LoD.DETAILED, logTags, logMsg, logInfo);
+
+        }
+    }
+
+    public static void logTupleError(String logMsg, String[] logInfo, String... logTags)
+    {
+        //If no logTags are provided, use the static final TAG inside the TupleLogger.logTupleMessage():
+        if(logTags.length == 0){
+            if(logInfo.length == 0)
+                DebugLogger.log_Error(TupleMock.TAG, logMsg);
+            else
+                DebugLogger.log_Error(TupleMock.TAG, logMsg, logInfo);
+        }
+        //If only one logTag is provided, use this inside the TupleLogger.logTupleMessage():
+        else if(logTags.length == 1){
+            if(logInfo.length == 0)
+                DebugLogger.log_Error(logTags[0], logMsg);
+            else
+                DebugLogger.log_Error(logTags[0], logMsg, logInfo);
+        }
+        //If several logTags are provided, use these inside the DebugLogger.multiLog_Message():
+        else{
+            if(logInfo.length == 0)
+                DebugLogger.multiLog_Error(logTags, logMsg);
+            else
+                DebugLogger.multiLog_Error(logTags, logMsg, logInfo);
+
+        }
+    }
 }

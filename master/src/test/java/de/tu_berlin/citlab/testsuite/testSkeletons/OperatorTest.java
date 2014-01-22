@@ -15,12 +15,13 @@ import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
 abstract public class OperatorTest implements OperatorTestMethods
 {
-	public final static String TAG = "OperatorTest";
+	public final String logTag;
 
     private final String testName;
     private final Fields inputFields;
@@ -34,55 +35,64 @@ abstract public class OperatorTest implements OperatorTestMethods
 
     public OperatorTest(String testName, Fields inputFields)
     {
+        this.logTag = "OperatorTest_"+testName;
         this.testName = testName;
         this.inputFields = inputFields;
-
-        this.initTestSetup();
     }
 
-//	@Before
-	public void initTestSetup()
+
+
+	private void initTestSetup()
 	{
 		//Will be overridden from configureDebugLogger() if set there explicitly:
 		DebugLogger.addFileLogging(testName+"/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
 		DebugLogger.addFileLogging(testName+"/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
-		DebugLogger.addFileLogging(testName, "OperatorTest.log", LoD.DETAILED, TAG);
+		DebugLogger.addFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
 //		this.configureDebugLogger();
 		
 		
-		String header = DebugLogger.print_Header("Initializing Operator-Test Setup...", '-');
-		DebugLogger.log_Message(LoD.DEFAULT, TAG, header);
+		String header = DebugLogger.print_Header("Initializing Operator-Test Setup ["+testName +"]...", '-');
+		DebugLogger.log_Message(LoD.DEFAULT, logTag, header);
 		
 		try{
 			inputTuples = this.generateInputTuples();
-			DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Input-Tuples are: ", DebugPrinter.toTupleListString(inputTuples));
+			DebugLogger.printAndLog_Message(LoD.DEFAULT, logTag, "Input-Tuples are: ", DebugPrinter.toTupleListString(inputTuples));
 		}
 		catch (NullPointerException e){
 			String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
-			DebugLogger.printAndLog_Error(TAG, errorMsg, e.toString());
+			DebugLogger.printAndLog_Error(logTag, errorMsg, e.toString());
 			throw new NullPointerException(errorMsg);
 			
 		}			
 		try{
 			operator = this.initOperator(inputTuples);
-			DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Operator successfully initialized.");
+			DebugLogger.printAndLog_Message(LoD.DEFAULT, logTag, "Operator successfully initialized.");
 		}
 		catch (NullPointerException e){
 			String errorMsg = "Operator must not be null! Return it in initOperator(..)";
-			DebugLogger.printAndLog_Error(TAG, errorMsg, e.toString());
+			DebugLogger.printAndLog_Error(logTag, errorMsg, e.toString());
 			throw new NullPointerException(errorMsg);
 		}
-			
-	}
+
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
 	
 
 //	@Test
 	public void testOperator()
 	{
+        this.initTestSetup();
+
 		AssertionError failureTrace = null;
 		
-		String header = DebugLogger.print_Header(LoD.BASIC, "Starting Operator Test...", '=');
-		DebugLogger.log_Message(LoD.BASIC, TAG, header);
+		String header = DebugLogger.print_Header(LoD.BASIC, "Starting Operator Test ["+testName +"]...", '=');
+		DebugLogger.log_Message(LoD.BASIC, logTag, header);
 
 
         OutputCollectorMock.resetOutput();
@@ -103,14 +113,17 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 
         try{
-            assertTrue("Operator.execute(..) result is not equal to asserted Output! \n", assertRes.equals(outputVals));
+            if(assertRes != null)
+                assertTrue("Operator.execute(..) result is not equal to asserted Output! \n", assertRes.equals(outputVals));
+            else //If assertRes is null, the output vals also needs to be null, so that assertRes == outputVals:
+                assertNull(outputVals);
 
-            DebugLogger.printAndLog_Message(LoD.BASIC, TAG, "Operator Test succeded!",
+            DebugLogger.printAndLog_Message(LoD.BASIC, logTag, "Operator Test succeded!",
                     "Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
                     "Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes));
         }
         catch (AssertionError e){
-            DebugLogger.printAndLog_Error(TAG, "Operator Test failed. For more infos, check the JUnit Failure Trace.",
+            DebugLogger.printAndLog_Error(logTag, "Operator Test failed. For more infos, check the JUnit Failure Trace.",
                     "Output Results: "+ DebugPrinter.toObjectWindowString(outputVals),
                     "Asserted Results: "+ DebugPrinter.toObjectWindowString(assertRes),
                     e.toString());
@@ -118,14 +131,14 @@ abstract public class OperatorTest implements OperatorTestMethods
         }
 		
 		
-		DebugLogger.printAndLog_Message(LoD.BASIC, TAG, "Summary:",
+		DebugLogger.printAndLog_Message(LoD.BASIC, logTag, "Summary ["+testName +"]:",
 										"Number of Input-Tuples: "+ inputTuples.size(),
 										"Number of Output-Values: "+ outputVals.size(),
 										"Time to execute input:"+ inputTimeDiff +" ms.");
 		
 		
 		String footer = DebugLogger.print_Footer("Finished Operator Test!", '=');
-		DebugLogger.log_Message(LoD.BASIC, TAG, footer);
+		DebugLogger.log_Message(LoD.BASIC, logTag, footer);
 		
 		if(failureTrace != null)
 			throw failureTrace;

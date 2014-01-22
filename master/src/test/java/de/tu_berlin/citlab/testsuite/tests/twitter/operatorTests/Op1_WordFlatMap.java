@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter;
+package de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
@@ -15,17 +15,19 @@ import java.util.List;
 /**
  * Created by Constantin on 1/21/14.
  */
-class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
+public class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
 {
 
-    public Op1_WordFlatMap(String testName, Fields inputFields) {
-        super(testName, inputFields);
+    public Op1_WordFlatMap(String testName) {
+        super(testName, new Fields("user_id", "msg", "id"));
     }
 
     @Override
     public List<Tuple> generateInputTuples() {
         List<Tuple> tupleList = new ArrayList<Tuple>();
-        tupleList.add(TupleMock.mockTupleByFields(new Values("hey leute heute war angela total witzlos."), this.getInputFields()));
+        int userID = 1;
+        int id = 0;
+        tupleList.add(TupleMock.mockTupleByFields(new Values(userID, "hey leute heute.", id), this.getInputFields()));
         return tupleList;
     }
 
@@ -34,7 +36,6 @@ class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
         IOperator flatMap = new IOperator(){
             public void execute(List<Tuple> input, OutputCollector collector) {
                 for(Tuple t : input){
-                    //TODO: check why getValueByField("msg") is null.
                     String[] words = t.getValueByField("msg").toString().split(" ");
                     for( String word : words ){
 
@@ -49,6 +50,10 @@ class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
 
     @Override
     public List<List<Object>> assertOutput(List<Tuple> inputTuples) {
-        return null;
+        List<List<Object>> outputVals = new ArrayList<List<Object>>();
+        outputVals.add(new Values(1, "hey", 0));
+        outputVals.add(new Values(1, "leute", 0));
+        outputVals.add(new Values(1, "heute.", 0));
+        return outputVals;
     }
 }
