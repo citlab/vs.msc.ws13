@@ -45,9 +45,9 @@ abstract public class OperatorTest implements OperatorTestMethods
 	private void initTestSetup()
 	{
 		//Will be overridden from configureDebugLogger() if set there explicitly:
-		DebugLogger.addFileLogging(testName+"/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
-		DebugLogger.addFileLogging(testName+"/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
-		DebugLogger.addFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
+		DebugLogger.setFileLogging(testName+"/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
+		DebugLogger.setFileLogging(testName+"/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
+		DebugLogger.setFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
 //		this.configureDebugLogger();
 		
 		

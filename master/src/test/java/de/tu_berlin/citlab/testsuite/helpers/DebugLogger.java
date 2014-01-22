@@ -317,17 +317,51 @@ public final class DebugLogger
 	}
 
 
-	
+    public static synchronized File setFileLogging(String fileName, LoD loggingLevel, String logType)
+    {
+        constructionRequest();
+        if(isEnabled && DebugLogger.hasLoggingOutput)
+        {
+            List<SimpleEntry<LoD, File>> newLogFileList = new ArrayList<SimpleEntry<LoD, File>>(5);
+            DebugLogger.logFileMap.put(logType, newLogFileList);
+
+            return DebugLogger.addFileLogging(fileName, loggingLevel, logType);
+        }
+        else return null;
+    }
+
+    public static synchronized File setFileLogging(String relFilePath, String fileName, LoD loggingLevel, String logType)
+    {
+        constructionRequest();
+        if(isEnabled && DebugLogger.hasLoggingOutput)
+        {
+            File debugDir = DebugLogger.homeDir;
+            if(debugDir.exists() == false) debugDir.mkdirs();
+
+            File logFileDir = new File(debugDir.getPath() + File.separatorChar + relFilePath);
+            if(logFileDir.exists() == false) logFileDir.mkdirs();
+
+            List<SimpleEntry<LoD, File>> newLogFileList = new ArrayList<SimpleEntry<LoD, File>>(5);
+            DebugLogger.logFileMap.put(logType, newLogFileList);
+
+            return DebugLogger.addFileLogging(relFilePath + File.separatorChar + fileName, loggingLevel, logType);
+        }
+        else return null;
+    }
+
+
+
+
 /* --------------- */
 /* Public Methods: */
 /* --------------- */
-	
+
 	/**
 	 * Just for clear arrangement, this method will create a stand-out text-header for console-printing. <br>
 	 * This method creates a header, that defines a text-block beginning, combining the char-parameter "lineSymbol" to a line-separator.
 	 * <p>
 	 * <em>This is a convenience-method for {@link DebugLogger#print_Header(de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD, String, char)} with a {@link LoD#DEFAULT} Level-of-Detail.</em>
-	 * 
+	 *
 	 * @param headText : The {@link String}-Headline, that will be printed in the Console.
 	 * @param lineSymbol : A <b>char</b> that is repeatedly printed as a header-line. <em>Hint: Use '=', '-', '.' or something like that.</em>
 	 * @return The formatted header as a {@link String}, to further append this headline to a log-file.
