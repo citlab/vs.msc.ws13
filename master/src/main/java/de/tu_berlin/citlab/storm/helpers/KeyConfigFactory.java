@@ -1,14 +1,11 @@
 package de.tu_berlin.citlab.storm.helpers;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.List;
 
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 
 @SuppressWarnings("serial")
 public class KeyConfigFactory implements Serializable {
@@ -33,10 +30,11 @@ public class KeyConfigFactory implements Serializable {
 	public static IKeyConfig ByFields(final Fields keyFields) {
 		return new IKeyConfig() {
 			public Serializable getKeyOf(Tuple input) {
-				return (Serializable) input.select(keyFields);
+				return (Serializable)input.select(keyFields);
 			}
 		};
 	}
+	// org.apache.commons.lang.StringUtils.join( 
 	
 	public static IKeyConfig BySource() {
 		return bySource;

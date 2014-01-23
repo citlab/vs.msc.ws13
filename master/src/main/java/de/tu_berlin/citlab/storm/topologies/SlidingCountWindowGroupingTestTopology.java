@@ -75,6 +75,7 @@ public class SlidingCountWindowGroupingTestTopology {
 				null, // no outputFields
 				new IOperator() {
 					public void execute(List<Tuple> param, OutputCollector collector ) {
+						System.out.println(param.size());
 						for(Tuple tuple : param) {
 							System.out.println(tuple.getValues());
 						}

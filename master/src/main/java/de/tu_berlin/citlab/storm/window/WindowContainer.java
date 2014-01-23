@@ -16,8 +16,4 @@ public class WindowContainer<I> implements Serializable, Cloneable
 	public List<I> getWindow(){
 		return window;
 	}
-	
-	public void sort(  ){
-		
-	}
 }

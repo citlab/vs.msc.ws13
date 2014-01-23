@@ -59,8 +59,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public void add(I entity) {
 		if (isSatisfied()) {
-//			System.out.println("TimeWindow '" + instanceId + "' is out of bounds");
-//			System.out.println("TimeWindow '" + instanceId + "'s aquiredTimeSlot '" + getAquiredTimeSlot() + "' while timeslot is '" + timeSlot + "' and # of tuples: " + slots.size());
 			throw new ArrayIndexOutOfBoundsException();
 		}
 		slots.add(new TimeEntity<I>(entity));
@@ -70,9 +68,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	public boolean isSatisfied() {
 		boolean result = false;
 		result = getAquiredTimeSlot() >= (long) (timeSlot);
-//			System.out.println("First Entity is from : " + slots.get(0).getTimestamp());
-//			System.out.println("Last Entity is from  : " + slots.get(slots.size() - 1).getTimestamp());
-//			System.out.println("Difference is " + aquiredTimeSlot + " so isSatisfied = " + result);
 		return result;
 	}
 
@@ -96,7 +91,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public TimeWindow<I> clone() {
 		TimeWindow<I> newInstance = new TimeWindow<I>(timeSlot, offset);
-//		System.out.println("TimeWindow '" + instanceId + "' cloned to TimeWindow '" + newInstance.instanceId + "'");
 		return newInstance;
 	}
 
@@ -113,8 +107,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 		List<I> result = null;
 		if (isSatisfied()) {
 			result = flush();
-//			System.out.println("TimeWindow '" + instanceId + "' is satisfied inside addSafely");
-//			System.out.println("TimeWindow '" + instanceId + "'s aquiredTimeSlot '" + getAquiredTimeSlot() + "' while timeslot is '" + timeSlot + "' and # of tuples: " + slots.size());
 		}
 		add(entity);
 		return result;

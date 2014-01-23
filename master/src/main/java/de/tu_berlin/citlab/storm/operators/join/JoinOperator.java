@@ -30,7 +30,7 @@ public class JoinOperator implements IOperator {
 		
 	HashMap<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
-	public JoinOperator(JoinUDF join, TupleComparator joinComparator, TupleProjection projection, String inner, String outer ) {
+	public JoinOperator(JoinUDF join, TupleComparator joinComparator, TupleProjection projection, String outer, String inner ) {
 		this.joinUDF = join;
 		this.joinComparator = joinComparator;
 		this.innerSource = inner;

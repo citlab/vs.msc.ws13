@@ -57,6 +57,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 		Serializable key = keyConfig.getKeyOf( input );
 		if ( ! windows.containsKey(key)) {
 			windows.put(key, stub.clone());
+		} else {
 		}
 		Window<Tuple, List<Tuple>> window = windows.get(key);
 		window.add(input);
@@ -76,14 +77,15 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 		for (Object key : windows.keySet()) {
 			Window<Tuple, List<Tuple>> window = windows.get(key);
 			if (window.isSatisfied()) {
-				
+				List<Tuple> windowTuples = window.flush();
+
 				if(sortByKey!=null){
-					List<Tuple> windowTuples = window.flush();
 					Collections.sort( windowTuples, sortByKey );
 					result.add(windowTuples);
 				} else {
-					result.add(window.flush());
+					result.add(windowTuples);
 				}
+
 			}//if
 		}
 		return result;

@@ -83,7 +83,10 @@ class TweetSource extends BaseRichSpout {
 													"das wetter ist sooo toll",
 													"storm ist interessant",
 													"wat für ne sexbombe",
-													"bomben bauen macht spass und kann ich jedem beibringen" };
+													"bomben bauen macht spass und kann ich jedem beibringen, nuklear sachen muss ich noch lernen",
+													"Für die Religion!!! Die Macht seid mit uns",
+													"Die Macht sei mit mir",
+													"macht macht macht religion nukelar bombe bombe"};
 	int _id = 0;
 
 	SpoutOutputCollector _collector;
@@ -110,12 +113,12 @@ class TweetSource extends BaseRichSpout {
 		
 		_collector.emit(new Values(	user_ids[rndUser],
 									user_messages[rndMsg],
-									_id));
+									""+_id));
 		_id++;
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("user_id", "msg", "id"));
+		declarer.declare(new Fields("user_id", "msg", "tweet_id"));
 	}
 
 	@Override
@@ -246,8 +249,6 @@ public class TweetsFilterUsersWithBadWordsTopology {
 				WINDOW_TYPE ), 1 )
 				.shuffleGrouping("update_user_significance");
 		
-		
-		
 		builder.setBolt(
 			"significant_users",
 			new UDFBolt(
@@ -256,13 +257,14 @@ public class TweetsFilterUsersWithBadWordsTopology {
 					new Fields("user_id", "total_significance" ), // input
 					new FilterUDF() {
 						public Boolean evaluate(Tuple tuple) {
-							return (Integer) tuple.getValueByField("total_significance") > 100;
+							return (Integer) 
+							tuple.getValueByField("total_significance") > 100;
 						}
 					}
 				)
 			),
 			1
-		).shuffleGrouping("user_total_signifiance");
+	 	).shuffleGrouping("user_total_signifiance");
 		
 		
 		

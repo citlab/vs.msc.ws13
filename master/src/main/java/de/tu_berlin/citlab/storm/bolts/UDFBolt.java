@@ -1,8 +1,10 @@
 package de.tu_berlin.citlab.storm.bolts;
 
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.Map;
+
+import java.util.logging.Logger;
 
 import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
@@ -38,7 +40,8 @@ public class UDFBolt extends BaseRichBolt {
 	final protected IOperator operator;
 
 	final protected WindowHandler windowHandler;
-	
+
+
 //	private static int instanceIdCounter = 0;
 //	
 //	public int instanceId = instanceIdCounter++;
@@ -106,18 +109,17 @@ public class UDFBolt extends BaseRichBolt {
 				executeBatches(window);
 			}
 		}
-
 	}
-
 	
 	
 /* Private Methods: */
 /* ================ */
 	
+	
 	private void executeBatches(List<List<Tuple>> windows) {
 		for (List<Tuple> window : windows) {
 			operator.execute(window, collector );
-
+			
 			// if succeed i can always say i processed it
 			for (Tuple tuple : window) {
 				collector.ack(tuple);
