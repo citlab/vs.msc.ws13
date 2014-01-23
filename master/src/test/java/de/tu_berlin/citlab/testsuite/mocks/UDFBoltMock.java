@@ -13,10 +13,13 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
+import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
 
 
 public class UDFBoltMock extends UDFBolt
 {
+    public static final String TAG ="UDFBoltMock";
 	private static final long serialVersionUID = 1L;
 
 
@@ -55,5 +58,19 @@ public class UDFBoltMock extends UDFBolt
 		this.collector = OutputCollectorMock.mockOutputCollector();
 	}
 
+    @Override
+    public void execute(Tuple input) {
+        super.execute(input);
 
+        DebugLogger.printAndLog_Message(DebugLogger.LoD.DETAILED, TAG, "Executed Tuple.",
+                "Tuple Values: "+ DebugPrinter.toObjectListString(input.getValues()));
+    }
+
+    @Override
+    protected void executeBatches(List<List<Tuple>> windows) {
+        super.executeBatches(windows);
+
+        //TODO: write List<List<Tuple>> as an DebugPrinter String and log it here.
+        DebugLogger.printAndLog_Message(DebugLogger.LoD.DETAILED, TAG, "Executed Batch of Tuple Window.");
+    }
 }

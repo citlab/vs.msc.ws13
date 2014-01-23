@@ -102,7 +102,7 @@ public class UDFBolt extends BaseRichBolt {
 /* Private Methods: */
 /* ================ */
 	
-	private void executeBatches(List<List<Tuple>> windows) {
+	protected void executeBatches(List<List<Tuple>> windows) {
         for (List<Tuple> window : windows) {
                 operator.execute(window, collector );
 

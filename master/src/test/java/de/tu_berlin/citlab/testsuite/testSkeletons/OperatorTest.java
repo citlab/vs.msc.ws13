@@ -13,6 +13,7 @@ import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
 import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
 import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
+import de.tu_berlin.citlab.testsuite.mocks.UDFBoltMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
 
 import static org.junit.Assert.assertNull;
@@ -44,11 +45,10 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 	private void initTestSetup()
 	{
-		//Will be overridden from configureDebugLogger() if set there explicitly:
-		DebugLogger.setFileLogging(testName+"/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
-		DebugLogger.setFileLogging(testName+"/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
-		DebugLogger.setFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
-//		this.configureDebugLogger();
+		DebugLogger.setFileLogging(testName + "/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
+		DebugLogger.setFileLogging(testName + "/operator", "UDFBoltMock.log", LoD.DETAILED, UDFBoltMock.TAG);
+        DebugLogger.setFileLogging(testName + "/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
+        DebugLogger.setFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
 		
 		
 		String header = DebugLogger.print_Header("Initializing Operator-Test Setup ["+testName +"]...", '-');

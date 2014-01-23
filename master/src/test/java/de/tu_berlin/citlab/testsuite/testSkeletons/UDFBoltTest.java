@@ -51,8 +51,9 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
 	private void initTestSetup()
 	{
-        DebugLogger.setFileLogging(testName+"/bolt", "TupleMock.log", DebugLogger.LoD.DETAILED, TupleMock.TAG);
-        DebugLogger.setFileLogging(testName+"/bolt", "OutputCollectorMock.log", DebugLogger.LoD.DETAILED, OutputCollectorMock.TAG);
+        DebugLogger.setFileLogging(testName + "/bolt", "TupleMock.log", DebugLogger.LoD.DETAILED, TupleMock.TAG);
+        DebugLogger.setFileLogging(testName + "/bolt", "OutputCollectorMock.log", DebugLogger.LoD.DETAILED, OutputCollectorMock.TAG);
+        DebugLogger.setFileLogging(testName + "/bolt", "UDFBoltMock.log", DebugLogger.LoD.DETAILED, UDFBoltMock.TAG);
         DebugLogger.setFileLogging(testName, "BoltTest.log", DebugLogger.LoD.DETAILED, logTag);
 
         String header = DebugLogger.print_Header("Initializing Bolt-Test Setup ["+testName +"]...", '-');
