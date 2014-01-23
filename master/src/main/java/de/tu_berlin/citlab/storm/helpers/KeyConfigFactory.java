@@ -66,6 +66,10 @@ public class KeyConfigFactory implements Serializable {
 		    		  return total_result;
 		    	  }//if
 		      } // compare()
+			@Override
+			public Serializable getTupleKey(Tuple tuple) {
+				return (Serializable) tuple.select(keyFields);
+			}
 		};
 	}	
 

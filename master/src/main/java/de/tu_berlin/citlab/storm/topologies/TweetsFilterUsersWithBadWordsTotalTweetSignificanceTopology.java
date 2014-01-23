@@ -49,12 +49,9 @@ public class TweetsFilterUsersWithBadWordsTotalTweetSignificanceTopology {
 		
 
 		
-		//Window<Tuple, List<Tuple>> WINDOW_TYPE =new CountWindow<Tuple>(windowSize, slidingOffset);
-		Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(1, 1);
+		Window<Tuple, List<Tuple>> WINDOW_TYPE =new CountWindow<Tuple>(windowSize, slidingOffset);
+		//Window<Tuple, List<Tuple>> WINDOW_TYPE =new TimeWindow<Tuple>(1, 1);
 
-		//new TimeWindow<Tuple>(windowSize, slidingOffset);
-		
-		
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("tweets", new TweetSource(), 1);
 		

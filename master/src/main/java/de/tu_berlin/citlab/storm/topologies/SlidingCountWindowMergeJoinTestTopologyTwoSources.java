@@ -21,6 +21,7 @@ import de.tu_berlin.citlab.storm.operators.join.JoinFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.MergeJoin;
 import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
+import de.tu_berlin.citlab.storm.operators.join.SimpleHashJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 
@@ -97,7 +98,7 @@ public class SlidingCountWindowMergeJoinTestTopologyTwoSources {
 			new UDFBolt(
 				null, // no outputFields
 				new JoinOperator( 
-								new MergeJoin(), 
+								new SimpleHashJoin(), 
 								KeyConfigFactory.compareByFields(new Fields("key")), 
 								projection, 
 								"s1", "s2" ), 
@@ -110,7 +111,7 @@ public class SlidingCountWindowMergeJoinTestTopologyTwoSources {
 
 		
 		Config conf = new Config();
-		conf.setDebug(true);
+		conf.setDebug(false);
 
 		conf.setMaxTaskParallelism(1);
 		conf.setMaxSpoutPending(1);
