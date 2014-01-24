@@ -3,6 +3,7 @@ package de.tu_berlin.citlab.storm.operators.join;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import backtype.storm.task.OutputCollector;
@@ -28,7 +29,7 @@ public class JoinOperator implements IOperator {
 	
 	private String outerSource;
 		
-	HashMap<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
+	private Map<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
 	public JoinOperator(JoinUDF join, TupleComparator joinComparator, TupleProjection projection, String outer, String inner ) {
 		this.joinUDF = join;
