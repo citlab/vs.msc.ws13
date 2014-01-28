@@ -14,10 +14,10 @@ public class TestingEnvironment
 
     public static void initLogger()
     {
-        DebugLogger.setEnabled(true);
-        DebugLogger.setConsoleOutput(DebugLogger.LoD.DEFAULT, true);
-        DebugLogger.appendTimeToOutput(true);
-        DebugLogger.appendCounterToOutput(true);
+//        DebugLogger.setEnabled(true);
+//        DebugLogger.setConsoleOutput(DebugLogger.LoD.DEFAULT, true);
+//        DebugLogger.appendTimeToOutput(true);
+//        DebugLogger.appendCounterToOutput(true);
     }
 
     @BeforeClass

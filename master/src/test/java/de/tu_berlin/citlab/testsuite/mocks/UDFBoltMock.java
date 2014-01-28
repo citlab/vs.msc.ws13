@@ -15,15 +15,24 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 
 
 public class UDFBoltMock extends UDFBolt
 {
-    public static final String TAG ="UDFBoltMock";
+/* Global Private Constants: */
+/* ========================= */
+
+    private static final Logger LOGGER = LogManager.getLogger(DebugLogger.UDFBOLTMOCK_ID);
+    private static final Marker DETAILED = DebugLogger.getDetailedMarker();
+
 	private static final long serialVersionUID = 1L;
 
 
     public final OutputCollector getOutputCollectorMock() { return this.collector; };
+
 
 /* Constructors: */
 /* ============= */
@@ -62,8 +71,7 @@ public class UDFBoltMock extends UDFBolt
     public void execute(Tuple input) {
         super.execute(input);
 
-        DebugLogger.printAndLog_Message(DebugLogger.LoD.DETAILED, TAG, "Executed Tuple.",
-                "Tuple Values: "+ DebugPrinter.toObjectListString(input.getValues()));
+        LOGGER.debug(DETAILED, "Executed Tuple {}", input.toString());
     }
 
     @Override
@@ -71,6 +79,6 @@ public class UDFBoltMock extends UDFBolt
         super.executeBatches(windows);
 
         //TODO: write List<List<Tuple>> as an DebugPrinter String and log it here.
-        DebugLogger.printAndLog_Message(DebugLogger.LoD.DETAILED, TAG, "Executed Batch of Tuple Window.");
+        LOGGER.debug(DETAILED, "Executed Batch of Tuple-Windows.");
     }
 }

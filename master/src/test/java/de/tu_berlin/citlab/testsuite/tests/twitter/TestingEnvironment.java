@@ -7,12 +7,22 @@ import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.BadWord;
 import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.STORAGE;
 import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op1_WordFlatMap;
 import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op2_BadWordsFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+
 
 public class TestingEnvironment
 {
+    static {
+        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2.xml");
+    }
+    private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
+
     private static Op1_WordFlatMap tOp1;
     private static Bolt1_WordFlatMap tBolt1;
 
@@ -24,10 +34,13 @@ public class TestingEnvironment
 
     public static void initLogger()
     {
-        DebugLogger.setEnabled(true);
-        DebugLogger.setConsoleOutput(DebugLogger.LoD.DEFAULT, true);
-        DebugLogger.appendTimeToOutput(true);
-        DebugLogger.appendCounterToOutput(true);
+//        DebugLogger.setEnabled(true);
+//        DebugLogger.setConsoleOutput(DebugLogger.LoD.DEFAULT, true);
+//        DebugLogger.appendTimeToOutput(true);
+//        DebugLogger.appendCounterToOutput(true);
+
+//        ConfigurationFactory configFactory = ConfigurationFactory.
+//        configFactory.
     }
 
 
@@ -71,5 +84,13 @@ public class TestingEnvironment
     {
         tOp2.testOperator();
         tBolt2.testUDFBolt();
+    }
+
+    @Test
+    public void testLogger()
+    {
+//        LogManager.
+        assertTrue(LOGGER.isDebugEnabled());
+//        assertTrue(LOGGER.isTraceEnabled());
     }
 }

@@ -48,7 +48,8 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 				//Test that inputTuples and Tuple t is the same for each iteration:
 				if(t.equals(inputTuples.get(count))){
 					count ++;
-					DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Evaluation for FilterUDF returned true!", "Evaluated Tuple: "+ t.toString());
+                    //TODO: use LOGGER here:
+//					DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Evaluation for FilterUDF returned true!", "Evaluated Tuple: "+ t.toString());
 					return true;
 				}
 				else return false;
