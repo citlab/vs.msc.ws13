@@ -31,24 +31,9 @@ public class TestingEnvironment
 
 
 
-
-    public static void initLogger()
-    {
-//        DebugLogger.setEnabled(true);
-//        DebugLogger.setConsoleOutput(DebugLogger.LoD.DEFAULT, true);
-//        DebugLogger.appendTimeToOutput(true);
-//        DebugLogger.appendCounterToOutput(true);
-
-//        ConfigurationFactory configFactory = ConfigurationFactory.
-//        configFactory.
-    }
-
-
-
     @BeforeClass
     public static void initEnvironment()
     {
-        initLogger();
         tOp1 = new Op1_WordFlatMap("OP1_WordsFlat");
         tBolt1 = new Bolt1_WordFlatMap("Bolt1_WordsFlat",tOp1);
         tOp2 = new Op2_BadWordsFilter("OP2_BadWordsFilter");

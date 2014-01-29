@@ -8,13 +8,6 @@
             </filters>
         </Console>
 
-        <File name="FileAppender" fileName="logs/all.log">
-            <PatternLayout>
-                <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
-                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
-            </PatternLayout>
-        </File>
-
 
 
         <Console name="TestSuiteConsole" target="SYSTEM_OUT">
@@ -70,7 +63,6 @@
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileAppender"/>
         </Root>
 
 

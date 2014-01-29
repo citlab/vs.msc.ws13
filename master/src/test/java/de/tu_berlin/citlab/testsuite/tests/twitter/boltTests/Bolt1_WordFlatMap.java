@@ -31,10 +31,11 @@ public class Bolt1_WordFlatMap extends UDFBoltTest implements UDFBoltTestMethods
 
     @Override
     public List<Tuple> generateInputTuples() {
-        List<Tuple> tupleList = TupleMockFactory.generateTupleList_ByFields(new Values[]{new Values(1, "hey leute",0),
-                                                                                         new Values(1, "sinnvoller Post.", 0),
-                                                                                         new Values(1,"bomben bauen macht spass",0)},
-                                                                            this.getOpTest().getInputFields());
+        List<Tuple> tupleList = TupleMockFactory.generateTupleList_ByFields(
+                                    new Values[]{new Values(1, "hey leute",0),
+                                                 new Values(1, "sinnvoller Post.", 0),
+                                                 new Values(1,"bomben bauen macht spass",0)},
+                                    this.getOpTest().getInputFields());
         //tupleList.add(TupleMock.mockTickTuple());
         return tupleList;
     }

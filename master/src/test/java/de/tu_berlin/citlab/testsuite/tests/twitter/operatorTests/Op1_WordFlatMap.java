@@ -27,7 +27,8 @@ public class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
         List<Tuple> tupleList = new ArrayList<Tuple>();
         int userID = 1;
         int id = 0;
-        tupleList.add(TupleMock.mockTupleByFields(new Values(userID, "hey leute heute.", id), this.getInputFields()));
+        tupleList.add(TupleMock.mockTupleByFields(new Values(userID, "hey leute heute.", id),
+                                                this.getInputFields()));
         return tupleList;
     }
 
@@ -39,7 +40,8 @@ public class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
                     String[] words = t.getValueByField("msg").toString().split(" ");
                     for( String word : words ){
 
-                        collector.emit( new Values( t.getValueByField("user_id"), word, t.getValueByField("id") ) );
+                        collector.emit(new Values( t.getValueByField("user_id"),
+                                        word, t.getValueByField("id") ) );
                     }//for
                 }//for
 
