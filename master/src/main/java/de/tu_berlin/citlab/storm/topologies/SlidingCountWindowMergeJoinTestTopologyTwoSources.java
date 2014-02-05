@@ -111,7 +111,7 @@ public class SlidingCountWindowMergeJoinTestTopologyTwoSources {
 
 		
 		Config conf = new Config();
-		conf.setDebug(false);
+		conf.setDebug(true);
 
 		conf.setMaxTaskParallelism(1);
 		conf.setMaxSpoutPending(1);

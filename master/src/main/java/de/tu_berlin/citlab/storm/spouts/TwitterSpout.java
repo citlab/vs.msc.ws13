@@ -104,31 +104,17 @@ public class TwitterSpout extends BaseRichSpout {
                 Object[] values = new Object[outputFields.length];
 
                 for (int i = 0; i < outputFields.length; i++) {
-                        switch (outputFields[i]) {
-                        case "user":
-                                values[i] = ret.getUser().getName();
-                                break;
-
-                        case "tweet":
-                                values[i] = ret.getText();
-                                break;
-
-                        case "date":
-                                values[i] = ret.getCreatedAt().getTime();
-                                break;
-
-                        case "lang":
-                                values[i] = ret.getIsoLanguageCode();
-                                break;
-
-                        case "geolocation":
-                                values[i] = ret.getGeoLocation();
-                                break;
-
-                        default:
-                                break;
-                        }
-                }
+                        if( outputFields[i].compareTo("user") == 0)
+                            values[i] = ret.getUser().getName();
+                        if( outputFields[i].compareTo("tweet") == 0)
+                            values[i] = ret.getText();
+                        if( outputFields[i].compareTo("date") == 0)
+                            values[i] = ret.getCreatedAt().getTime();
+                        if( outputFields[i].compareTo("lang") == 0)
+                            values[i] = ret.getIsoLanguageCode();
+                        if( outputFields[i].compareTo("geolocation") == 0)
+                            values[i] = ret.getGeoLocation();
+                }//for
 
                 return new Values(values);
         }

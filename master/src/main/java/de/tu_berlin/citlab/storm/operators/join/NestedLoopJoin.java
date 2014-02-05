@@ -24,6 +24,5 @@ public class NestedLoopJoin implements JoinUDF {
 				}//if
 			}//while
 		}//while
-		
 	}
 }

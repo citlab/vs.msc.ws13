@@ -16,8 +16,8 @@ public class SimpleHashJoin implements JoinUDF {
 	private static final long serialVersionUID = -318981036829194511L;
 	
 	public void executeJoin(JoinPair pair, TupleComparator comparator, TupleProjection projection, OutputCollector collector ) {
-		
-		
+
+
 		Iterator<Tuple> outerTuples = pair.getOuter().getWindow().iterator();
 		
 		Map<Serializable,  List<Tuple> > hashTable= new Hashtable<Serializable, List<Tuple>>();
