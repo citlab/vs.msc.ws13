@@ -52,10 +52,15 @@ public class UDFBolt extends BaseRichBolt {
 	}
 	
 	public UDFBolt(Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, IKeyConfig keyConfig) {
+			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey) {
+		this(outputFields, operator, window, windowKey, KeyConfigFactory.DefaultKey());
+	}
+	
+	public UDFBolt(Fields outputFields, IOperator operator,
+			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey) {
 		this.outputFields = outputFields;
 		this.operator = operator;
-		windowHandler = new WindowHandler(window, keyConfig);
+		windowHandler = new WindowHandler(window, windowKey, groupByKey);
 	}
 	
 	
