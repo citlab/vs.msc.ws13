@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </Console>
+
+
+
+        <Console name="TestSuiteConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="Test-Suite: %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </Console>
+
+
+        <File name="TestSuiteFile" fileName="logs/Test-Suite.log" append="false">
+            <PatternLayout>
+                <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <filters>
+                <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+
+        <File name="UDFMockFile" fileName="logs/mocks/UDFBolt.log" append="false">
+            <PatternLayout>
+                <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+        <File name="TupleMockFile" fileName="logs/mocks/Tuple.log" append="false">
+            <PatternLayout>
+                <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+        <File name="OCollMockFile" fileName="logs/mocks/OutputCollector.log" append="false">
+            <PatternLayout>
+                <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+    </Appenders>
+
+
+
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+
+        <logger name="TestSuite" level="debug"  additivity="false">
+            <AppenderRef ref="TestSuiteConsole" />
+            <AppenderRef ref="TestSuiteFile" />
+        </logger>
+        <logger name="TestSuite.Headers" level="debug"  additivity="true">
+            <AppenderRef ref="UDFMockFile" />
+            <AppenderRef ref="OCollMockFile" />
+            <AppenderRef ref="TupleMockFile" />
+        </logger>
+
+        <logger name="TestSuite.Mocks.UDFBolt" level="debug"  additivity="true">
+            <AppenderRef ref="UDFMockFile" />
+        </logger>
+        <logger name="TestSuite.Mocks.Tuple" level="debug"  additivity="true">
+            <AppenderRef ref="TupleMockFile" />
+        </logger>
+        <logger name="TestSuite.Mocks.OutputCollector" level="debug"  additivity="true">
+            <AppenderRef ref="OCollMockFile" />
+        </logger>
+    </Loggers>
+</Configuration>
