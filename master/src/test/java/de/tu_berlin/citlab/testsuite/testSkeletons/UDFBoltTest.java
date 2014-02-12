@@ -71,7 +71,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 //        DebugLogger.setFileLogging(testName + "/bolt", "UDFBoltMock.log", DebugLogger.LoD.DETAILED, UDFBoltMock.TAG);
 //        DebugLogger.setFileLogging(testName, "BoltTest.log", DebugLogger.LoD.DETAILED, logTag);
 
-        LOGGER.debug(DEFAULT, DebugPrinter.print_Header("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
+        LOGGER.debug(DEFAULT, DebugPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
 
         try{
             inputTuples = this.generateInputTuples();
@@ -132,7 +132,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
         AssertionError failureTrace = null;
 
-        HEADLINER.debug(BASIC, DebugPrinter.print_Header("Starting Bolt Test [" + testName + "]...", '='));
+        HEADLINER.debug(BASIC, DebugPrinter.printHeader("Starting Bolt Test [" + testName + "]...", '='));
 
 
         OutputCollectorMock.resetOutput();
@@ -181,7 +181,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
                     outputVals.size(),
                     inputTimeDiff);
 
-        HEADLINER.debug(BASIC, DebugPrinter.print_Footer("Finished Bolt Test!", '='));
+        HEADLINER.debug(BASIC, DebugPrinter.printFooter("Finished Bolt Test!", '='));
 
 
         if(failureTrace != null)

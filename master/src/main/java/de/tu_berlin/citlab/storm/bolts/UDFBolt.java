@@ -18,11 +18,16 @@ import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 
 public class UDFBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = 1L;
-	
+    private static final Logger LOGGER = LogManager.getLogger("UDFBolt");
+
+
 /* Global Variables: */
 /* ================= */
 	

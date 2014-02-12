@@ -11,8 +11,8 @@ import backtype.storm.tuple.Values;
 public final class DebugPrinter
 {
 
-    private static final String newline = System.getProperty("line.separator");
-    private static final int lineSeparator_length = 40;
+    private static final String NEWLINE = System.getProperty("line.separator");
+    private static final int LINE_SEPARATOR_LENGTH = 40;
 
 
     /**
@@ -26,24 +26,14 @@ public final class DebugPrinter
      * @see {@link System#getProperty(String key)} - with <b>key = "line.separator"</b> for newlines.
      * @see {@link de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD}
      */
-    public static synchronized String print_Header(String headText, char lineSymbol)
+    public static synchronized String printHeader(String headText, char lineSymbol)
     {
         //Line-Generators:
-        String headerSeparator = ""; //will have a constant line-length, defined in the class-constant lineSeparator_length.
-        for(int n = 0 ; n < lineSeparator_length ; n++)
-        {
-            headerSeparator = headerSeparator.concat(String.valueOf(lineSymbol));
-        }
-
-        String headText_Line =""; //will have exactly the same length, as the char-count of the "headText"-String.
-        for(int n = 0 ; n < headText.length() ; n++)
-        {
-            headText_Line = headText_Line.concat(String.valueOf(lineSymbol));
-        }
-
+        String headerSeparator = fillSymbolLine(LINE_SEPARATOR_LENGTH, lineSymbol);
+        String headTextLine = fillSymbolLine(headText.length(), lineSymbol);
 
         //Headline-arranging:
-        String headline = newline + headerSeparator + newline + headText.toUpperCase() + newline + headText_Line + newline;
+        String headline = NEWLINE + headerSeparator + NEWLINE + headText.toUpperCase() + NEWLINE + headTextLine + NEWLINE;
 
         return headline;
     }
@@ -52,32 +42,34 @@ public final class DebugPrinter
      * Just for clear arrangement, this method will create a stand-out text-footer for console-printing.
      * This method creates a footer, that defines a text-block ending, combining the char-parameter "lineSymbol" to a line-separator.
      *
-     * @param headText : The {@link String}-Foot-Line, that will be printed in the Console.
+     * @param footerText : The {@link String}-Foot-Line, that will be printed in the Console.
      * @param lineSymbol : A <b>char</b> that is repeatedly printed as a header-line. <em>Hint: Use '=', '-', '.' or something like that.</em>
      * @return : The formatted header as a {@link String}, to further append this headline to a log-file.
      * @see {@link System#getProperty(String key)} - with <b>key = "line.separator"</b> for newlines.
      * @see {@link de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD}
      */
-    public static synchronized String print_Footer(String headText, char lineSymbol)
+    public static synchronized String printFooter(String footerText, char lineSymbol)
     {
         //Line-Generators:
-        String footerSeparator = ""; //will have a constant line-length, defined in the class-constant lineSeparator_length.
-        for(int n = 0 ; n < lineSeparator_length ; n++)
-        {
-            footerSeparator = footerSeparator.concat(String.valueOf(lineSymbol));
-        }
-
-        String headText_Line =""; //will have exactly the same length, as the char-count of the "headText"-String.
-        for(int n = 0 ; n < headText.length() ; n++)
-        {
-            headText_Line = headText_Line.concat(String.valueOf(lineSymbol));
-        }
-
+        String footerSeparator = fillSymbolLine(LINE_SEPARATOR_LENGTH, lineSymbol);
+        String footTextLine = fillSymbolLine(footerText.length(), lineSymbol);
 
         //Headline-arranging:
-        String footLine = newline + headText_Line + newline + headText.toUpperCase() + newline + footerSeparator + newline;
+        String footLine = NEWLINE + footTextLine + NEWLINE + footerText.toUpperCase() + NEWLINE + footerSeparator + NEWLINE;
 
         return footLine;
+    }
+
+
+    private static synchronized String fillSymbolLine(int lineLength, char lineSymbol)
+    {
+        String symbolLine ="";
+        for(int n = 0 ; n < lineLength; n++)
+        {
+            symbolLine = symbolLine.concat(String.valueOf(lineSymbol));
+        }
+
+        return symbolLine;
     }
 
 
@@ -175,10 +167,10 @@ public final class DebugPrinter
                 Object actObj = vals.get(i);
                 output += actObj.toString();
 
-                if(i+1 != vals.size())
-                    output += ", ";
+                if(i+1 == vals.size())
+                    output += "]";
                 else
-                    output +="]";
+                    output +=", ";
             }
 
             return output;

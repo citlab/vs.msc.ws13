@@ -36,13 +36,13 @@ abstract public class OperatorTest implements OperatorTestMethods
 /* Global Variables: */
 /* ================= */
 
-	public final String logTag;
+    public final String logTag;
 
     private final String testName;
     private final Fields inputFields;
 
-	private List<Tuple> inputTuples;
-	private IOperator operator;
+    private List<Tuple> inputTuples;
+    private IOperator operator;
 
     public final Fields getInputFields() { return inputFields; }
 
@@ -63,7 +63,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 //        DebugLogger.setFileLogging(testName + "/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
 //        DebugLogger.setFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
 		
-		LOGGER.debug(DebugPrinter.print_Header("Initializing Operator-Test Setup [" + testName + "]...", '-'));
+		LOGGER.debug(DebugPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
 
 		try{
 			inputTuples = this.generateInputTuples();
@@ -102,7 +102,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 		AssertionError failureTrace = null;
 
-        HEADLINER.debug(BASIC, DebugPrinter.print_Header("Starting Operator Test [" + testName + "]...", '='));
+        HEADLINER.debug(BASIC, DebugPrinter.printHeader("Starting Operator Test [" + testName + "]...", '='));
 
 
         OutputCollectorMock.resetOutput();
@@ -148,7 +148,7 @@ abstract public class OperatorTest implements OperatorTestMethods
                     outputVals.size(),
                     inputTimeDiff);
 
-        HEADLINER.debug(BASIC, DebugPrinter.print_Footer("Finished Operator Test!", '='));
+        HEADLINER.debug(BASIC, DebugPrinter.printFooter("Finished Operator Test!", '='));
 
 
 		if(failureTrace != null)
