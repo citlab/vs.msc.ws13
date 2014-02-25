@@ -103,8 +103,7 @@ public class SlidingCountWindowMergeJoinTestTopologyTwoSources {
 								projection, 
 								"s1", "s2" ), 
 				new CountWindow<Tuple>(windowSize, slidingOffset),
-				KeyConfigFactory.BySource(),
-				KeyConfigFactory.compareByFields(new Fields("key"))
+				KeyConfigFactory.BySource()
 			),
 		1)	.shuffleGrouping("s1")
 			.shuffleGrouping("s2");

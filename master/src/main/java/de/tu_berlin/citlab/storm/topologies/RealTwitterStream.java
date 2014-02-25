@@ -190,7 +190,7 @@ public class RealTwitterStream {
 		.shuffleGrouping("tweets")
 		.shuffleGrouping("significant_users");
 
-		
+		/*
 		builder.setBolt("cassandra_save_tweets",
 				new UDFBolt(
 						new Fields("user_id", "msg", "total_significance" ), 
@@ -210,7 +210,7 @@ public class RealTwitterStream {
 					KeyConfigFactory.ByFields("key1", "key2")
 				),
 			1).shuffleGrouping("spout");
-
+        */
 		
 		Config conf = new Config();
 		conf.setDebug(true);

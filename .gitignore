@@ -20,6 +20,7 @@
 *.rar
 *.tar
 *.zip
+*.iml
 
 # Logs and databases #
 ######################
@@ -49,3 +50,4 @@ Thumbs.db
 __pycache__
 /target
 /bin
+/.idea

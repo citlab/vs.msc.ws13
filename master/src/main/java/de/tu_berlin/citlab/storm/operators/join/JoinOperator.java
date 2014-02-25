@@ -21,7 +21,7 @@ public class JoinOperator implements IOperator {
 
 	protected JoinUDF joinUDF;
 	
-	private TupleComparator joinComparator;
+	private TupleComparator joinPredicate;
 	
 	private TupleProjection projection;
 
@@ -31,9 +31,9 @@ public class JoinOperator implements IOperator {
 		
 	private Map<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
-	public JoinOperator(JoinUDF join, TupleComparator joinComparator, TupleProjection projection, String outer, String inner ) {
+	public JoinOperator(JoinUDF join, TupleComparator joinPredicate, TupleProjection projection, String outer, String inner ) {
 		this.joinUDF = join;
-		this.joinComparator = joinComparator;
+		this.joinPredicate = joinPredicate;
 		this.innerSource = inner;
 		this.outerSource = outer;
 		this.projection = projection;
@@ -65,7 +65,7 @@ public class JoinOperator implements IOperator {
 			// pairs found?
 			if(pair != null ){
 				// join strategy
-				joinUDF.executeJoin(pair, joinComparator, projection, collector );
+				joinUDF.executeJoin(pair, joinPredicate, projection, collector );
 			}
 			else {
 			}
