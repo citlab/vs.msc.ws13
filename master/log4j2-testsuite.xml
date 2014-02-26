@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" name="TestSuite">
+    <Properties>
+        <Property name="hostIP">192.168.1.1</Property>
+        <Property name="hostPort">8000</Property>
+    </Properties>
+
+    <Appenders>
+    <!-- The Root-Appender: Console Output -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </Console>
+
+
+    <!-- Network Socket replacements for Testing: -->
+        <!-- Test Suite File-Appenders: -->
+        <File name="bolt" fileName="logs/Bolt.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <ThresholdFilter level="info" />
+        </File>
+
+        <File name="spout" fileName="logs/Spout.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <ThresholdFilter level="info" />
+        </File>
+
+
+    <!-- Test-Suite Appenders -->
+        <!-- Test Suite Console: -->
+        <Console name="TestSuiteConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="Test-Suite: %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </Console>
+
+
+        <!-- Test Suite File-Appenders: -->
+        <File name="TestSuiteFile" fileName="logs/Test-Suite.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+
+        <File name="UDFMockFile" fileName="logs/mocks/UDFBolt.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+        <File name="TupleMockFile" fileName="logs/mocks/Tuple.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+        <File name="OCollMockFile" fileName="logs/mocks/OutputCollector.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+    </Appenders>
+
+
+
+
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+    <!-- Network Logging for the real Infrastructure: -->
+        <logger name="Bolt" level="info" additivity="false">
+            <AppenderRef ref="bolt" />
+        </logger>
+        <logger name="Spout" level="info" additivity="false">
+            <AppenderRef ref="spout" />
+        </logger>
+
+    <!-- TestSuite Logging: -->
+        <logger name="TestSuite" level="debug"  additivity="false">
+            <AppenderRef ref="TestSuiteConsole" />
+            <AppenderRef ref="TestSuiteFile" />
+        </logger>
+        <logger name="TestSuite.Headers" level="debug"  additivity="true">
+            <AppenderRef ref="UDFMockFile" />
+            <AppenderRef ref="OCollMockFile" />
+            <AppenderRef ref="TupleMockFile" />
+        </logger>
+
+        <logger name="TestSuite.Mocks.UDFBolt" level="debug"  additivity="true">
+            <AppenderRef ref="UDFMockFile" />
+        </logger>
+        <logger name="TestSuite.Mocks.Tuple" level="debug"  additivity="true">
+            <AppenderRef ref="TupleMockFile" />
+        </logger>
+        <logger name="TestSuite.Mocks.OutputCollector" level="debug"  additivity="true">
+            <AppenderRef ref="OCollMockFile" />
+        </logger>
+    </Loggers>
+</Configuration>
