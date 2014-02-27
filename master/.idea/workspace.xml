@@ -67,11 +67,8 @@
       <file leaf-file-name="MergeJoin.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/MergeJoin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="258" selection-end="258" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="848">
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#683#690#0" expanded="false" />
-              </folding>
+            <state line="9" column="13" selection-start="258" selection-end="258" vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="928">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -79,10 +76,8 @@
       <file leaf-file-name="NestedLoopJoin.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/NestedLoopJoin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="13" selection-start="229" selection-end="229" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="464">
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+            <state line="8" column="13" selection-start="229" selection-end="229" vertical-scroll-proportion="0.0" vertical-offset="128" max-vertical-offset="528">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -90,20 +85,7 @@
       <file leaf-file-name="SimpleHashJoin.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/SimpleHashJoin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="13" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="800">
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#728#755#0" expanded="false" />
-                <element signature="e#1100#1107#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RealTwitterStream.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/RealTwitterStream.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="212" column="8" selection-start="6784" selection-end="6784" vertical-scroll-proportion="-21.533333" vertical-offset="2234" max-vertical-offset="3184">
+            <state line="14" column="13" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="224" max-vertical-offset="944">
               <folding />
             </state>
           </provider>
@@ -112,7 +94,7 @@
       <file leaf-file-name="StaticJoinOperator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/StaticJoinOperator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="37" selection-start="890" selection-end="890" vertical-scroll-proportion="0.5701058" vertical-offset="1" max-vertical-offset="1040">
+            <state line="27" column="37" selection-start="890" selection-end="890" vertical-scroll-proportion="0.47058824" vertical-offset="160" max-vertical-offset="1040">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -123,7 +105,7 @@
       <file leaf-file-name="TupleProjection.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/TupleProjection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="17" selection-start="170" selection-end="170" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="208">
+            <state line="7" column="17" selection-start="170" selection-end="170" vertical-scroll-proportion="0.0" vertical-offset="112" max-vertical-offset="256">
               <folding />
             </state>
           </provider>
@@ -132,10 +114,8 @@
       <file leaf-file-name="FilterUDF.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/FilterUDF.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="17" selection-start="129" selection-end="129" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="208">
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+            <state line="6" column="17" selection-start="129" selection-end="129" vertical-scroll-proportion="0.0" vertical-offset="96" max-vertical-offset="240">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -143,10 +123,8 @@
       <file leaf-file-name="FilterOperator.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/FilterOperator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="247" selection-end="247" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="496">
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+            <state line="9" column="13" selection-start="247" selection-end="247" vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="576">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -154,7 +132,7 @@
       <file leaf-file-name="JoinFactory.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/JoinFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="13" selection-start="64" selection-end="64" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="176">
+            <state line="2" column="13" selection-start="64" selection-end="64" vertical-scroll-proportion="0.0" vertical-offset="32" max-vertical-offset="176">
               <folding />
             </state>
           </provider>
@@ -163,7 +141,7 @@
       <file leaf-file-name="JoinOperator.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/JoinOperator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="48" column="0" selection-start="1520" selection-end="1520" vertical-scroll-proportion="0.0" vertical-offset="96" max-vertical-offset="1456">
+            <state line="48" column="0" selection-start="1520" selection-end="1520" vertical-scroll-proportion="0.0" vertical-offset="768" max-vertical-offset="1664">
               <folding />
             </state>
           </provider>
@@ -199,8 +177,8 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="64" />
     <option name="y" value="-4" />
-    <option name="width" value="1857" />
-    <option name="height" value="1205" />
+    <option name="width" value="1303" />
+    <option name="height" value="773" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -399,10 +377,6 @@
               <option name="myItemId" value="storm" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="topologies" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -434,215 +408,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="topologies" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="SlidingCountWindowNLJoinTestTopologyTwoSources.java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sinks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="operators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="operators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="join" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="helpers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vs.msc.ws13" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="master" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="citlab" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="storm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="exceptions" />
+              <option name="myItemId" value="examples" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -819,14 +585,6 @@
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
       <method />
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-      <method />
-    </configuration>
     <configuration default="true" type="Specs2RunConfiguration" factoryName="Specs2">
       <module name="" />
       <setting name="path" value="" />
@@ -840,17 +598,12 @@
       <setting name="showProgressMessages" value="true" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
       <method />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
@@ -878,6 +631,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -914,6 +680,19 @@
       <patterns />
       <method />
     </configuration>
+    <configuration default="true" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <method />
+    </configuration>
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -931,19 +710,6 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <method />
-    </configuration>
-    <configuration default="true" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
-      <module name="" />
-      <setting name="path" value="" />
-      <setting name="package" value="" />
-      <setting name="vmparams" value="" />
-      <setting name="params" value="" />
-      <setting name="workingDirectory" value="$PROJECT_DIR$" />
-      <setting name="searchForTest" value="Across module dependencies" />
-      <setting name="testName" value="" />
-      <setting name="testKind" value="Class" />
-      <setting name="showProgressMessages" value="true" />
       <method />
     </configuration>
     <list size="5">
@@ -994,8 +760,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-4" width="1857" height="1205" extended-state="6" />
-    <editor active="true" />
+    <frame x="64" y="-4" width="1303" height="773" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1007,19 +773,19 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32819584" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3401617" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26473254" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33973867" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2637854" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32819584" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1064,13 +830,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupByTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="22" selection-start="1765" selection-end="1765" vertical-scroll-proportion="0.0" vertical-offset="944" max-vertical-offset="1392">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/window/CountWindow.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="5" column="13" selection-start="108" selection-end="108" vertical-scroll-proportion="0.0" vertical-offset="80" max-vertical-offset="1328">
@@ -1099,34 +858,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/UDFTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="611" selection-end="611" vertical-scroll-proportion="0.0" vertical-offset="256" max-vertical-offset="2016">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#631#658#0" expanded="false" />
-            <element signature="e#2250#2387#0" expanded="false" />
-            <element signature="e#2379#2380#0" expanded="false" />
-            <element signature="e#2521#2795#0" expanded="false" />
-            <element signature="e#2788#2789#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingTimeWindowTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="42" selection-start="2586" selection-end="2586" vertical-scroll-proportion="0.0" vertical-offset="1584" max-vertical-offset="1746">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupingTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="13" selection-start="814" selection-end="814" vertical-scroll-proportion="0.0" vertical-offset="414" max-vertical-offset="1926">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="39" column="0" selection-start="1114" selection-end="1114" vertical-scroll-proportion="0.0" vertical-offset="702" max-vertical-offset="810">
@@ -1134,26 +865,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingTimeWindowJoinTestTopologyTwoSources.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="13" selection-start="1812" selection-end="1812" vertical-scroll-proportion="0.0" vertical-offset="1188" max-vertical-offset="2214">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1334#1363#1" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/bolts/UDFBolt.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="38" column="0" selection-start="1168" selection-end="1168" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2448" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupingWithMultiKeyTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="13" selection-start="813" selection-end="813" vertical-scroll-proportion="0.0" vertical-offset="396" max-vertical-offset="1854">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
@@ -1168,40 +882,9 @@
         <state line="55" column="5" selection-start="1519" selection-end="1519" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2040" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingTimeWindowJoinTestTopologyTwoSources.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="5" selection-start="1589" selection-end="1589" vertical-scroll-proportion="0.0" vertical-offset="759" max-vertical-offset="1782">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1334#1363#1" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupingWithMultiKeyTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="55" selection-start="2064" selection-end="2064" vertical-scroll-proportion="0.0" vertical-offset="410" max-vertical-offset="1458">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingTimeWindowTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="42" selection-start="2586" selection-end="2586" vertical-scroll-proportion="0.85923755" vertical-offset="161" max-vertical-offset="1184">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/twitter.config">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="0" selection-start="285" selection-end="285" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="192" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/CassandraSinkTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="52" selection-start="2104" selection-end="2104" vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1712">
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
@@ -1253,20 +936,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/UDFTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="611" selection-end="611" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1926">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#631#658#0" expanded="false" />
-            <element signature="e#2250#2387#0" expanded="false" />
-            <element signature="e#2379#2380#0" expanded="false" />
-            <element signature="e#2521#2795#0" expanded="false" />
-            <element signature="e#2788#2789#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/window/WindowHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="26" selection-start="280" selection-end="293" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1760">
@@ -1299,88 +968,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/spouts/TwitterSpout.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="43" selection-start="1057" selection-end="1057" vertical-scroll-proportion="0.0" vertical-offset="48" max-vertical-offset="2416">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/CounterProducer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="20" selection-start="1109" selection-end="1109" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="736">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowMergeJoinTestTopologyTwoSources.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="107" column="34" selection-start="3077" selection-end="3077" vertical-scroll-proportion="0.0" vertical-offset="763" max-vertical-offset="1664">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="456" selection-end="456" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1232">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#579#606#0" expanded="false" />
-            <element signature="e#945#960#0" expanded="false" />
-            <element signature="e#1118#1127#0" expanded="false" />
-            <element signature="e#1384#1393#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupByTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="13" selection-start="1990" selection-end="1990" vertical-scroll-proportion="1.1162791" vertical-offset="0" max-vertical-offset="1392">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/SlidingCountWindowGroupingTestTopology.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="13" selection-start="814" selection-end="814" vertical-scroll-proportion="-0.6621067" vertical-offset="564" max-vertical-offset="1392">
-          <folding />
-        </state>
+        <state line="29" column="43" selection-start="1057" selection-end="1057" vertical-scroll-proportion="0.0" vertical-offset="48" max-vertical-offset="2416" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/MergeJoin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="13" selection-start="258" selection-end="258" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="848">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#683#690#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/NestedLoopJoin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="13" selection-start="229" selection-end="229" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="464">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/FilterOperator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="13" selection-start="247" selection-end="247" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="496">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/FilterUDF.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="17" selection-start="129" selection-end="129" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="208">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1401,17 +1016,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/SimpleHashJoin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="13" selection-start="360" selection-end="360" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="800">
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#728#755#0" expanded="false" />
-            <element signature="e#1100#1107#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/topologies/RealTwitterStream.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="212" column="8" selection-start="6784" selection-end="6784" vertical-scroll-proportion="-21.533333" vertical-offset="2234" max-vertical-offset="3184">
           <folding />
         </state>
       </provider>
@@ -1439,7 +1043,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/de/tu_berlin/citlab/storm/operators/join/StaticJoinOperator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="37" selection-start="890" selection-end="890" vertical-scroll-proportion="0.5701058" vertical-offset="1" max-vertical-offset="1040">
+        <state line="27" column="37" selection-start="890" selection-end="890" vertical-scroll-proportion="0.47058824" vertical-offset="160" max-vertical-offset="1040">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
