@@ -12,7 +12,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
-public class StaticJoinOperator implements IOperator {
+public class StaticHashJoinOperator implements IOperator {
 	
 	private static final long serialVersionUID = -1921795142772743781L;
 
@@ -23,7 +23,7 @@ public class StaticJoinOperator implements IOperator {
 	private Map<Serializable,  List<Tuple> > hashTable= new Hashtable<Serializable, List<Tuple>>();
 	
 	
-	public StaticJoinOperator( TupleComparator comparator, TupleProjection projection, Iterator<Tuple> inMemoryTuples ) {
+	public StaticHashJoinOperator(TupleComparator comparator, TupleProjection projection, Iterator<Tuple> inMemoryTuples) {
 		this.joinComparator = comparator;
 		this.projection = projection;
 		

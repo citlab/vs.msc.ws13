@@ -87,7 +87,6 @@ public class SlidingCountWindowNLJoinTestTopologyTwoSources {
 		
 		TupleProjection projection = new TupleProjection(){
 			public Values project(Tuple left, Tuple right) {
-				
 				return new Values(  left.getValueByField("key"),
 									left.getValueByField("value"),
 									right.getValueByField("key"),
