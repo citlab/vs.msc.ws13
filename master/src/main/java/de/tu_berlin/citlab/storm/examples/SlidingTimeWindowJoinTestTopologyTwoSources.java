@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.topologies;
+package de.tu_berlin.citlab.storm.examples;
 
 
 import java.io.Serializable;
@@ -16,9 +16,9 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
-import de.tu_berlin.citlab.storm.operators.join.JoinPredicate;
-import de.tu_berlin.citlab.storm.operators.join.NLJoin;
+import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
@@ -82,13 +82,6 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 			}
 		};
 		
-		JoinPredicate joinPredicate = new JoinPredicate() {
-			public boolean evaluate(Tuple t1, Tuple t2) {
-				return ((String)t1.getValueByField("key")).compareTo( (String)t2.getValueByField("key") ) == 0;
-			}
-		};
-		
-		
 		TupleProjection projection = new TupleProjection(){
 			public Values project(Tuple left, Tuple right) {
 				
@@ -103,7 +96,9 @@ public class SlidingTimeWindowJoinTestTopologyTwoSources {
 		
 		
 		builder.setBolt("slide",
-				new UDFBolt(null, new JoinOperator( new NLJoin(), joinPredicate, projection, "s1", "s2" ), 
+				new UDFBolt(null, new JoinOperator( new NestedLoopJoin(),
+													KeyConfigFactory.compareByFields(new Fields("user_id")),
+													projection, "s1", "s2" ), 
 				new TimeWindow<Tuple>(windowSize, slidingOffset), groupKey), 1)
 				.shuffleGrouping("s1")
 				.shuffleGrouping("s2");

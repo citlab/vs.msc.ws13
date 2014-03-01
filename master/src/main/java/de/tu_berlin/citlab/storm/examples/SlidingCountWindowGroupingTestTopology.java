@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.topologies;
+package de.tu_berlin.citlab.storm.examples;
 
 
 import java.util.List;
@@ -75,6 +75,7 @@ public class SlidingCountWindowGroupingTestTopology {
 				null, // no outputFields
 				new IOperator() {
 					public void execute(List<Tuple> param, OutputCollector collector ) {
+						System.out.println(param.size());
 						for(Tuple tuple : param) {
 							System.out.println(tuple.getValues());
 						}

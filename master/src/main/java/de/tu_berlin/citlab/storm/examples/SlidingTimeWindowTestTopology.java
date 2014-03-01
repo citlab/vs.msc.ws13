@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.topologies;
+package de.tu_berlin.citlab.storm.examples;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class SlidingTimeWindowTestTopology {
 			}
 
 			public void nextTuple() {
-				Utils.sleep(500);
+				Utils.sleep(1);
 				_collector.emit(new Values(ids[currentId++ % ids.length], _id));
 				_id++;
 			}
