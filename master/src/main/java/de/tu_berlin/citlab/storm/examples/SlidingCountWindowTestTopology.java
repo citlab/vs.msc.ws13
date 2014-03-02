@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.topologies;
+package de.tu_berlin.citlab.storm.examples;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -3,6 +3,7 @@ package de.tu_berlin.citlab.storm.operators.join;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import backtype.storm.task.OutputCollector;
@@ -11,6 +12,7 @@ import de.tu_berlin.citlab.storm.exceptions.InvalidJoinPairCountException;
 import de.tu_berlin.citlab.storm.exceptions.JoinException;
 import de.tu_berlin.citlab.storm.exceptions.JoinSourceNotFoundException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
 import de.tu_berlin.citlab.storm.window.WindowContainer;
 
 public class JoinOperator implements IOperator {
@@ -19,7 +21,7 @@ public class JoinOperator implements IOperator {
 
 	protected JoinUDF joinUDF;
 	
-	private JoinPredicate joinPredicate;
+	private TupleComparator joinPredicate;
 	
 	private TupleProjection projection;
 
@@ -27,11 +29,11 @@ public class JoinOperator implements IOperator {
 	
 	private String outerSource;
 		
-	HashMap<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
+	private Map<String, Queue<WindowContainer<Tuple>>> activeWindows = new HashMap<String, Queue<WindowContainer<Tuple>>> ();
 
-	public JoinOperator(JoinUDF join, JoinPredicate predicate, TupleProjection projection, String inner, String outer ) {
+	public JoinOperator(JoinUDF join, TupleComparator joinPredicate, TupleProjection projection, String outer, String inner ) {
 		this.joinUDF = join;
-		this.joinPredicate = predicate;
+		this.joinPredicate = joinPredicate;
 		this.innerSource = inner;
 		this.outerSource = outer;
 		this.projection = projection;

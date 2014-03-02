@@ -6,5 +6,5 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public interface TupleProjection extends Serializable {
-	public Values project(Tuple left, Tuple right);
+	public Values project(Tuple outer, Tuple inner );
 }

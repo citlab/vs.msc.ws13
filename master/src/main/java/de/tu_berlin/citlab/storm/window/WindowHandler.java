@@ -11,95 +11,95 @@ import backtype.storm.tuple.Tuple;
 
 public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 	/* Global Constants: */
 	/* ================= */
 
-	final protected Map<Serializable, Window<Tuple, List<Tuple>>> windows;
-	final Window<Tuple, List<Tuple>> stub;
-	/**
-	 * By assigning window-keys to tuples, multiple windows can be created for
-	 * (semantically) different tuples.
-	 */
-	final protected IKeyConfig windowKey;
-	/**
-	 * By assigning group-keys to tuples, groups can be created WITHIN one
-	 * window. Once a window is satisfied its inner groups are extracted and
-	 * returned by the flush method, just as if each group would have been a
-	 * distinct window before
-	 */
-	final protected IKeyConfig groupByKey;
+    final protected Map<Serializable, Window<Tuple, List<Tuple>>> windows;
+    final Window<Tuple, List<Tuple>> stub;
+    /**
+     * By assigning window-keys to tuples, multiple windows can be created for
+     * (semantically) different tuples.
+     */
+    final protected IKeyConfig windowKey;
+    /**
+     * By assigning group-keys to tuples, groups can be created WITHIN one
+     * window. Once a window is satisfied its inner groups are extracted and
+     * returned by the flush method, just as if each group would have been a
+     * distinct window before
+     */
+    final protected IKeyConfig groupByKey;
 
 
 	/* Constructors: */
 	/* ============= */
 
-	public WindowHandler(Window<Tuple, List<Tuple>> stub) {
-		this(stub, KeyConfigFactory.DefaultKey());
-	}
-	
-	public WindowHandler(Window<Tuple, List<Tuple>> stub, IKeyConfig windowKey) {
-		this(stub, windowKey, KeyConfigFactory.DefaultKey());
-	}
-	
-	public WindowHandler(Window<Tuple, List<Tuple>> stub, IKeyConfig windowKey, IKeyConfig groupByKey) {
-		this.stub = stub;
-		this.windowKey = windowKey;
-		this.groupByKey = groupByKey;
+    public WindowHandler(Window<Tuple, List<Tuple>> stub) {
+        this(stub, KeyConfigFactory.DefaultKey());
+    }
 
-		windows = new HashMap<Serializable, Window<Tuple, List<Tuple>>>();
-	}
+    public WindowHandler(Window<Tuple, List<Tuple>> stub, IKeyConfig windowKey) {
+        this(stub, windowKey, KeyConfigFactory.DefaultKey());
+    }
+
+    public WindowHandler(Window<Tuple, List<Tuple>> stub, IKeyConfig windowKey, IKeyConfig groupByKey) {
+        this.stub = stub;
+        this.windowKey = windowKey;
+        this.groupByKey = groupByKey;
+
+        windows = new HashMap<Serializable, Window<Tuple, List<Tuple>>>();
+    }
 
 	/* Public Methods: */
 	/* =============== */
 
-	public void add(Tuple input) {
-		Serializable key = windowKey.getKeyOf(input);
-		if (!windows.containsKey(key)) {
-			windows.put(key, stub.clone());
-		}
-		Window<Tuple, List<Tuple>> window = windows.get(key);
-		window.add(input);
-	}
+    public void add(Tuple input) {
+        Serializable key = windowKey.getKeyOf(input);
+        if (!windows.containsKey(key)) {
+            windows.put(key, stub.clone());
+        }
+        Window<Tuple, List<Tuple>> window = windows.get(key);
+        window.add(input);
+    }
 
-	public boolean isSatisfied() {
-		boolean result = false;
-		for (Object key : windows.keySet()) {
-			Window<Tuple, List<Tuple>> window = windows.get(key);
-			result |= window.isSatisfied();
-		}
-		return result;
-	}
+    public boolean isSatisfied() {
+        boolean result = false;
+        for (Object key : windows.keySet()) {
+            Window<Tuple, List<Tuple>> window = windows.get(key);
+            result |= window.isSatisfied();
+        }
+        return result;
+    }
 
-	public List<List<Tuple>> flush() {
-		List<List<Tuple>> result = new ArrayList<List<Tuple>>();
-		for (Object key : windows.keySet()) {
-			Window<Tuple, List<Tuple>> window = windows.get(key);
-			if (window.isSatisfied()) {
-				Map<Serializable, List<Tuple>> groups = new HashMap<Serializable, List<Tuple>>();
-				for(Tuple tuple : window.flush()) {
-					Serializable groupKey = groupByKey.getKeyOf(tuple);
-					if(!groups.containsKey(groupKey)) {
-						groups.put(groupKey, new ArrayList<Tuple>());
-					}
-					groups.get(groupKey).add(tuple);
-				}
-				for(List<Tuple> group : groups.values()) {
-					result.add(group);
-				}
-			}
-		}
-		return result;
+    public List<List<Tuple>> flush() {
+        List<List<Tuple>> result = new ArrayList<List<Tuple>>();
+        for (Object key : windows.keySet()) {
+            Window<Tuple, List<Tuple>> window = windows.get(key);
+            if (window.isSatisfied()) {
+                Map<Serializable, List<Tuple>> groups = new HashMap<Serializable, List<Tuple>>();
+                for(Tuple tuple : window.flush()) {
+                    Serializable groupKey = groupByKey.getKeyOf(tuple);
+                    if(!groups.containsKey(groupKey)) {
+                        groups.put(groupKey, new ArrayList<Tuple>());
+                    }
+                    groups.get(groupKey).add(tuple);
+                }
+                for(List<Tuple> group : groups.values()) {
+                    result.add(group);
+                }
+            }
+        }
+        return result;
 
-	}
+    }
 
-	public Window<Tuple, List<Tuple>> getStub() {
-		return stub;
-	}
+    public Window<Tuple, List<Tuple>> getStub() {
+        return stub;
+    }
 
-	public WindowHandler clone() {
-		return null;
-	}
+    public WindowHandler clone() {
+        return null;
+    }
 
 }

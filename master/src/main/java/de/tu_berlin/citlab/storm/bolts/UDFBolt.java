@@ -24,103 +24,103 @@ import org.apache.logging.log4j.Marker;
 
 public class UDFBolt extends BaseRichBolt {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LogManager.getLogger("UDFBolt");
 
 
 /* Global Variables: */
 /* ================= */
-	
-	protected OutputCollector collector;
+
+    protected OutputCollector collector;
 
 /* Global Constants: */
 /* ================= */
-	
-	final protected Fields outputFields;
 
-	final protected IOperator operator;
+    final protected Fields outputFields;
 
-	final protected WindowHandler windowHandler;
+    final protected IOperator operator;
 
-	
-	
+    final protected WindowHandler windowHandler;
+
+
+
 /* Constructors: */
 /* ============= */
-	
-	public UDFBolt(Fields outputFields, IOperator operator) {
-		this(outputFields, operator, new CountWindow<Tuple>(1));
-	}
 
-	public UDFBolt(Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window) {
-		this(outputFields, operator, window, KeyConfigFactory.DefaultKey());
-	}
-	
-	public UDFBolt(Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey) {
-		this(outputFields, operator, window, windowKey, KeyConfigFactory.DefaultKey());
-	}
-	
-	public UDFBolt(Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey) {
-		this.outputFields = outputFields;
-		this.operator = operator;
-		windowHandler = new WindowHandler(window, windowKey, groupByKey);
-	}
-	
-	
-	
+    public UDFBolt(Fields outputFields, IOperator operator) {
+        this(outputFields, operator, new CountWindow<Tuple>(1));
+    }
+
+    public UDFBolt(Fields outputFields, IOperator operator,
+                   Window<Tuple, List<Tuple>> window) {
+        this(outputFields, operator, window, KeyConfigFactory.DefaultKey());
+    }
+
+    public UDFBolt(Fields outputFields, IOperator operator,
+                   Window<Tuple, List<Tuple>> window, IKeyConfig windowKey) {
+        this(outputFields, operator, window, windowKey, KeyConfigFactory.DefaultKey());
+    }
+
+    public UDFBolt(Fields outputFields, IOperator operator,
+                   Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey) {
+        this.outputFields = outputFields;
+        this.operator = operator;
+        windowHandler = new WindowHandler(window, windowKey, groupByKey);
+    }
+
+
+
 /* Public Methods: */
 /* =============== */
 
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		if (outputFields != null) {
-			declarer.declare(outputFields);
-		}
-	}
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        if (outputFields != null) {
+            declarer.declare(outputFields);
+        }
+    }
 
-	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
-			TopologyContext context, OutputCollector collector) {
-		this.collector = collector;
-	}
+    public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
+                        TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+    }
 
-	public Map<String, Object> getComponentConfiguration() {
-		Config conf = new Config();
-		if (windowHandler.getStub() instanceof TimeWindow) {
-			conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
-					((TimeWindow<Tuple>) windowHandler.getStub()).getTimeSlot());
-		}
-		return conf;
-	}
+    public Map<String, Object> getComponentConfiguration() {
+        Config conf = new Config();
+        if (windowHandler.getStub() instanceof TimeWindow) {
+            conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
+                    ((TimeWindow<Tuple>) windowHandler.getStub()).getTimeSlot());
+        }
+        return conf;
+    }
 
-	
-	public void execute(Tuple input) {
-		if (TupleHelper.isTickTuple(input)) {
-			executeBatches(windowHandler.flush());
-		}
-		else {
-			windowHandler.add(input);
-			if (windowHandler.isSatisfied()) {
-				executeBatches(windowHandler.flush());
-			}
-		}
 
-	}
+    public void execute(Tuple input) {
+        if (TupleHelper.isTickTuple(input)) {
+            executeBatches(windowHandler.flush());
+        }
+        else {
+            windowHandler.add(input);
+            if (windowHandler.isSatisfied()) {
+                executeBatches(windowHandler.flush());
+            }
+        }
 
-	
-	
+    }
+
+
+
 /* Private Methods: */
 /* ================ */
-	
-	protected void executeBatches(List<List<Tuple>> windows) {
-        for (List<Tuple> window : windows) {
-                operator.execute(window, collector );
 
-                // if succeed i can always say i processed it
-                for (Tuple tuple : window) {
-                        collector.ack(tuple);
-                }
+    protected void executeBatches(List<List<Tuple>> windows) {
+        for (List<Tuple> window : windows) {
+            operator.execute(window, collector );
+
+            // if succeed i can always say i processed it
+            for (Tuple tuple : window) {
+                collector.ack(tuple);
+            }
         }//for
-	}
+    }
 
 }
