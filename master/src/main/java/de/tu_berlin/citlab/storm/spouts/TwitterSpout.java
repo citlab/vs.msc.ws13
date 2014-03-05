@@ -114,6 +114,8 @@ public class TwitterSpout extends BaseRichSpout {
                             values[i] = ret.getIsoLanguageCode();
                         if( outputFields[i].compareTo("geolocation") == 0)
                             values[i] = ret.getGeoLocation();
+                        if( outputFields[i].compareTo("id") == 0)
+                            values[i] = ret.getUser().getId();
                 }//for
 
                 return new Values(values);
