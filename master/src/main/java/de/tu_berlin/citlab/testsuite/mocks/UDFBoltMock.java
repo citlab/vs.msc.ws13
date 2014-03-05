@@ -14,7 +14,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -78,7 +77,7 @@ public class UDFBoltMock extends UDFBolt
     protected void executeBatches(List<List<Tuple>> windows) {
         super.executeBatches(windows);
 
-        //TODO: write List<List<Tuple>> as an DebugPrinter String and log it here.
+        //TODO: write List<List<Tuple>> as an LogPrinter String and log it here.
         LOGGER.debug(DETAILED, "Executed Batch of Tuple-Windows.");
     }
 }

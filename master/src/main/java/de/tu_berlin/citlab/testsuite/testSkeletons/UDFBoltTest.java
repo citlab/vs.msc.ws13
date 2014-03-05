@@ -6,7 +6,7 @@ import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.DebugPrinter;
+import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
 
 import backtype.storm.tuple.Fields;
@@ -19,8 +19,7 @@ import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 
 
 abstract public class UDFBoltTest implements UDFBoltTestMethods
@@ -71,11 +70,11 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 //        DebugLogger.setFileLogging(testName + "/bolt", "UDFBoltMock.log", DebugLogger.LoD.DETAILED, UDFBoltMock.TAG);
 //        DebugLogger.setFileLogging(testName, "BoltTest.log", DebugLogger.LoD.DETAILED, logTag);
 
-        LOGGER.debug(DEFAULT, DebugPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
+        LOGGER.debug(DEFAULT, LogPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
 
         try{
             inputTuples = this.generateInputTuples();
-            LOGGER.debug(DEFAULT, "Input-Tuples are: \n\t {}", DebugPrinter.toTupleListString(inputTuples));
+            LOGGER.debug(DEFAULT, "Input-Tuples are: \n\t {}", LogPrinter.toTupleListString(inputTuples));
         }
         catch (NullPointerException e){
             String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
@@ -132,7 +131,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
         AssertionError failureTrace = null;
 
-        HEADLINER.debug(BASIC, DebugPrinter.printHeader("Starting Bolt Test [" + testName + "]...", '='));
+        HEADLINER.debug(BASIC, LogPrinter.printHeader("Starting Bolt Test [" + testName + "]...", '='));
 
 
         OutputCollectorMock.resetOutput();
@@ -159,16 +158,16 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
 
         try{
-            assertTrue("UDFBolt.execute(..) result is not equal to asserted Output from OperatorTest! \n", assertRes.equals(outputVals));
+            Assert.assertTrue("UDFBolt.execute(..) result is not equal to asserted Output from OperatorTest! \n", assertRes.equals(outputVals));
 
             LOGGER.debug(BASIC, "Bolt Test succeded! \n\t Output Results: {} \n\t Asserted Results: {}",
-                    DebugPrinter.toObjectWindowString(outputVals),
-                    DebugPrinter.toObjectWindowString(assertRes));
+                    LogPrinter.toObjectWindowString(outputVals),
+                    LogPrinter.toObjectWindowString(assertRes));
         }
         catch (AssertionError e){
             LOGGER.error("Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
-                    DebugPrinter.toObjectWindowString(outputVals),
-                    DebugPrinter.toObjectWindowString(assertRes),
+                    LogPrinter.toObjectWindowString(outputVals),
+                    LogPrinter.toObjectWindowString(assertRes),
                     e);
             failureTrace = e;
         }
@@ -181,7 +180,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
                     outputVals.size(),
                     inputTimeDiff);
 
-        HEADLINER.debug(BASIC, DebugPrinter.printFooter("Finished Bolt Test!", '='));
+        HEADLINER.debug(BASIC, LogPrinter.printFooter("Finished Bolt Test!", '='));
 
 
         if(failureTrace != null)

@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.helpers;
+package de.tu_berlin.citlab.storm.tests.twitter.helpers;
 
 /**
  * Created by Constantin (on behalf of Kay) on 1/22/14.

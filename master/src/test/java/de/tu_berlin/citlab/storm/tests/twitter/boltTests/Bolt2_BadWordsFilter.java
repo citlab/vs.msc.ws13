@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.boltTests;
+package de.tu_berlin.citlab.storm.tests.twitter.boltTests;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;

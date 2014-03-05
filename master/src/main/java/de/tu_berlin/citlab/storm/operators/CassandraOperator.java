@@ -4,6 +4,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.db.*;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class CassandraOperator implements IOperator {
     }
 
     @Override
-    public void execute(List<Tuple> tuples, OutputCollector collector) {
+    public void execute(List<Tuple> tuples, OutputCollector collector) throws OperatorException {
 
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
@@ -40,7 +41,7 @@ public class CassandraOperator implements IOperator {
             try{
                 dao.store( tuples );
             } catch (Exception e ){
-                // ERROR
+                throw new OperatorException("Storing of tuples into Cassandra DB failed!");
             }
         }
 

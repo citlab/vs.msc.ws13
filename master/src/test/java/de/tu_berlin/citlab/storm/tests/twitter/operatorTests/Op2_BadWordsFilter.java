@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests;
+package de.tu_berlin.citlab.storm.tests.twitter.operatorTests;
 
 
 import backtype.storm.task.OutputCollector;
@@ -9,8 +9,8 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
-import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.STORAGE;
-import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.BadWord;
+import de.tu_berlin.citlab.storm.tests.twitter.helpers.STORAGE;
+import de.tu_berlin.citlab.storm.tests.twitter.helpers.BadWord;
 
 import java.util.ArrayList;
 import java.util.List;

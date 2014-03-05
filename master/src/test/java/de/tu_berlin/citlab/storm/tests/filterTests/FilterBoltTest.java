@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.filterTests;
+package de.tu_berlin.citlab.storm.tests.filterTests;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.filterTests;
+package de.tu_berlin.citlab.storm.tests.filterTests;
 
 
 import java.util.ArrayList;
@@ -10,8 +10,6 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FilterUDF;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
@@ -49,7 +47,7 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 				if(t.equals(inputTuples.get(count))){
 					count ++;
                     //TODO: use LOGGER here:
-//					DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Evaluation for FilterUDF returned true!", "Evaluated Tuple: "+ t.toString());
+//					DebugLogger.printAndLog_Message(LoD.DEFAULT, TAG, "Evaluation for FilterUDF returned true!", "Evaluated Tuple: "+ t.toValString());
 					return true;
 				}
 				else return false;

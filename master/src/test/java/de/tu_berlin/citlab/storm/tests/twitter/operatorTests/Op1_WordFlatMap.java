@@ -1,21 +1,16 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests;
+package de.tu_berlin.citlab.storm.tests.twitter.operatorTests;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
-import org.apache.logging.log4j.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
 
 /**
  * Created by Constantin on 1/21/14.

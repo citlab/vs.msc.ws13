@@ -1,7 +1,6 @@
-package de.tu_berlin.citlab.testsuite.tests.filterTests;
+package de.tu_berlin.citlab.storm.tests.filterTests;
 
 import backtype.storm.tuple.Fields;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

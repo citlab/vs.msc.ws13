@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.helpers;
+package de.tu_berlin.citlab.storm.tests.twitter.helpers;
 
 import java.util.HashMap;
 

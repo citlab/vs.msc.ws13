@@ -1,12 +1,12 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter;
+package de.tu_berlin.citlab.storm.tests.twitter;
 
+import de.tu_berlin.citlab.storm.tests.twitter.boltTests.Bolt1_WordFlatMap;
+import de.tu_berlin.citlab.storm.tests.twitter.helpers.BadWord;
+import de.tu_berlin.citlab.storm.tests.twitter.helpers.STORAGE;
+import de.tu_berlin.citlab.storm.tests.twitter.operatorTests.Op1_WordFlatMap;
+import de.tu_berlin.citlab.storm.tests.twitter.operatorTests.Op2_BadWordsFilter;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.tests.twitter.boltTests.Bolt1_WordFlatMap;
-import de.tu_berlin.citlab.testsuite.tests.twitter.boltTests.Bolt2_BadWordsFilter;
-import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.BadWord;
-import de.tu_berlin.citlab.testsuite.tests.twitter.helpers.STORAGE;
-import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op1_WordFlatMap;
-import de.tu_berlin.citlab.testsuite.tests.twitter.operatorTests.Op2_BadWordsFilter;
+import de.tu_berlin.citlab.storm.tests.twitter.boltTests.Bolt2_BadWordsFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;

@@ -1,18 +1,14 @@
-package de.tu_berlin.citlab.testsuite.tests.twitter.boltTests;
+package de.tu_berlin.citlab.storm.tests.twitter.boltTests;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
-import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest;
-import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethods;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 
 import java.util.ArrayList;

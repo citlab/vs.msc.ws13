@@ -4,6 +4,7 @@ import java.util.List;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class DataSink implements IOperator {
@@ -16,7 +17,7 @@ public class DataSink implements IOperator {
 		this.op = op;
 	}
 	
-	public void execute(List<Tuple> tuples, OutputCollector collector) {
+	public void execute(List<Tuple> tuples, OutputCollector collector) throws OperatorException {
 		op.execute( tuples, collector);
 	}
 

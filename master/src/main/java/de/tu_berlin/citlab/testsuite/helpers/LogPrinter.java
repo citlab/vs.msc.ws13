@@ -8,7 +8,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 
-public final class DebugPrinter
+public final class LogPrinter
 {
 
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -84,7 +84,7 @@ public final class DebugPrinter
             String output = "List<Values>(";
             for(int n = 0 ; n < valList.size() ; n++){
                 Values actVals = valList.get(n);
-                output += DebugPrinter.toString(actVals);
+                output += LogPrinter.toValString(actVals);
 
                 if(n+1 != valList.size())
                     output += ", ";
@@ -103,7 +103,7 @@ public final class DebugPrinter
 
             for(int n = 0 ; n < tupleList.size() ; n++){
                 Tuple actTuple = tupleList.get(n);
-                output += actTuple.toString(); //Assumed to use TupleMock, so toString() is valid here.
+                output += actTuple.toString(); //Assumed to use TupleMock, so toValString() is valid here.
 
                 if(n+1 != tupleList.size())
                     output += ", ";
@@ -142,7 +142,7 @@ public final class DebugPrinter
             String output = "List<List<Object>>((";
             for(int n = 0 ; n < objWindow.size(); n++){
                 List<Object> actList = objWindow.get(n);
-                output += DebugPrinter.toObjectListString(actList);
+                output += LogPrinter.toObjectListString(actList);
 
                 if(n+1 != objWindow.size())
                     output += ", ";
@@ -159,7 +159,7 @@ public final class DebugPrinter
 /* Storm Element-Printing Methods: */
 /* =============================== */
 	
-	public static String toString(Values vals)
+	public static String toValString(Values vals)
 	{
         if(vals != null){
             String output ="[";
