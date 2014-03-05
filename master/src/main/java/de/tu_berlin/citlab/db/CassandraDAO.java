@@ -77,12 +77,17 @@ public class CassandraDAO implements DAO, Serializable
 		}
 		
 	}
-	
+
+    //TODO: do we need this function any more?
 	public DBConfig createConfig()
 	{
 		this.config = new CassandraConfig();
 		return config;
 	}
+
+    public void setConfig( CassandraConfig config ){
+        this.config=config;
+    }
 	
 	public void analyzeTuple( Tuple tuple )
 	{

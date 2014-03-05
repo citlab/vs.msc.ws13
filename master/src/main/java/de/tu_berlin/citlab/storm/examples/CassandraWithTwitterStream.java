@@ -21,6 +21,7 @@ import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.db.TupleAnalyzer;
 import de.tu_berlin.citlab.db.TupleFields;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.operators.CassandraOperator;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
@@ -66,41 +67,23 @@ public class CassandraWithTwitterStream {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweets", new TwitterSpout(config), 1);
 
+        CassandraConfig cassandraCfg = new CassandraConfig();
+
+
+
+        cassandraCfg.setParams(  //optional, but defaults not always sensable
+                "127.0.0.1",
+                "myks",
+                "mytable3",
+                new PrimaryKey("user", "id", "msg"), /* CassandraFactory.PrimaryKey(..)  */
+                new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+        );
+
+
         builder.setBolt("save_tweets",
                 new UDFBolt(
                         new Fields( "user", "msg" ),    //Output Fields momentan nicht verwendet
-                        new IOperator()
-                        {
-                            boolean initialized = false;
-
-                            DAO dao = DAOFactory.createDAO( "Cassandra" );
-
-                            @Override
-                            public void execute( List<Tuple> tuples, OutputCollector collector )
-                            {
-                                // First tuple used to initialize datastructures and derive data types
-                                if ( !initialized )
-                                {
-                                    ((CassandraConfig) dao.createConfig()).setParams(  //optional, but defaults not always sensable
-                                            "127.0.0.1",
-                                            "myks",
-                                            "mytable3",
-                                            new PrimaryKey( "user", "id", "msg" ),
-                                            new Fields()
-                                    );
-                                    dao.init();
-                                    dao.analyzeTuple( tuples.get(0) );
-                                    dao.createDataStructures();
-
-                                    initialized = true;
-                                }
-                                else
-                                {
-                                    dao.store( tuples );
-                                }
-                            }
-                        }
-
+                        new CassandraOperator(cassandraCfg)
                 )).shuffleGrouping("tweets");
 
 
