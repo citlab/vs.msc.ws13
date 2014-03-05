@@ -37,7 +37,11 @@ public class CassandraOperator implements IOperator {
         }
         else
         {
-            dao.store( tuples );
+            try{
+                dao.store( tuples );
+            } catch (Exception e ){
+                // ERROR
+            }
         }
 
         // emit tuples
