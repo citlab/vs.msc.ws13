@@ -1,0 +1,25 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+
+POST    /login                      controllers.Application.login()
+
+GET    /kontakt                     controllers.Application.kontakt()
+GET    /impressum                   controllers.Application.impressum()
+
+GET     /server                     controllers.Application.server()
+GET     /deployment                 controllers.Application.deploy()
+POST    /deployment/upload          controllers.Application.upload()
+
+GET     /startserver/nimbus         controllers.Server.startNimbus()
+GET     /startserver/supervisor     controllers.Server.startSupervisor()
+GET     /startserver/node           controllers.Server.startNode()
+GET     /stopserver/id              controllers.Server.stopServer()
+
+POST    /log                        controllers.Log.get()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
