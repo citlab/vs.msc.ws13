@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 public class TestingEnvironment
 {
     static {
-        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2.xml");
+        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
     }
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
 
