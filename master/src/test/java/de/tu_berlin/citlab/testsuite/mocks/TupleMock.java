@@ -19,6 +19,9 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public final class TupleMock
 {
@@ -109,7 +112,6 @@ public final class TupleMock
     {
         Tuple tuple = mock(Tuple.class);
 
-
         class IsAnyFieldsSelector extends ArgumentMatcher<Fields>
         {
             @Override
@@ -151,14 +153,36 @@ public final class TupleMock
         }
         else{
             when(tuple.getValues()).thenReturn(vals);
-            when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenReturn(vals);
+			if(keyFields.length > 0){
+				when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenAnswer(new Answer<Object>() {
+					@Override
+					public Object answer(InvocationOnMock invocation) throws Throwable {
+						Fields fields = (Fields) invocation.getArguments()[0];
+						List<Object> retArr = new ArrayList<Object>(fields.size());
+						for(String actField : fields){
+							for (int n = 0; n < keyFields.length; n++) {
+								String keyField = keyFields[n];
+								if (actField.equals(keyField)) {
+									retArr.add(vals.get(n));
+								}
+							}
+						}
+
+						return retArr;
+					}
+
+				});
+			}
+			else{
+				when(tuple.select(argThat(new IsAnyFieldsSelector()))).thenReturn(vals);
+			}
         }
 
 
         if(keyType.equals(IKeyType.BY_FIELDS)){
             when(tuple.getFields()).thenReturn(new Fields(keyFields));
             when(tuple.getValueByField(argThat(new IsAnyString()))).thenAnswer(new Answer<Object>() {
-
+				@Override
                 public Object answer(InvocationOnMock invocation)
                         throws Throwable {
                     String keyField = (String) invocation.getArguments()[0];
