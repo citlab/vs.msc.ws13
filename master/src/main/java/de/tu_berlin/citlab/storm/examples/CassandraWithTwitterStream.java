@@ -56,7 +56,7 @@ public class CassandraWithTwitterStream {
         String[] keywords = new String[] {"der", "die", "das"};
         String[] languages = new String[] {"de"};
         // String[] languages = new String[] { "en", "de" };
-        String[] outputFields = new String[] {"user", "id"};
+        String[] outputFields = new String[] {"user", "id", "tweet"};
         //String[] outputFields = new String[] {"user", "id"};  // User name as string, Tweet-ID as long
         TwitterConfiguration config = new TwitterConfiguration(user, keywords,
                 languages, outputFields);
@@ -73,8 +73,8 @@ public class CassandraWithTwitterStream {
 
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "127.0.0.1",
-                "myks",
-                "new2",
+                "citstorm",
+                "tweets",
                 new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */
                 new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
         );
