@@ -54,6 +54,6 @@ public class StaticHashJoinOperator implements IOperator {
 					collector.emit(projection.project(memoryTuple,tuple));
 				}
 			}//if
-		}//while			
+		}//while
 	}	
 }
