@@ -1,4 +1,4 @@
-<project name="StormNodeStartupService" basedir="." default="main">
+<project name="NodeStartupService" basedir="." default="main">
 
 	<target name="main">
 		<jar destfile="CITStormNodeStartupService.jar" basedir="./bin">

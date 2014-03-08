@@ -1,4 +1,4 @@
-<project name="StormWebDeployment" basedir="." default="main">
+<project name="WebDeployment" basedir="." default="main">
 
 	<target name="main">
 		<jar destfile="CITStormWebDeployment.jar" basedir="./bin">

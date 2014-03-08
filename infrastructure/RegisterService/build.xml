@@ -1,4 +1,4 @@
-<project name="StormRegisterService" basedir="." default="main">
+<project name="RegisterService" basedir="." default="main">
 
 	<target name="main">
 		<jar destfile="CITStormRegisterService.jar" basedir="./bin">
