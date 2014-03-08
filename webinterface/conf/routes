@@ -14,10 +14,7 @@ GET     /server                     controllers.Application.server()
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
 
-GET     /startserver/nimbus         controllers.Server.startNimbus()
-GET     /startserver/supervisor     controllers.Server.startSupervisor()
-GET     /startserver/node           controllers.Server.startNode()
-GET     /stopserver/id              controllers.Server.stopServer()
+GET     /startserver         controllers.Server.startServer()
 
 POST    /log                        controllers.Log.get()
 
