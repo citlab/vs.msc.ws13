@@ -17,9 +17,13 @@ public class Server extends Controller {
 
     public static Result startServerByAction(String action, String server) {
         if(server.equals("cluster")) {
-            
+            if(action.equals("reboot")) {
+                Cluster.rebootCluster();
+            } else if(action.equals("shutdown")) {
+                Cluster.killCluster();
+            }
         } else if(server.equals("nimbus")) {
-
+            Cluster.startNimbus();
         } else if(server.equals("supervisor")) {
             int count = Integer.parseInt(request().getQueryString("n_sv"));
             Cluster.startSupervisor(count);
