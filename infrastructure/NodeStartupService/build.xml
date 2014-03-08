@@ -1,0 +1,10 @@
+<project name="StormNodeStartupService" basedir="." default="main">
+
+	<target name="main">
+		<jar destfile="CITStormNodeStartupService.jar" basedir="./bin">
+			<manifest>
+				<attribute name="Main-Class" value="de.tu_berlin.citlab.ws.NodeStartupService" />
+			</manifest>
+		</jar>
+	</target>
+</project>
