@@ -23,7 +23,7 @@ public class Config {
     FileInputStream fis = null;
 
     try {
-      fis = new FileInputStream("manager.properties");
+      fis = new FileInputStream("conf/manager.properties");
       prop.load(fis);
     } catch (IOException e) {
       System.err.println("Could not load manager configuration file");
