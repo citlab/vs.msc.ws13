@@ -1,4 +1,4 @@
-<project name="StormClusterManagment" basedir="." default="main">
+<project name="ClusterManagment" basedir="." default="main">
 
 	<target name="main">
 		<jar destfile="CITStormClusterManagment.jar" basedir="./bin">
