@@ -29,16 +29,6 @@ public class WindowHandlerTest {
 		return TupleMock.mockTupleByFields(new Values(windowKey, groupKey, value), fields);
 	}
 	
-//	private static List<List<Tuple>> getWindows(int windows, int groups) {
-//		List<List<Tuple>> result = new ArrayList<List<Tuple>>();
-//		for(int i=1; i <= windows; i++) {
-//			for(int j=1; j <= groups; j++) {
-//				result.add(getTuple("w"+i, "g"+j));
-//			}
-//		}
-//		return result;
-//	}
-	
 	@Before
 	public void setUp() {
 
@@ -115,45 +105,45 @@ public class WindowHandlerTest {
 		);
 		
 
-		handler.add(getTuple("1", "1"));
+		handler.add(getTuple("1", "1", "v1"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("2", "1"));
+		handler.add(getTuple("2", "1", "v2"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("3", "1"));
+		handler.add(getTuple("3", "1", "v3"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("1", "1"));
+		handler.add(getTuple("1", "1", "v4"));
 		assertTrue(handler.isSatisfied());
 		
-		handler.add(getTuple("2", "1"));
+		handler.add(getTuple("2", "1", "v5"));
 		assertTrue(handler.isSatisfied());
 		
-		handler.add(getTuple("3", "1"));
+		handler.add(getTuple("3", "1", "v6"));
 		assertTrue(handler.isSatisfied());
 		
 		handler.flush();
 		assertFalse(handler.isSatisfied());
 
-		handler.add(getTuple("1", "1"));
+		handler.add(getTuple("1", "1", "v1"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("2", "1"));
+		handler.add(getTuple("2", "1", "v2"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("3", "1"));
+		handler.add(getTuple("3", "1", "v3"));
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("1", "1"));
+		handler.add(getTuple("1", "1", "v4"));
 		handler.flush();
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("2", "1"));
+		handler.add(getTuple("2", "1", "v5"));
 		handler.flush();
 		assertFalse(handler.isSatisfied());
 		
-		handler.add(getTuple("3", "1"));
+		handler.add(getTuple("3", "1", "v6"));
 		handler.flush();
 		assertFalse(handler.isSatisfied());
 	}
@@ -162,8 +152,8 @@ public class WindowHandlerTest {
 	@Test
 	public void testObjectConsistency() {
 			
-		Tuple t = getTuple("1", "1");
-		Tuple t2 = getTuple("1", "1");
+		Tuple t = getTuple("1", "1", "v1");
+		Tuple t2 = getTuple("1", "1", "v2");
 		
 		assertFalse(t.equals(t2));
 		
@@ -180,8 +170,7 @@ public class WindowHandlerTest {
 	@Test
 	public void testFlushSingleWindowsSingleGroup() {
 		handler = new WindowHandler(
-			new CountWindow<Tuple>(2),
-			KeyConfigFactory.ByFields("windowKey")
+			new CountWindow<Tuple>(2)
 		);
 		
 		ArrayList<Tuple> l1 = new ArrayList<Tuple>();
@@ -196,6 +185,46 @@ public class WindowHandlerTest {
 		
 		assertTrue(result.size() == 1);
 		assertTrue(result.get(0).equals(l1));
+		
+	}
+	
+	@Test
+	public void testFlushSingleWindowsMultipleGroup() {
+		handler = new WindowHandler(
+			new CountWindow<Tuple>(2),
+			KeyConfigFactory.DefaultKey(),
+			KeyConfigFactory.ByFields("groupKey")
+		);
+		
+		ArrayList<Tuple> l1 = new ArrayList<Tuple>();
+		l1.add(getTuple("1", "1", "v1"));
+		l1.add(getTuple("1", "2", "v1"));
+		
+		for(Tuple t : l1) {
+			handler.add(t);
+		}
+		
+		List<List<Tuple>> result = handler.flush();
+		
+		assertTrue(result.size() == 2);
+		assertTrue(result.get(0).get(0).equals(l1.get(1)));
+		assertTrue(result.get(1).get(0).equals(l1.get(0)));
+		System.out.println(result);
+		
+		l1 = new ArrayList<Tuple>();
+		l1.add(getTuple("1", "1", "v1"));
+		l1.add(getTuple("3", "2", "v3"));
+		
+		for(Tuple t : l1) {
+			handler.add(t);
+		}
+		
+		result = handler.flush();
+		
+		assertTrue(result.size() == 2);
+		assertTrue(result.get(0).get(0).equals(l1.get(1)));
+		assertTrue(result.get(1).get(0).equals(l1.get(0)));
+		System.out.println(result);
 		
 	}
 
