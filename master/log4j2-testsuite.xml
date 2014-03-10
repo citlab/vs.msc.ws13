@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" name="TestSuite">
-    <Properties>
-        <Property name="hostIP">192.168.1.1</Property>
-        <Property name="hostPort">8000</Property>
-    </Properties>
 
     <Appenders>
     <!-- The Root-Appender: Console Output -->
@@ -103,4 +99,5 @@
             <AppenderRef ref="OCollMockFile" />
         </logger>
     </Loggers>
+
 </Configuration>

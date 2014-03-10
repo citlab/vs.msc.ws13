@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" name="CIT-Storm">
+<Configuration status="WARN" name="CIT-Storm" monitorInterval="30">
+
     <Properties>
         <Property name="hostIP">192.168.1.1</Property>
         <Property name="hostPort">8000</Property>
@@ -41,4 +42,5 @@
             <AppenderRef ref="spoutSocket" />
         </logger>
     </Loggers>
+
 </Configuration>
