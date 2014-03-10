@@ -330,6 +330,10 @@ public final class TupleMock
 				Mockito.when(tuple.select(Matchers.argThat(new IsAnyFieldsSelector()))).thenAnswer(new Answer<Object>() {
 					@Override
 					public Object answer(InvocationOnMock invocation) throws Throwable {
+						if(vals.size() != keyFields.length){
+							LOGGER.error("Value- and KeyField-length do not match for this tuple! Correct that in the Tuple generation.");
+							return null;
+						}
 						Fields fields = (Fields) invocation.getArguments()[0];
 						List<Object> retArr = new ArrayList<Object>(fields.size());
 						for(String actField : fields){
@@ -381,16 +385,20 @@ public final class TupleMock
 				@Override
                 public Object answer(InvocationOnMock invocation)
                         throws Throwable {
+
+					if(vals.size() != keyFields.length){
+						LOGGER.error("Value- and KeyField-length do not match for this tuple! Correct that in the Tuple generation.");
+						return null;
+					}
                     String keyField = (String) invocation.getArguments()[0];
 
                     for (int n = 0; n < keyFields.length; n++) {
                         String actField = keyFields[n];
                         if (keyField.equals(actField)) {
-
-                            LOGGER.debug(DETAILED, "Found ValueByField. \n\t Value: {} \n\t Key-Field: {}",
-                                    vals.get(n).toString(),
-                                    actField);
-                            return vals.get(n);
+							LOGGER.debug(DETAILED, "Found ValueByField. \n\t Value: {} \n\t Key-Field: {}",
+								vals.get(n).toString(),
+								actField);
+							return vals.get(n);
                         }
 
                     }

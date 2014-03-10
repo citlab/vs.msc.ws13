@@ -138,21 +138,21 @@ public class CassandraDAO implements DAO, Serializable
 			{
 				//System.out.println("javaTypesinTuple: " + ta.javaTypesInTuple);
 				//System.out.println("switch: " + ta.javaTypesInTuple.get( i ));
-				switch( ta.javaTypesInTuple.get( i ) )  //TODO: besser enum mit typen verwenden
-				{
-					case "String":
-						values.add( tuple.getString( i ) );
-						break;
-					case "Integer":
-						values.add( tuple.getInteger( i ) );
-						break;
-					case "Long":
-						values.add( tuple.getLong( i ) );
-						break;
-					case "blob":  // Object must be serialized
-						values.add( ByteBuffer.wrap( serializeObject( tuple.getValue( i ) ) ) );
-						break;
-				}
+//				switch( ta.javaTypesInTuple.get( i ) )  //TODO: besser enum mit typen verwenden
+//				{
+//					case "String":
+//						values.add( tuple.getString( i ) );
+//						break;
+//					case "Integer":
+//						values.add( tuple.getInteger( i ) );
+//						break;
+//					case "Long":
+//						values.add( tuple.getLong( i ) );
+//						break;
+//					case "blob":  // Object must be serialized
+//						values.add( ByteBuffer.wrap( serializeObject( tuple.getValue( i ) ) ) );
+//						break;
+//				}
 			}
 			bindValues( values.toArray( new Object[ values.size() ] ) );
 			addToBatch( boundStatement );
