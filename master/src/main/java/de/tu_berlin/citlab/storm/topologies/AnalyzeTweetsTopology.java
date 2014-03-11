@@ -14,7 +14,7 @@ import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.operators.CassandraOperator;
+import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
@@ -27,9 +27,7 @@ import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class AnalyzeTweetsTopology implements Serializable{
     private static final int windowSize = 10;
@@ -76,7 +74,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                         for( Tuple p : tuples ){
                             String[] words = p.getStringByField("tweet").split(" ");
                             for( String word : words ){
-                                collector.emit(new Values(p.getValueByField("user"),p.getValueByField("id"), word.toLowerCase() ));
+                                collector.emit(new Values(p.getValueByField("user"),p.getValueByField("id"), word.trim().toLowerCase() ));
                             }//for
                         }//for
                     }// execute()
@@ -108,10 +106,14 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 500)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", 1000)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", 10)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("religion", 200)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("gott", 50)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", 1000)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("heilig", 500)) );
 
         return new UDFBolt(
                 new Fields( "user", "id", "word", "significance" ),
@@ -140,11 +142,57 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                     }// execute()
                 },
-                new TimeWindow<Tuple>(500, 500),
+                new TimeWindow<Tuple>(1000, 1000),
                 KeyConfigFactory.ByFields("user")
         );
 
     }
+
+    public UDFBolt filterBadUsers(){
+
+        return new UDFBolt(
+                new Fields( "user", "id", "tweet" ), // output
+
+                new FilterBadUserMultipleOperators(
+
+                    // process raw comping tweets
+                    new OperatorProcessingDescription(
+                        new FilterOperator(
+                                new Fields("user", "id", "tweet"), // input
+
+                                new FilterUDF() {
+                                    @Override
+                                    public void prepare() {
+                                    }
+
+                                    @Override
+                                    public Boolean evaluate(Tuple tuple ) {
+                                        System.out.println("save "+tuple.getSourceComponent());
+                                        return false;
+                                    }
+                                }),
+                            "tweets"
+                        ),
+
+                        // process new bad users
+                        new OperatorProcessingDescription(
+                                new IOperator(){
+                                    @Override
+                                    public void execute(List<Tuple> tuples, OutputCollector collector) {
+                                        for( Tuple t : tuples ){
+                                            String user = t.getStringByField("user");
+                                            int totalsignificance = t.getIntegerByField("total_significance");
+                                        }
+                                        System.out.println("execute add bad users");
+                                    }// execute()
+                                },
+                                "reduce_to_user_significance"
+                        )
+                ),
+            new TimeWindow<Tuple>(1000, 1000)
+        );
+    }
+
 
 
     public StormTopology createTopology() throws Exception {
@@ -153,6 +201,15 @@ public class AnalyzeTweetsTopology implements Serializable{
         // provide twitter streaminh data
         builder.setSpout("tweets", createTwitterSpout(), 1);
 
+        // filter and find bad users
+        builder.setBolt("filter_bad_users", filterBadUsers(), 1)
+                .shuffleGrouping("tweets")
+                .shuffleGrouping("reduce_to_user_significance");
+
+        builder.setBolt("store_tweets", createCassandraSink(), 1)
+                .shuffleGrouping("filter_bad_users");
+
+        // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
                 .shuffleGrouping("tweets");
 
@@ -161,6 +218,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
                 .shuffleGrouping("join_with_badwords");
+
 
 
         return builder.createTopology();
