@@ -146,7 +146,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                     }// execute()
                 },
-                new TimeWindow<Tuple>(1000, 1000),
+                new CountWindow<Tuple>(1, 1), //new TimeWindow<Tuple>(1000, 1000),
                 KeyConfigFactory.ByFields("user")
         );
 
@@ -167,7 +167,9 @@ public class AnalyzeTweetsTopology implements Serializable{
                                         int totalsignificance = t.getIntegerByField("total_significance");
 
                                         // process detected user
-                                        BadUserDatabase.updateDetectedUser(user, totalsignificance);
+                                        int sig = BadUserDatabase.updateDetectedUser(user, totalsignificance);
+
+                                        // do not output any tuples
                                     }
                                 }// execute()
                             },
@@ -192,7 +194,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                             "tweets"
                         )
                 ),
-                COUNT_WINDOW, //new TimeWindow<Tuple>(2000, 2000),
+            new CountWindow<Tuple>(1, 1), //new TimeWindow<Tuple>(2000, 2000),
             KeyConfigFactory.BySource()
         );
     }

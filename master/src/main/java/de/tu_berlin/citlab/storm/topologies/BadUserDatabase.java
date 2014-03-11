@@ -18,7 +18,6 @@ public class BadUserDatabase extends MultipleOperators implements Serializable {
     public static boolean isDetectedUser(String user){
         if( existUser(user) ){
             Integer sig = BadUserDatabase.badUsers.get(user);
-
            return sig >= SIGNIFICANCE_THRESHOLD;
         } else {
             return false;
@@ -34,7 +33,7 @@ public class BadUserDatabase extends MultipleOperators implements Serializable {
     }
 
     synchronized public static int updateDetectedUser(String user, int total_significance ){
-        if( isDetectedUser(user) ){
+        if( BadUserDatabase.badUsers.containsKey(user) ){
             Integer new_significance = BadUserDatabase.badUsers.get(user) + total_significance;
             BadUserDatabase.badUsers.put(user, new_significance);
 
