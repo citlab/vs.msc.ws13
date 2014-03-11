@@ -115,6 +115,10 @@ public class AnalyzeTweetsTopology implements Serializable{
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", 1000)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("heilig", 500)) );
 
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("der", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("die", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );
+
         return new UDFBolt(
                 new Fields( "user", "id", "word", "significance" ),
                 new StaticHashJoinOperator(
@@ -152,48 +156,44 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         return new UDFBolt(
                 new Fields( "user", "id", "tweet" ), // output
+                new MultipleOperators(
+                    // process new bad users
+                    new OperatorProcessingDescription(
+                            new IOperator(){
+                                @Override
+                                public void execute(List<Tuple> tuples, OutputCollector collector) {
+                                    for( Tuple t : tuples ){
+                                        String user = t.getStringByField("user");
+                                        int totalsignificance = t.getIntegerByField("total_significance");
 
-                new FilterBadUserMultipleOperators(
-
+                                        // process detected user
+                                        BadUserDatabase.updateDetectedUser(user, totalsignificance);
+                                    }
+                                }// execute()
+                            },
+                            "reduce_to_user_significance"
+                    ),
                     // process raw comping tweets
                     new OperatorProcessingDescription(
                         new FilterOperator(
                                 new Fields("user", "id", "tweet"), // input
-
                                 new FilterUDF() {
                                     @Override
                                     public void prepare() {
+                                        //TODO: Load from database if data exists
                                     }
 
                                     @Override
                                     public Boolean evaluate(Tuple tuple ) {
                                         String user = tuple.getStringByField("user");
-                                        return FilterBadUserMultipleOperators.isDetectedUser(user );
+                                        return BadUserDatabase.isDetectedUser(user);
                                     }
                                 }),
                             "tweets"
-                        ),
-
-                        // process new bad users
-                        new OperatorProcessingDescription(
-                                new IOperator(){
-
-                                    @Override
-                                    public void execute(List<Tuple> tuples, OutputCollector collector) {
-                                        for( Tuple t : tuples ){
-                                            String user = t.getStringByField("user");
-                                            int totalsignificance = t.getIntegerByField("total_significance");
-
-                                            // process detected user
-                                            FilterBadUserMultipleOperators.updateDetectedUser(user, totalsignificance);
-                                        }
-
-                                    }// execute()
-                                },
-                                "reduce_to_user_significance"
                         )
                 ),
-            new TimeWindow<Tuple>(2000, 2000)
+                COUNT_WINDOW, //new TimeWindow<Tuple>(2000, 2000),
+            KeyConfigFactory.BySource()
         );
     }
 
