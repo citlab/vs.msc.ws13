@@ -39,7 +39,7 @@ public class AnalyzeTweetsTopology implements Serializable{
     public TwitterSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"der", "die", "das"};
+        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie" };
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
@@ -167,8 +167,8 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                                     @Override
                                     public Boolean evaluate(Tuple tuple ) {
-                                        System.out.println("save "+tuple.getSourceComponent());
-                                        return false;
+                                        String user = tuple.getStringByField("user");
+                                        return FilterBadUserMultipleOperators.isDetectedUser(user );
                                     }
                                 }),
                             "tweets"
@@ -177,19 +177,23 @@ public class AnalyzeTweetsTopology implements Serializable{
                         // process new bad users
                         new OperatorProcessingDescription(
                                 new IOperator(){
+
                                     @Override
                                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                                         for( Tuple t : tuples ){
                                             String user = t.getStringByField("user");
                                             int totalsignificance = t.getIntegerByField("total_significance");
+
+                                            // process detected user
+                                            FilterBadUserMultipleOperators.updateDetectedUser(user, totalsignificance);
                                         }
-                                        System.out.println("execute add bad users");
+
                                     }// execute()
                                 },
                                 "reduce_to_user_significance"
                         )
                 ),
-            new TimeWindow<Tuple>(1000, 1000)
+            new TimeWindow<Tuple>(2000, 2000)
         );
     }
 
