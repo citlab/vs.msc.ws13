@@ -6,7 +6,10 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Properties;
 
 public class CassandraOperator implements IOperator {
 
@@ -18,10 +21,27 @@ public class CassandraOperator implements IOperator {
 
 
     public CassandraOperator( CassandraConfig config ){
-        /* place your code here */
         this.config = config;
+        this.getClusterIP();
     }
 
+    public void getClusterIP()
+    {
+    	Properties prop = new Properties();
+    	InputStream in = getClass().getResourceAsStream("citstorm.properties");
+    	try
+		{
+			prop.load( in );
+			in.close();
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+		}
+    	this.config.setIP( prop.getProperty( "cluster-manager-ip" ) );
+    	
+    }
+    
     @Override
     public void execute(List<Tuple> tuples, OutputCollector collector) {
 

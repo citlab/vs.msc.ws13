@@ -72,7 +72,6 @@ public class CassandraWithTwitterStream {
 
 
         cassandraCfg.setParams(  //optional, but defaults not always sensable
-                "127.0.0.1",
                 "myks",
                 "new2",
                 new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */

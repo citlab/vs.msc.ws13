@@ -14,9 +14,8 @@ public class CassandraConfig implements DBConfig, Serializable
 	private String keyspace;
 	private String table;
 	
-	public void setParams( String IP, String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields )
+	public void setParams( String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields )
 	{
-		this.IP = IP;
 		this.primaryKeys = primaryKeys;
 		this.tupleFields = tupleFields;
 		this.keyspace = keyspace;
@@ -50,6 +49,11 @@ public class CassandraConfig implements DBConfig, Serializable
 	public String getIP()
 	{
 		return IP;
+	}
+	
+	public void setIP( String IP )
+	{
+		this.IP = IP;
 	}
 
 	/**
