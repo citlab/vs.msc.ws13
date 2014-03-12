@@ -23,7 +23,11 @@ public class Server extends Controller {
                 Cluster.killCluster();
             }
         } else if(server.equals("nimbus")) {
-            Cluster.startNimbus();
+            if(action.equals("start")) {
+                Cluster.startNimbus();
+            } else if (action.equals("stop")) {
+                //Cluster.stopNimbus();
+            }
         } else if(server.equals("supervisor")) {
             int count = Integer.parseInt(request().getQueryString("n_sv"));
             Cluster.startSupervisor(count);
