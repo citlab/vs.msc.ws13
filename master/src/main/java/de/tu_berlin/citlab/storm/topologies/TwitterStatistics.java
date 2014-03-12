@@ -29,8 +29,13 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 import java.io.Serializable;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 @SuppressWarnings("serial")
 public class TwitterStatistics implements Serializable {
+	
+	private final static Logger log = Logger.getLogger(TwitterStatistics.class);
+	
 	private static final int windowSize = 10;
 	private static final int slidingOffset = 10;
 
@@ -58,35 +63,131 @@ public class TwitterStatistics implements Serializable {
 				// optional, but defaults not always sensable
 				"127.0.0.1", "citstorm", "tweets",
 				new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..) */
-				new Fields()
-		);
+				new Fields());
 
 		return new UDFBolt(new Fields("user", "id", "tweet"),
 				new CassandraOperator(cassandraCfg), COUNT_WINDOW);
 	}
-	
+
+	public UDFBolt flatMapTweetWords() {
+		return new UDFBolt(new Fields("user", "id", "word"), new IOperator() {
+
+			@Override
+			public void execute(List<Tuple> tuples, OutputCollector collector) {
+				for (Tuple p : tuples) {
+					String[] words = p.getStringByField("tweet").split(" ");
+					for (String word : words) {
+						collector.emit(new Values(p.getValueByField("user"), p
+								.getValueByField("id"), word.trim()
+								.toLowerCase()));
+					}// for
+				}// for
+			}// execute()
+		});
+	}
 
 	private UDFBolt createFilterHashTagsBolt() {
 		return new UDFBolt(
 			new Fields("hashtag"),
-			new FilterUDF() {
-				
+			new IOperator() {
 				@Override
-				public Boolean evaluate(Tuple t) {
-					// TODO Auto-generated method stub
-					return null;
+				public void execute(List<Tuple> input, OutputCollector collector) {
+					for(Tuple t : input) {
+						String word = t.getStringByField("word");
+						if(word.startsWith("#")) {
+							collector.emit(new Values(word));
+//							log.error(word);
+						}
+					}
 				}
-			};
+			}
 		);
 	}
 	
+	private UDFBolt createFilterConnectorBolt() {
+		return new UDFBolt(
+			new Fields("connector"),
+			new IOperator() {
+				@Override
+				public void execute(List<Tuple> input, OutputCollector collector) {
+					for(Tuple t : input) {
+						String word = t.getStringByField("word");
+						if(word.startsWith("@")) {
+							collector.emit(new Values(word));
+//							log.error(word);
+						}
+					}
+				}
+			}
+		);
+	}
+	
+
+	private UDFBolt createHashtagCountsBolt() {
+		return new UDFBolt(
+			new Fields("hashtag", "count"),
+			new IOperator() {
+				@Override
+				public void execute(List<Tuple> input, OutputCollector collector) {
+					int count = 0;
+					String hashtag = input.get(0).getStringByField("hashtag");
+					for(Tuple _ : input) {
+						count++;
+					}
+					collector.emit(new Values(hashtag, count));
+//					log.error("hashtag '"+hashtag+"' '"+count+"' mal");
+				}
+			},
+			new TimeWindow<Tuple>(10*1000, 2*1000),
+			KeyConfigFactory.DefaultKey(), // no window-groups
+			KeyConfigFactory.ByFields("hashtag")
+		);
+	}
+	
+
+
+	private IRichBolt createHashtagRankingsBolt() {
+		return new UDFBolt(
+			
+			new Fields("hashtag_ranking"),
+			new IOperator() {
+				@Override
+				public void execute(List<Tuple> input, OutputCollector collector) {
+					int count = 0;
+					String hashtag = input.get(0).getStringByField("hashtag");
+					for(Tuple _ : input) {
+						count++;
+					}
+					collector.emit(new Values(hashtag, count));
+				}
+			},
+			new TimeWindow<Tuple>(10*1000, 2*1000),
+			KeyConfigFactory.DefaultKey(), // no window-groups
+			KeyConfigFactory.ByFields("count")
+		);
+	}
+
 	public StormTopology createTopology() throws Exception {
 		TopologyBuilder builder = new TopologyBuilder();
 
 		// provide twitter streaminh data
 		builder.setSpout("tweets", createTwitterSpout(), 1);
+
+		builder.setBolt("words", flatMapTweetWords(), 1)
+			.shuffleGrouping("tweets");
 		
-		builder.setBolt("hashtags", createFilterHashTagsBolt(), 1);
+		builder.setBolt("hashtags", createFilterHashTagsBolt(), 1)
+			.shuffleGrouping("words");
+		
+		builder.setBolt("hashtagCounts", createHashtagCountsBolt(), 1)
+			.fieldsGrouping("hashtags", new Fields("hashtag"));
+		
+//		builder.setBolt("hashtagRanking", createHashtagRankingsBolt(), 1)
+//			.globalGrouping("hashtagCounts");
+		
+		builder.setBolt("connector", createFilterConnectorBolt(), 1)
+			.shuffleGrouping("words");
+
 
 		return builder.createTopology();
 	}
@@ -95,13 +196,13 @@ public class TwitterStatistics implements Serializable {
 	public static void main(String[] args) throws Exception {
 
 		Config conf = new Config();
-		conf.setDebug(true);
+		conf.setDebug(false);
 
 		conf.setMaxTaskParallelism(1);
 		conf.setMaxSpoutPending(1);
 
 		LocalCluster cluster = new LocalCluster();
 		cluster.submitTopology("twitter-statistics", conf,
-				new AnalyzeTweetsTopology().createTopology());
+				new TwitterStatistics().createTopology());
 	}
 }
