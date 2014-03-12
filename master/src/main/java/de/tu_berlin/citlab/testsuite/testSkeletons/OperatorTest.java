@@ -60,11 +60,6 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 	private void initTestSetup()
 	{
-//		DebugLogger.setFileLogging(testName + "/operator", "TupleMock.log", LoD.DETAILED, TupleMock.TAG);
-//		DebugLogger.setFileLogging(testName + "/operator", "UDFBoltMock.log", LoD.DETAILED, UDFBoltMock.TAG);
-//        DebugLogger.setFileLogging(testName + "/operator", "OutputCollectorMock.log", LoD.DETAILED, OutputCollectorMock.TAG);
-//        DebugLogger.setFileLogging(testName, "OperatorTest.log", LoD.DETAILED, logTag);
-		
 		LOGGER.debug(LogPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
 
 
@@ -86,9 +81,9 @@ abstract public class OperatorTest implements OperatorTestMethods
         }
 
     }
-	
 
-//	@Test
+
+
 	public void testOperator()
 	{
         this.initTestSetup();
@@ -152,8 +147,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 			throw failureTrace;
 	}
 	
-	
-//	@After
+
 	public void terminateTestSetup()
 	{
 		operator = null;
