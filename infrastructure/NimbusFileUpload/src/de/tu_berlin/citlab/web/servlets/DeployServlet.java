@@ -23,7 +23,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import de.tu_berlin.citlab.web.Config;
 import de.tu_berlin.citlab.web.JarTools;
-import de.tu_berlin.citlab.web.tools.HTMLBuilder;
 
 public class DeployServlet extends HttpServlet {
 
@@ -34,156 +33,156 @@ public class DeployServlet extends HttpServlet {
 			throws ServletException, IOException {
 		PrintWriter pw = resp.getWriter();
 
-		String cmd = req.getParameter("delete");
-		if (cmd != null) {
-			deleteFile(req);
+		String uri = req.getRequestURI();
+		String result;
+
+		if (uri.equals("/delete")) {
+			System.out.println("Delete requested");
+			String filename = req.getParameter("file");
+			if (filename != null) {
+				result = deleteFile(filename);
+			} else {
+				result = "No filename";
+			}
+		} else if (uri.equals("/run")) {
+			System.out.println("Run requested");
+			String filename = req.getParameter("file");
+			if (filename != null) {
+				result = runJob(filename);
+			} else {
+				result = "No filename";
+			}
+		} else if (uri.equals("/kill")) {
+			System.out.println("Kill requested");
+			String filename = req.getParameter("file");
+			if (filename != null) {
+				result = killJob(filename);
+			} else {
+				result = "No filename";
+			}
+		} else {
+			result = "Nothing happened";
 		}
-		cmd = req.getParameter("run");
-		if (cmd != null) {
-			runJob(req);
-		}
-		cmd = req.getParameter("kill");
-		if (cmd != null) {
-			killJob(req);
-		}
 
-		HTMLBuilder.htmlHead(resp);
-		pw.println("<html>");
-
-		HTMLBuilder.titledHeader(resp, "CIT-Storm - Web Deployment");
-
-		pw.println("<body>");
-
-		generateUploadForm(pw);
-
-		listAvailableJobs(pw);
-
-		pw.println("</body>");
-		pw.println("</html>");
+		pw.println(result);
+		System.out.println(result);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		System.out.println("Upload requested");
+		PrintWriter pw = resp.getWriter();
 
-		uploadFileToServer(req);
+		String uri = req.getRequestURI();
+		String result;
 
-		resp.sendRedirect("/deploy");
-	}
-
-	private void generateUploadForm(PrintWriter pw) {
-		// create file upload form
-		pw.println(" <form action=\"/deploy\" method=\"post\" enctype=\"multipart/form-data\">");
-		pw.println("  <p>Choose a storm topology jar file:");
-		pw.println("   <br>");
-		pw.println("   <input type=\"file\" name=\"file\" />");
-		pw.println("   <br>");
-		pw.println("   <input type=\"submit\" />");
-		pw.println("  </p>");
-		pw.println(" </form>");
-	}
-
-	private void listAvailableJobs(PrintWriter pw) {
-		// list available jobs
-		File[] files = new File(Config.getInstance().getPath("job.path"))
-				.listFiles();
-		if (files.length == 0) {
-			pw.println("No jobs uploaded");
+		if (uri.equals("/upload")) {
+			result = uploadFileToServer(req);
 		} else {
-			for (File f : files) {
-				String name = f.getName();
-				if (name.endsWith(".jar")) {
-					String topologyName = JarTools.getManifestAttributeFromJar(
-							"Topology-Name", f);
+			result = "Nothing happened";
+		}
 
-					pw.println("<form action=\"/deploy\">");
-					pw.println(" <input type=\"hidden\" name=\"file\" value=\""
-							+ name + "\">");
-					pw.println(" <input type=\"hidden\" name=\"topology\" value=\""
-							+ topologyName + "\">");
-					pw.println(" <input type=\"submit\" name=\"run\" value=\"Run\">");
-					pw.println(" <input type=\"submit\" name=\"kill\" value=\"Kill\">");
-					pw.println(" <input type=\"submit\" name=\"delete\" value=\"Delete\">");
+		pw.println(result);
+		System.out.println(result);
+	}
 
-					pw.println(name);
-					pw.println("Topology-Name: " + topologyName);
-					pw.println("</form>");
-				}
+	private String deleteFile(String filename) {
+		String folder = Config.getInstance().getPath("job.path");
+		File file = new File(folder + "/" + filename);
+		if (file.getAbsolutePath().startsWith(folder)) {
+			if (file.exists()) {
+				file.delete();
+				return "File deleted";
+			} else {
+				return "File does not exist";
 			}
+		} else {
+			return "Invalid file path";
 		}
 	}
 
-	private void deleteFile(HttpServletRequest req) {
-		String cmd = req.getParameter("file");
-		if (cmd != null) {
-			String folder = Config.getInstance().getPath("job.path");
-			File f = new File(folder + "/" + cmd);
-			if (f.getAbsolutePath().startsWith(folder)) {
-				f.delete();
+	private String runJob(String filename) {
+		String folder = Config.getInstance().getPath("job.path");
+		String stormPath = Config.getInstance().getPath("storm.path");
+		File file = new File(folder + "/" + filename);
+
+		if (!file.exists()) {
+			return "File does not exist";
+		}
+
+		String filePath = file.getAbsolutePath();
+		String mainClass = JarTools.getManifestAttributeFromJar(
+				"Storm-Main-Class", file);
+		if (mainClass == null) {
+			return "No main class in Manifest";
+		}
+
+		String topologyName = JarTools.getManifestAttributeFromJar(
+				"Topology-Name", file);
+
+		if (topologyName == null) {
+			return "No topology name in Manifest";
+		}
+
+		if (filePath.startsWith(folder)) {
+			ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm", "jar",
+					filePath, mainClass, topologyName);
+			pb.directory(new File(stormPath));
+
+			try {
+				Process p = pb.start();
+				p.waitFor();
+			} catch (IOException | InterruptedException e) {
+				return "Failed to start topology";
 			}
+			return "Topology started";
+		} else {
+			return "Invalid file path";
 		}
 	}
 
-	private void runJob(HttpServletRequest req) {
-		String cmd = req.getParameter("file");
-		if (cmd != null) {
-			String folder = Config.getInstance().getPath("job.path");
-			String stormPath = Config.getInstance().getPath("storm.path");
-			File file = new File(folder + "/" + cmd);
-			String filePath = file.getAbsolutePath();
-			String mainClass = JarTools.getManifestAttributeFromJar(
-					"Storm-Main-Class", file);
-			String topologyName = JarTools.getManifestAttributeFromJar(
-					"Topology-Name", file);
-			if (filePath.startsWith(folder)) {
-				ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm",
-						"jar", filePath, mainClass, topologyName);
-				pb.directory(new File(stormPath));
+	private String killJob(String filename) {
+		String folder = Config.getInstance().getPath("job.path");
+		String stormPath = Config.getInstance().getPath("storm.path");
+		File file = new File(folder + "/" + filename);
 
-				try {
-					Process p = pb.start();
-					p.waitFor();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		if (!file.exists()) {
+			return "File does not exist";
+		}
 
+		String filePath = file.getAbsolutePath();
+
+		String topologyName = JarTools.getManifestAttributeFromJar(
+				"Topology-Name", file);
+		if (topologyName == null) {
+			return "No topology name in Manifest";
+		}
+
+		if (filePath.startsWith(folder)) {
+			ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm", "kill",
+					topologyName);
+			pb.directory(new File(stormPath));
+
+			try {
+				Process p = pb.start();
+				p.waitFor();
+			} catch (IOException | InterruptedException e) {
+				return "Failed to stop topology";
 			}
+			return "Topology stopped";
+		} else {
+			return "Invalid file path";
 		}
 	}
 
-	private void killJob(HttpServletRequest req) {
-		String cmd = req.getParameter("file");
-		if (cmd != null) {
-			String folder = Config.getInstance().getPath("job.path");
-			String stormPath = Config.getInstance().getPath("storm.path");
-			File file = new File(folder + "/" + cmd);
-			String filePath = file.getAbsolutePath();
-			String topologyName = JarTools.getManifestAttributeFromJar(
-					"Topology-Name", file);
-			if (filePath.startsWith(folder)) {
-				ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm",
-						"kill", topologyName);
-				pb.directory(new File(stormPath));
-
-				try {
-					Process p = pb.start();
-					p.waitFor();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-			}
-		}
-	}
-
-	private void uploadFileToServer(HttpServletRequest req)
-			throws ServletException, IOException {
+	private String uploadFileToServer(HttpServletRequest req)
+			throws IOException {
 		// code from:
 		// http://stackoverflow.com/questions/2422468/how-to-upload-files-to-server-using-jsp-servlet
+
+		String name = null;
+
 		try {
 			List<FileItem> items = new ServletFileUpload(
 					new DiskFileItemFactory()).parseRequest(req);
@@ -191,17 +190,19 @@ public class DeployServlet extends HttpServlet {
 				if (!item.isFormField()) {
 					String fileName = FilenameUtils.getName(item.getName());
 					InputStream fileContent = item.getInputStream();
+					name = getTimeStamp() + "_" + fileName;
 					saveFileToDisk(fileContent, new File(Config.getInstance()
-							.getPath("job.path")
-							+ "/"
-							+ getTimeStamp()
-							+ "_"
-							+ fileName));
+							.getPath("job.path") + "/" + name));
 				}
 			}
+			if (name != null) {
+				return name;
+			}
 		} catch (FileUploadException e) {
-			throw new ServletException("Cannot parse multipart request.", e);
+			e.printStackTrace();
 		}
+
+		return "null";
 	}
 
 	private void saveFileToDisk(InputStream is, File outputFile) {
