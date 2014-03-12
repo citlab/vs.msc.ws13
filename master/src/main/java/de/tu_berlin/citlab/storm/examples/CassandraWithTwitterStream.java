@@ -69,8 +69,6 @@ public class CassandraWithTwitterStream {
 
         CassandraConfig cassandraCfg = new CassandraConfig();
 
-
-
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "myks",
                 "mytable1",

@@ -30,8 +30,10 @@ public class CassandraOperator implements IOperator {
 
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
-        this.config.setIP("127.0.0.1");
-        //this.config.setIP( loadClusterManagerIPFromProperties() );
+        //this.config.setIP("54.195.205.160");
+        this.config.setIP( loadClusterManagerIPFromProperties() );
+        //System.out.println(loadClusterManagerIPFromProperties());
+        //System.out.println("cluster ip: " + loadClusterManagerIPFromProperties());
     }
 
     public String loadClusterManagerIPFromProperties()
@@ -49,64 +51,35 @@ public class CassandraOperator implements IOperator {
 		}
     	String clusterManagerIP =  prop.getProperty( "cluster-manager-ip" );
     	return getCassandraClusterIPFromClusterManager( clusterManagerIP );
+
      }
 	
     private String getCassandraClusterIPFromClusterManager( String clusterManagerIP ) 
 	{
 		String USER_AGENT = "Mozilla/5.0";
 		String url_string = "http://" + clusterManagerIP + ":9000/lookup?type=cassandra";
-		URL url = null;
-		try
-		{
-			url = new URL(url_string);
-		}
-		catch ( MalformedURLException e )
-		{
+		StringBuffer sb = null;
+		try {
+			URL url = new URL(url_string);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestProperty("User-Agent", USER_AGENT);
+			int responseCode = con.getResponseCode();  //TODO: check response code
+			BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
+			String inputLine;
+			sb = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				sb.append(inputLine);
+			}
+			in.close();
+		} catch (MalformedURLException e) {
+			// TODO Automatisch generierter Erfassungsblock
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Automatisch generierter Erfassungsblock
 			e.printStackTrace();
 		}
-		HttpURLConnection con = null;
-		try
-		{
-			con = (HttpURLConnection) url.openConnection();
-		}
-		catch ( IOException e )
-		{
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		}
-		con.setRequestProperty("User-Agent", USER_AGENT);
-		try
-		{
-			int responseCode = con.getResponseCode();
-		}
-		catch ( IOException e )
-		{
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		}  //TODO: check response code
-		BufferedReader in = null;
- 		try
-		{
-			in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-		}
-		catch ( IOException e )
-		{
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		}
- 		String response = null;
-		try
-		{
-			response = in.readLine();
-		}
-		catch ( IOException e )
-		{
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		}
-    	
-    	return response;
+ 
+		return sb.toString();
 	}
     
     @Override
@@ -115,8 +88,9 @@ public class CassandraOperator implements IOperator {
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
         {
-            dao.init();
+
             dao.setConfig(config);
+            dao.init();
             dao.analyzeTuple( tuples.get(0) );
             dao.createDataStructures();
 
