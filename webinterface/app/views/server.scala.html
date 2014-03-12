@@ -7,82 +7,30 @@
   <div class="controls">
     <form action="/startserver">
       <div class="row">
-        <div class="col-md-3">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Nimbus</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="start_nimbus">
-                <span class="glyphicon glyphicon-play"></span>
-                Start Nimbus
-              </button>
-            </div>
-          </div>
-        </div>
+        @server_control.panel("Nimbus", "col-md-6") {
+          @server_control.button.render("Start Nimbus", "start_nimbus", "play")
+          @server_control.button.render("Stop Nimbus", "stop_nimbus", "stop")
+          @server_control.button.render("Reboot Nimbus", "reboot_nimbus", "repeat")
+        }
 
+        @server_control.panel("Cassandra", "col-md-6") {
+          @server_control.button.render("Start Cassandra", "start_cassandra", "play")
+          @server_control.button.render("Stop Cassandra", "stop_cassandra", "stop")
+          @server_control.button.render("Reboot Cassandra", "reboot_cassandra", "repeat")
+        }
 
-        <div class="col-md-3">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Cassandra</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="start_cassandra">
-                <span class="glyphicon glyphicon-play"></span>
-                Start Cassandra
-              </button>
-            </div>
-          </div>
-        </div>
+        @server_control.panel("Supervisor", "col-md-12") {
+          @server_control.number_of_supervisor_input()
+          @server_control.button.render("Start Supervisor", "start_supervisor", "play")
+          @server_control.button.render("Stop Supervisor", "stop_supervisor", "stop")
+          @server_control.button.render("Reboot Supervisor", "reboot_supervisor", "repeat")
+        }
 
-        <div class="col-md-6">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Cluster</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="reboot_cluster">
-                <span class="glyphicon glyphicon-repeat"></span>
-                Reboot Cluster
-              </button>
-
-              <button class="btn btn-primary" type="submit" name="action" value="shutdown_cluster">
-                <span class="glyphicon glyphicon-stop"></span>
-                Shutdown Cluster
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title">Supvisor</h3>
-        </div>
-        <div class="panel-body">
-          <p>
-            <label for="n_sv">Anzahl</label>
-            <input type="number" name="n_sv" id="n_sv" value="1">
-          </p>
-
-          <button class="btn btn-primary" type="submit" name="action" value="start_supervisor">
-            <span class="glyphicon glyphicon-play"></span>
-            Start Supervisors
-          </button>
-
-          <button class="btn btn-primary" type="submit" name="action" value="terminate_supervisor">
-            <span class="glyphicon glyphicon-remove"></span>
-            Terminate Supervisors
-          </button>
-
-          <button class="btn btn-primary" type="submit" name="action" value="reboot_supervisor">
-            <span class="glyphicon glyphicon-repeat"></span>
-            Reboot Supervisors
-          </button>
-        </div>
-      </div>
+        @server_control.panel("Cluster", "col-md-12") {
+          @server_control.button.render("Start Cluster", "start_cluster", "play")
+          @server_control.button.render("Stop Cluster", "stop_cluster", "stop")
+          @server_control.button.render("Reboot Cluster", "reboot_cluster", "repeat")
+        }
     </form>
   </div>
 }
