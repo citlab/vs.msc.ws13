@@ -33,8 +33,10 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public TimeWindow(int timeSlot, int offset) {
 		if (offset > timeSlot) {
+			System.out.println("offset ("+ offset +") must not be larger than size("+ timeSlot +")");
 			throw new IllegalArgumentException(
-					"offset must not be larger than size");
+					"offset ("+ offset +") must not be larger than size("+ timeSlot +")");
+			
 		}
 		this.timeSlot = timeSlot;
 		this.offset = offset;
@@ -45,13 +47,13 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 		long result = 0;
 		if(!slots.isEmpty()) {
 			long youngestAquiredTime = slots.get(0).getTimestamp();
-			long oldestAquiredTime;
-			if(slots.size() == 1) {
-				oldestAquiredTime = TimeEntity.getcurrentTime();
-			}
-			else {
-				oldestAquiredTime = slots.get(slots.size() - 1).getTimestamp();
-			}
+			long oldestAquiredTime = TimeEntity.getcurrentTime();
+//			if(slots.size() == 1) {
+//				oldestAquiredTime = TimeEntity.getcurrentTime();
+//			}
+//			else {
+//				oldestAquiredTime = slots.get(slots.size() - 1).getTimestamp();
+//			}
 			result = oldestAquiredTime - youngestAquiredTime;
 		}
 		return result;
