@@ -44,7 +44,7 @@ public class StaticHashJoinOperator implements IOperator {
 	}
 	
 	public void execute(List<Tuple> tuples, OutputCollector collector ) {
-        UDFBolt.LOGGER.info("StaticHashJoinOperator: test");
+//        UDFBolt.LOGGER.info("StaticHashJoinOperator: test");
 
 		// lookup: stream second side through and generate output
 		Iterator<Tuple> windowTuples = tuples.iterator();

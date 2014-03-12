@@ -27,7 +27,7 @@ public class Bolt5_SignificantUsers extends UDFBoltTest implements UDFBoltTestMe
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 }

@@ -48,11 +48,18 @@ public class UDFBoltMock extends UDFBolt
 	}
 
 	public UDFBoltMock(Fields outputFields, IOperator operator,
-			Window<Tuple, List<Tuple>> window, IKeyConfig keyConfig) 
+			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey)
 	{
-		super(outputFields, operator, window, keyConfig);
+		super(outputFields, operator, window, windowKey, KeyConfigFactory.DefaultKey());
 		this.prepare(null, null, null); //TODO: maybe adjust this?
 	}
+
+    public UDFBoltMock(Fields outputFields, IOperator operator,
+                       Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey)
+    {
+        super(outputFields, operator, window, windowKey, groupByKey);
+        this.prepare(null, null, null); //TODO: maybe adjust this?
+    }
 	
 	
 /* Public Methods: */

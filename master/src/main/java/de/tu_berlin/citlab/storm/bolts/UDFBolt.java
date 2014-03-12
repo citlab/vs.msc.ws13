@@ -41,9 +41,7 @@ public class UDFBolt extends BaseRichBolt {
 /* ================= */
 
     final protected Fields outputFields;
-
     final protected IOperator operator;
-
     final protected WindowHandler windowHandler;
 
 
@@ -70,6 +68,21 @@ public class UDFBolt extends BaseRichBolt {
         this.outputFields = outputFields;
         this.operator = operator;
         windowHandler = new WindowHandler(window, windowKey, groupByKey);
+    }
+
+
+
+/* Getters & Setters */
+/* ================= */
+
+    public Fields getOutputFields() {
+        return outputFields;
+    }
+    public IOperator getOperator() {
+        return operator;
+    }
+    public WindowHandler getWindowHandler() {
+        return windowHandler;
     }
 
 

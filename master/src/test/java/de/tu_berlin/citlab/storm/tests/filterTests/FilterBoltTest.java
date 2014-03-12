@@ -49,7 +49,7 @@ public class FilterBoltTest extends UDFBoltTest implements UDFBoltTestMethods
 	}
 
 	@Override
-	public IKeyConfig initKeyConfig()
+	public IKeyConfig initWindowHandler()
 	{
 		return null;
 	}

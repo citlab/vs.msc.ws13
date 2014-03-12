@@ -27,7 +27,7 @@ public class Bolt4_UserTotalSign extends UDFBoltTest implements UDFBoltTestMetho
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 }

@@ -27,7 +27,7 @@ public class Bolt6_SignUserWithTweets extends UDFBoltTest implements UDFBoltTest
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 }

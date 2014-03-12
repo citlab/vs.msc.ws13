@@ -4,6 +4,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.WindowHandler;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface UDFBoltTestMethods
 
     public Window<Tuple, List<Tuple>> initWindow();
 
-    public IKeyConfig initKeyConfig();
+    public WindowHandler initWindowHandler();
 
     public List<List<Object>> assertWindowedOutput(final List<Tuple> inputTuples);
 }

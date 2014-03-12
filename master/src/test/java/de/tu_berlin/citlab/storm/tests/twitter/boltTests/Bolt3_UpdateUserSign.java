@@ -27,7 +27,7 @@ public class Bolt3_UpdateUserSign extends UDFBoltTest implements UDFBoltTestMeth
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 }

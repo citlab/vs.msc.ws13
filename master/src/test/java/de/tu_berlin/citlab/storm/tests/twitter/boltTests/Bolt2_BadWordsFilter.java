@@ -27,7 +27,7 @@ public class Bolt2_BadWordsFilter extends UDFBoltTest implements UDFBoltTestMeth
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 }

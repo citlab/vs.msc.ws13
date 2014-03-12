@@ -3,8 +3,7 @@ package de.tu_berlin.citlab.testsuite.testSkeletons;
 import java.util.List;
 
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
+import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
@@ -12,9 +11,7 @@ import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.testsuite.mocks.UDFBoltMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +45,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 	private List<Tuple> inputTuples;
 
 	private Window<Tuple, List<Tuple>> window;
-	private IKeyConfig keyConfig;
+	private WindowHandler windowHandler;
 
 
     public final OperatorTest getOpTest() { return opTest; }
@@ -117,7 +114,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
 		IOperator operator = opTest.initOperator(inputTuples);
 		window = this.initWindow();
-		keyConfig = this.initKeyConfig();
+		windowHandler = this.initWindowHandler();
 		
 		if (window == null){
 			udfBolt = new UDFBoltMock(outputFields, operator);
@@ -125,7 +122,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
             //Logging:
             LOGGER.debug(DEFAULT, "Initialized windowless UDFBolt.");
         }
-		else if(keyConfig == null){
+		else if(windowHandler == null){
 			udfBolt = new UDFBoltMock(outputFields, operator, window);
 
             //Logging:
@@ -137,7 +134,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
                 LOGGER.debug(DEFAULT, "Initialized UDFBolt with unknown Window type.");
         }
 		else{
-			udfBolt = new UDFBoltMock(outputFields, operator, window, keyConfig);
+			udfBolt = new UDFBoltMock(outputFields, operator, window, windowHandler.getWindowKey(), windowHandler.getGroupByKey());
 
             //Logging:
             if(window.getClass().equals(CountWindow.class))
@@ -229,7 +226,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 		udfBolt = null;
 
 		window = null;
-		keyConfig = null;
+		windowHandler = null;
 	}
 	
 
@@ -246,6 +243,6 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
     abstract public Window<Tuple, List<Tuple>> initWindow();
 
-    abstract public IKeyConfig initKeyConfig();
+    abstract public WindowHandler initWindowHandler();
 
 }

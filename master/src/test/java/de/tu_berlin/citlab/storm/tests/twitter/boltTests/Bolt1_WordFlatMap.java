@@ -45,7 +45,7 @@ public class Bolt1_WordFlatMap extends UDFBoltTest implements UDFBoltTestMethods
     }
 
     @Override
-    public IKeyConfig initKeyConfig() {
+    public IKeyConfig initWindowHandler() {
         return null;
     }
 

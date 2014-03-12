@@ -51,7 +51,20 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         windows = new HashMap<Serializable, Window<Tuple, List<Tuple>>>();
     }
 
-	/* Public Methods: */
+
+    /* Public Methods: */
+	/* =============== */
+
+    public IKeyConfig getWindowKey() {
+        return windowKey;
+    }
+
+    public IKeyConfig getGroupByKey() {
+        return groupByKey;
+    }
+
+
+    /* Public Methods: */
 	/* =============== */
 
     public void add(Tuple input) {

@@ -40,25 +40,25 @@ abstract public class OperatorTest implements OperatorTestMethods
     public final String logTag;
 
     private final String testName;
-    private final Fields inputFields;
-    private final List<Tuple> inputTuples;
+//    private final Fields inputFields;
+    private List<Tuple> inputTuples;
 
     private IOperator operator;
 
-    public final Fields getInputFields() { return inputFields; }
+//    public final Fields getInputFields() { return inputFields; }
 
 
-    public OperatorTest(String testName, Fields inputFields, List<Tuple> inputTuples)
+    public OperatorTest(String testName)
     {
         this.logTag = "OperatorTest_"+testName;
         this.testName = testName;
-        this.inputFields = inputFields;
-        this.inputTuples = inputTuples;
+//        this.inputFields = inputFields;
+//        this.inputTuples = inputTuples;
     }
 
 
 
-	private void initTestSetup()
+	public void initTestSetup(List<Tuple> inputTuples)
 	{
 		LOGGER.debug(LogPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
 
@@ -86,7 +86,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 	public void testOperator()
 	{
-        this.initTestSetup();
+//        this.initTestSetup(); TODO: add initTestSetup in tests.
 
 		AssertionError failureTrace = null;
 
