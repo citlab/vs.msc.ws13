@@ -1,53 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" name="CIT-Storm">
-    <Properties>
-        <Property name="hostIP">192.168.1.1</Property>
-        <Property name="hostPort">8000</Property>
-    </Properties>
 
-    <Appenders>
-    <!-- The Root-Appender: Console Output -->
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
+	<Properties>
+		<Property name="hostIP">10.0.2.15</Property>
+		<Property name="hostPort">3306</Property>
+		<Property name="mysqlDB">log4j2</Property>
+		<Property name="mysqlUser">log4j2</Property>
+		<Property name="mysqlPass">log4j2</Property>
+	</Properties>
 
-        <File name="bolt" fileName="logs/Bolt.log">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="info" />
-        </File>
+	<Appenders>
+		<JDBC name="databaseAppender" tableName="%mysqlDB">
+			<DriverManager url="jdbc:mysql://localhost:3306/%mysqlDB"
+				username="%mysqlUser" password="%mysqlPass" />
+			<Column name="datetime" pattern="%d{yyy-MM-dd HH:mm:ss}" />
+			<Column name="milliseconds" pattern="%d{SSS}" />
+			<Column name="logger" pattern="%logger" />
+			<Column name="level" pattern="%level" />
+			<Column name="message" pattern="%message" />
+		</JDBC>
+	</Appenders>
 
-
-
-    <!-- Network Socket Appenders for the real Infrastructure -->
-        <Socket name="boltSocket" host="${hostIP}" port="${hostPort}" protocol="TCP">
-            <SerializedLayout />
-            <ThresholdFilter level="info" />
-        </Socket>
-
-        <Socket name="spoutSocket" host="${hostIP}" port="${hostPort}" protocol="TCP">
-            <SerializedLayout />
-            <ThresholdFilter level="info" />
-        </Socket>
-    </Appenders>
-
-
-
-
-    <Loggers>
-        <Root level="error">
-            <AppenderRef ref="Console"/>
-        </Root>
-
-        <logger name="Bolt" level="info" additivity="false">
-            <AppenderRef ref="bolt" />
-        </logger>
-
-        <!-- Network Logging for the real Infrastructure: -->
-        <logger name="Bolt" level="info" additivity="false">
-            <AppenderRef ref="boltSocket" />
-        </logger>
-        <logger name="Spout" level="info" additivity="false">
-            <AppenderRef ref="spoutSocket" />
-        </logger>
-    </Loggers>
+	<Loggers>
+		<Root level="trace">
+			<AppenderRef ref="databaseAppender" />
+		</Root>
+	</Loggers>
+	
 </Configuration>
