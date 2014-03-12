@@ -27,3 +27,13 @@ Code Composition:
   </tr>
 </table>
 
+Cassandra Binding:
+----------------------
+1. Creaete new CassandraConfig instance
+2. Use setParams-method of instance to provide Cassandra configuration parameters
+  * String - keysapce name to use or create
+  * String - table name to use or
+  * new PrimaryKey( String... keys )  //will change in future implementation
+  * new Fields() - pass tuple field names to store (or no arguments for storing whole tuple)
+  * boolean - set true for a counting table  //to be implemented
+3. Use CassandraOperator in UDF-Bolt and pass configuration instance
