@@ -102,7 +102,6 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         return null;
     }
 
-	@Override
 	public List<List<Tuple>> addSafely(Tuple input) {
 		List<List<Tuple>> result = null;
 		if (isSatisfied()) {
