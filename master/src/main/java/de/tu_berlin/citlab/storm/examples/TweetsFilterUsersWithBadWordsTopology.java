@@ -254,7 +254,12 @@ public class TweetsFilterUsersWithBadWordsTopology {
 				new FilterOperator(
 					new Fields("user_id", "total_significance" ), // input
 					new FilterUDF() {
-						public Boolean evaluate(Tuple tuple) {
+                        @Override
+                        public void prepare() {
+
+                        }
+
+                        public Boolean evaluate(Tuple tuple) {
 							return (Integer) 
 							tuple.getValueByField("total_significance") > 100;
 						}

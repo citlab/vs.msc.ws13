@@ -103,9 +103,9 @@ public class UDFBolt extends BaseRichBolt {
             executeBatches(windowHandler.flush());
         }
         else {
-            windowHandler.add(input);
-            if (windowHandler.isSatisfied()) {
-                executeBatches(windowHandler.flush());
+            List<List<Tuple>> windows = windowHandler.addSafely(input);
+            if (windows != null) {
+                executeBatches(windows);
             }
         }
 
