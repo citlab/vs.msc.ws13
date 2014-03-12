@@ -55,14 +55,14 @@ public class CassandraDAO implements DAO, Serializable
 
 	public void createKeyspace( String query )
 	{
-		System.out.println( query );
-		// session.execute( query );
+		//System.out.println( query );
+		session.execute( query );
 	}
 
 	public void createTable( String query )
 	{
-		System.out.println( query );
-		// session.execute( query );
+		//System.out.println( query );
+		session.execute( query );
 	}
 
 	public void init()

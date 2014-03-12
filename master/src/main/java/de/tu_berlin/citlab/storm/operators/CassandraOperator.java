@@ -30,7 +30,8 @@ public class CassandraOperator implements IOperator {
 
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
-        this.config.setIP( loadClusterManagerIPFromProperties() );
+        this.config.setIP("127.0.0.1");
+        //this.config.setIP( loadClusterManagerIPFromProperties() );
     }
 
     public String loadClusterManagerIPFromProperties()
@@ -53,7 +54,7 @@ public class CassandraOperator implements IOperator {
     private String getCassandraClusterIPFromClusterManager( String clusterManagerIP ) 
 	{
 		String USER_AGENT = "Mozilla/5.0";
-		String url_string = "http://" + clusterManagerIP + ":8080/lookup?type=cassandra";
+		String url_string = "http://" + clusterManagerIP + ":9000/lookup?type=cassandra";
 		URL url = null;
 		try
 		{

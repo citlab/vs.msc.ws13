@@ -73,7 +73,7 @@ public class CassandraWithTwitterStream {
 
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "myks",
-                "new2",
+                "mytable1",
                 new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */
                 new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
         );
