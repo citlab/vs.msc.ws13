@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class TimeWindow<I> implements Window<I, List<I>> {
 
 	private static final long serialVersionUID = 3210792646347151651L;
+	private static final Logger log = Logger.getLogger(TimeWindow.class);
 
 	/**
 	 * maximum amount of slots within this windows
@@ -61,6 +64,7 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public void add(I entity) {
 		if (isSatisfied()) {
+			log.error("TimeWindow oferflow! aquiredTimeSlot: '" + getAquiredTimeSlot() + "', timeSlot: '" + timeSlot +  "'");
 			throw new ArrayIndexOutOfBoundsException();
 		}
 		slots.add(new TimeEntity<I>(entity));
