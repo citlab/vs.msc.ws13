@@ -146,7 +146,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                     }// execute()
                 },
-                new CountWindow<Tuple>(1, 1), //new TimeWindow<Tuple>(1000, 1000),
+                new TimeWindow<Tuple>(1000, 1000),
                 KeyConfigFactory.ByFields("user")
         );
 
@@ -194,7 +194,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                             "tweets"
                         )
                 ),
-            new CountWindow<Tuple>(1, 1), //new TimeWindow<Tuple>(2000, 2000),
+            new TimeWindow<Tuple>(2000, 2000),
             KeyConfigFactory.BySource()
         );
     }
