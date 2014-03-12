@@ -52,7 +52,7 @@ public class Op5_SignificantUsers extends OperatorTest implements OperatorTestMe
 	}
 
 	@Override
-	public List<List<Object>> assertOutput(List<Tuple> inputTuples) {
+	public List<List<Object>> assertOperatorOutput(List<Tuple> inputTuples) {
 		List<List<Object>> emptyList = new ArrayList<List<Object>>();
 		return emptyList;
 	}

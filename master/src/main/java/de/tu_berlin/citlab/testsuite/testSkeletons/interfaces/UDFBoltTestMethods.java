@@ -18,5 +18,5 @@ public interface UDFBoltTestMethods
 
     public IKeyConfig initKeyConfig();
 
-    public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
+    public List<List<Object>> assertWindowedOutput(final List<Tuple> inputTuples);
 }

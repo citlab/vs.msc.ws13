@@ -15,5 +15,5 @@ public interface OperatorTestMethods
 
     public IOperator initOperator(final List<Tuple> inputTuples);
 
-    public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
+    public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples);
 }

@@ -59,7 +59,7 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 	}
 	
 	@Override
-	public List<List<Object>> assertOutput(final List<Tuple> inputTuples)
+	public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples)
 	{
         List<List<Object>> outputVals = new ArrayList<List<Object>>();
         outputVals.add(new Values(1,2,3));

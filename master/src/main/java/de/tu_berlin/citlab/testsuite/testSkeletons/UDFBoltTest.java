@@ -150,7 +150,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
 
 
         List<List<Object>> outputVals = OutputCollectorMock.output;
-        List<List<Object>> assertRes = this.assertOutput(inputTuples);
+        List<List<Object>> assertRes = this.assertWindowedOutput(inputTuples);
 
 
 		long endTime = System.currentTimeMillis();
@@ -206,9 +206,9 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
         return opTest.generateInputTuples();
     }
 
-	public List<List<Object>> assertOutput(List<Tuple> inputTuples)
+	public List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples)
     {
-        return opTest.assertOutput(inputTuples);
+        return opTest.assertOperatorOutput(inputTuples);
     }
 
 

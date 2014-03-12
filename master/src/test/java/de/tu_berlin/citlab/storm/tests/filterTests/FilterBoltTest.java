@@ -55,7 +55,7 @@ public class FilterBoltTest extends UDFBoltTest implements UDFBoltTestMethods
 	}
 
 	/*@Override
-	protected List<Object> assertOutput(List<Tuple> inputTuples)
+	protected List<Object> assertWindowedOutput(List<Tuple> inputTuples)
 	{
 		// TODO Auto-generated method stub
 		return null;

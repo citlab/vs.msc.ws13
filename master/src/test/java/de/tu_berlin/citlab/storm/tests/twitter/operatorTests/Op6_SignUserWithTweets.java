@@ -58,7 +58,7 @@ public class Op6_SignUserWithTweets extends OperatorTest implements OperatorTest
 	}
 
 	@Override
-	public List<List<Object>> assertOutput(List<Tuple> inputTuples) {
+	public List<List<Object>> assertOperatorOutput(List<Tuple> inputTuples) {
 		List<List<Object>> emptyList = new ArrayList<List<Object>>();
 		return emptyList;
 	}

@@ -41,18 +41,19 @@ abstract public class OperatorTest implements OperatorTestMethods
 
     private final String testName;
     private final Fields inputFields;
+    private final List<Tuple> inputTuples;
 
-    private List<Tuple> inputTuples;
     private IOperator operator;
 
     public final Fields getInputFields() { return inputFields; }
 
 
-    public OperatorTest(String testName, Fields inputFields)
+    public OperatorTest(String testName, Fields inputFields, List<Tuple> inputTuples)
     {
         this.logTag = "OperatorTest_"+testName;
         this.testName = testName;
         this.inputFields = inputFields;
+        this.inputTuples = inputTuples;
     }
 
 
@@ -66,16 +67,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 		
 		LOGGER.debug(LogPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
 
-		try{
-			inputTuples = this.generateInputTuples();
-            LOGGER.debug(DEFAULT, "Input-Tuples are: {}", LogPrinter.toTupleListString(inputTuples));
-		}
-		catch (NullPointerException e){
-            String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
-            LOGGER.error(errorMsg, e);
-			throw new NullPointerException(errorMsg);
-			
-		}			
+
 		try{
 			operator = this.initOperator(inputTuples);
             LOGGER.debug(DEFAULT, "Operator successfully initialized.");
@@ -120,7 +112,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 
 		List<List<Object>> outputVals = OutputCollectorMock.output;
-		List<List<Object>> assertRes = assertOutput(inputTuples);
+		List<List<Object>> assertRes = assertOperatorOutput(inputTuples);
 
 
 		long endTime = System.currentTimeMillis();
@@ -164,15 +156,10 @@ abstract public class OperatorTest implements OperatorTestMethods
 //	@After
 	public void terminateTestSetup()
 	{
-		inputTuples = null;
 		operator = null;
 	}
-	
-	
 
-	abstract public List<Tuple> generateInputTuples();
 
 	abstract public IOperator initOperator(final List<Tuple> inputTuples);
-	
-	abstract public List<List<Object>> assertOutput(final List<Tuple> inputTuples);
+	abstract public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples);
 }

@@ -50,7 +50,7 @@ public class Op1_WordFlatMap extends OperatorTest implements OperatorTestMethods
     }
 
     @Override
-    public List<List<Object>> assertOutput(List<Tuple> inputTuples) {
+    public List<List<Object>> assertOperatorOutput(List<Tuple> inputTuples) {
         List<List<Object>> outputVals = new ArrayList<List<Object>>();
         outputVals.add(new Values(1, "hey", 0));
         outputVals.add(new Values(1, "leute", 0));
