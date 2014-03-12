@@ -9,6 +9,7 @@ import java.util.Map;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
@@ -43,6 +44,8 @@ public class StaticHashJoinOperator implements IOperator {
 	}
 	
 	public void execute(List<Tuple> tuples, OutputCollector collector ) {
+        UDFBolt.LOGGER.info("StaticHashJoinOperator: test");
+
 		// lookup: stream second side through and generate output
 		Iterator<Tuple> windowTuples = tuples.iterator();
 		while (windowTuples.hasNext()) {
@@ -54,6 +57,6 @@ public class StaticHashJoinOperator implements IOperator {
 					collector.emit(projection.project(memoryTuple,tuple));
 				}
 			}//if
-		}//while			
+		}//while
 	}	
 }
