@@ -5,9 +5,8 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import de.tu_berlin.citlab.web.servlets.DeployServlet;
-import de.tu_berlin.citlab.web.servlets.MainServlet;
 
-public class StormWebDeployStart {
+public class NimbusFileUploadStart {
 
 	public static void main(String[] args) throws Exception {
 		Server server = new Server(8081);
@@ -16,8 +15,7 @@ public class StormWebDeployStart {
 
 		ServletContextHandler handler = new ServletContextHandler();
 		handler.setContextPath("/");
-		handler.addServlet(MainServlet.class, "/");
-		handler.addServlet(DeployServlet.class, "/deploy");
+		handler.addServlet(DeployServlet.class, "/");
 
 		handlers.addHandler(handler);
 
