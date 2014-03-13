@@ -116,6 +116,10 @@ public class TwitterSpout extends BaseRichSpout {
                             values[i] = ret.getGeoLocation();
                         if( outputFields[i].compareTo("id") == 0)
                             values[i] = ret.getUser().getId();
+                        if( outputFields[i].compareTo("user_id") == 0)
+                            values[i] = ret.getUser().getId();
+                        if( outputFields[i].compareTo("tweet_id") == 0)
+                            values[i] = ret.getId();
                 }//for
 
                 return new Values(values);

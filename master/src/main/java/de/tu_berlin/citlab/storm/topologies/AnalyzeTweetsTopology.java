@@ -37,9 +37,9 @@ public class AnalyzeTweetsTopology implements Serializable{
     public TwitterSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter", ""};
+        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter" };
         String[] languages = new String[] {"de"};
-        String[] outputFields = new String[] {"user", "id", "tweet"};
+        String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
         return new TwitterSpout(config);
     }
@@ -50,26 +50,26 @@ public class AnalyzeTweetsTopology implements Serializable{
                 "127.0.0.1",
                 "citstorm",
                 "tweets",
-                new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */
+                new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                 new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
         );
 
         return new UDFBolt(
-                new Fields( "user", "id", "tweet" ),
+                new Fields( "user", "tweet_id", "tweet" ),
                 new CassandraOperator(cassandraCfg)
         );
     }
 
     public UDFBolt flatMapTweetWords(){
         return new UDFBolt(
-                new Fields( "user", "id", "word" ),
+                new Fields( "user", "tweet_id", "word" ),
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         for( Tuple p : tuples ){
                             String[] words = p.getStringByField("tweet").split(" ");
                             for( String word : words ){
-                                collector.emit(new Values(p.getValueByField("user"),p.getValueByField("id"), word.trim().toLowerCase() ));
+                                collector.emit(new Values(p.getValueByField("user"),p.getValueByField("tweet_id"), word.trim().toLowerCase() ));
                             }//for
                         }//for
                     }// execute()
@@ -92,7 +92,7 @@ public class AnalyzeTweetsTopology implements Serializable{
             public Values project(Tuple left, Tuple right) {
                 return new Values(
                         right.getValueByField("user"),
-                        right.getValueByField("id"),
+                        right.getValueByField("tweet_id"),
                         right.getValueByField("word"),
                         left.getValueByField("significance")
                 );
@@ -135,7 +135,7 @@ public class AnalyzeTweetsTopology implements Serializable{
         };*/
 
         return new UDFBolt(
-                new Fields( "user", "id", "word", "significance" ),
+                new Fields( "user", "tweet_id", "word", "significance" ),
                 new StaticHashJoinOperator(
                         KeyConfigFactory.compareByFields( new Fields("word")),
                         projection,
@@ -182,7 +182,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public UDFBolt filterBadUsers(){
         return new UDFBolt(
-                new Fields( "user", "id", "tweet" ), // output
+                new Fields( "user", "tweet_id", "tweet" ), // output
                 new MultipleOperators(
                     // process new bad users
                     new OperatorProcessingDescription(
@@ -208,7 +208,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                     // process raw comping tweets
                     new OperatorProcessingDescription(
                         new FilterOperator(
-                                new Fields("user", "id", "tweet"), // input
+                                new Fields("user", "tweet_id", "tweet"), // input
                                 new FilterUDF() {
                                     @Override
                                     public void prepare() {
