@@ -41,27 +41,34 @@ public class DeployServlet extends HttpServlet {
 			String filename = req.getParameter("file");
 			if (filename != null) {
 				result = deleteFile(filename);
+				resp.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				result = "No filename";
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
 		} else if (uri.equals("/run")) {
 			System.out.println("Run requested");
 			String filename = req.getParameter("file");
 			if (filename != null) {
 				result = runJob(filename);
+				resp.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				result = "No filename";
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
 		} else if (uri.equals("/kill")) {
 			System.out.println("Kill requested");
 			String filename = req.getParameter("file");
 			if (filename != null) {
 				result = killJob(filename);
+				resp.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				result = "No filename";
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
 		} else {
 			result = "Nothing happened";
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 
 		pw.println(result);
@@ -79,8 +86,10 @@ public class DeployServlet extends HttpServlet {
 
 		if (uri.equals("/upload")) {
 			result = uploadFileToServer(req);
+			resp.setStatus(HttpServletResponse.SC_OK);
 		} else {
 			result = "Nothing happened";
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 
 		pw.println(result);
@@ -200,6 +209,7 @@ public class DeployServlet extends HttpServlet {
 			}
 		} catch (FileUploadException e) {
 			e.printStackTrace();
+			return e.getMessage();
 		}
 
 		return "null";
