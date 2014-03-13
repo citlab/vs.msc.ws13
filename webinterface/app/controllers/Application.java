@@ -48,7 +48,7 @@ public class Application extends Controller {
             File file = uploaded.getFile();
             
             String nimbusIp = getNimbusIp();
-            String msg = sendFile(file, nimbusIp);
+            String msg = sendFile(file, nimbusIp, fileName);
 
             flash("notice", "File uploaded");
             return ok(String.format("{ip: %s, msg: %s}", nimbusIp, msg));
@@ -62,7 +62,9 @@ public class Application extends Controller {
         return HttpRequest.get("http://54.195.243.38:9000/lookup?type=nimbus").body().replaceAll("\\s","");
     }
 
-    private static String sendFile(File file, String nimbusIp) {
-        return HttpRequest.post("http://"+ nimbusIp +":8081/upload").send(file).body();
+    private static String sendFile(File file, String nimbusIp, String fileName) {
+        HttpRequest request = HttpRequest.post("http://"+ nimbusIp +":8081/upload");
+        request.part("file", fileName , file);
+        return request.ok() ? request.body() : request.server();
     }
 }
