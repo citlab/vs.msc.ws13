@@ -23,7 +23,8 @@ public class Config {
 		FileInputStream fis = null;
 
 		try {
-			fis = new FileInputStream("/home/ubuntu/NimbusFileUpload/server.properties");
+			fis = new FileInputStream(
+					"/home/ubuntu/NimbusFileUpload/server.properties");
 			prop.load(fis);
 		} catch (IOException e) {
 			System.err.println("Could not load server configuration file");
@@ -42,6 +43,6 @@ public class Config {
 	}
 
 	public String getPath(String name) {
-		return System.getProperty("user.home") + "/" + prop.getProperty(name);
+		return prop.getProperty(name);
 	}
 }
