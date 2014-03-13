@@ -64,7 +64,7 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public void add(I entity) {
 		if (isSatisfied()) {
-			log.error("TimeWindow oferflow! aquiredTimeSlot: '" + getAquiredTimeSlot() + "', timeSlot: '" + timeSlot +  "'");
+			log.error("TimeWindow overflow! aquiredTimeSlot: '" + getAquiredTimeSlot() + "', timeSlot: '" + timeSlot +  "', size: '"+slots.size()+"'");
 			throw new ArrayIndexOutOfBoundsException();
 		}
 		slots.add(new TimeEntity<I>(entity));

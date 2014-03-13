@@ -19,10 +19,7 @@ import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.TimeWindow;
-import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
@@ -30,16 +27,17 @@ import java.io.Serializable;
 import java.util.*;
 
 public class AnalyzeTweetsTopology implements Serializable{
-    private static final int windowSize = 10;
-    private static final int slidingOffset = 10;
+    private static final int windowSize = 1;
+    private static final int slidingOffset = 1;
 
-    public Window<Tuple, List<Tuple>> COUNT_WINDOW =new CountWindow<Tuple>(windowSize, slidingOffset);
+    public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
+
     //public Window<Tuple, List<Tuple>> TIME_WINDOW =new CountWindow<Tuple>(windowSize, slidingOffset);
 
     public TwitterSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie" };
+        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter", ""};
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
@@ -47,7 +45,6 @@ public class AnalyzeTweetsTopology implements Serializable{
     }
 
     public UDFBolt createCassandraSink(){
-
         CassandraConfig cassandraCfg = new CassandraConfig();
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "127.0.0.1",
@@ -59,8 +56,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         return new UDFBolt(
                 new Fields( "user", "id", "tweet" ),
-                new CassandraOperator(cassandraCfg),
-                COUNT_WINDOW
+                new CassandraOperator(cassandraCfg)
         );
     }
 
@@ -68,7 +64,6 @@ public class AnalyzeTweetsTopology implements Serializable{
         return new UDFBolt(
                 new Fields( "user", "id", "word" ),
                 new IOperator(){
-
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         for( Tuple p : tuples ){
@@ -79,7 +74,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                         }//for
                     }// execute()
                 },
-                COUNT_WINDOW
+                WINDOW
                 );
     }
 
@@ -104,8 +99,15 @@ public class AnalyzeTweetsTopology implements Serializable{
             }
         };
 
+        ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD = 1;
+
+
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", 1)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", 1)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", 1)) );
+
+        /*badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 500)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", 1000)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", 10)) );
@@ -117,15 +119,28 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("der", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("die", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );*/
+
+        /*
+        TupleComparator comparator = new TupleComparator() {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            public int compare(Tuple staticSide, Tuple tuple) {
+                    return tuple.getStringByField("word").contains( staticSide.getStringByField("word") )? 0 : -1;
+                }
+
+            @Override
+            public Serializable getTupleKey(Tuple tuple) {
+                return (Serializable) tuple.select(new Fields("word"));
+            }
+        };*/
 
         return new UDFBolt(
                 new Fields( "user", "id", "word", "significance" ),
                 new StaticHashJoinOperator(
-                        KeyConfigFactory.compareByFields(new Fields("word")),
+                        KeyConfigFactory.compareByFields( new Fields("word")),
                         projection,
                         badWordJoinSide.iterator() ),
-                COUNT_WINDOW
+                WINDOW
         );
     }
 
@@ -141,19 +156,31 @@ public class AnalyzeTweetsTopology implements Serializable{
                             int significance = p.getIntegerByField("significance");
                             total_significance+=significance;
                         }//for
-
                         collector.emit(new Values(user,total_significance ));
-
                     }// execute()
                 },
                 new TimeWindow<Tuple>(1000, 1000),
                 KeyConfigFactory.ByFields("user")
         );
-
     }
 
-    public UDFBolt filterBadUsers(){
+    public UDFBolt delayTuplesBolt(int millisec, Fields fields){
+        return new UDFBolt(
+                fields,
+                new IOperator(){
+                    @Override
+                    public void execute(List<Tuple> tuples, OutputCollector collector) {
+                        for( Tuple p : tuples ){
+                            collector.emit(p.getValues());
+                        }//for
+                    }//execute()
+                },
+                new TimeWindow<Tuple>(millisec, millisec)
+        );
+    }
 
+
+    public UDFBolt filterBadUsers(){
         return new UDFBolt(
                 new Fields( "user", "id", "tweet" ), // output
                 new MultipleOperators(
@@ -163,13 +190,16 @@ public class AnalyzeTweetsTopology implements Serializable{
                                 @Override
                                 public void execute(List<Tuple> tuples, OutputCollector collector) {
                                     for( Tuple t : tuples ){
+                                        System.out.println("add new user: "+t);
                                         String user = t.getStringByField("user");
+
                                         int totalsignificance = t.getIntegerByField("total_significance");
 
                                         // process detected user
-                                        int sig = BadUserDatabase.updateDetectedUser(user, totalsignificance);
+                                        int sig = ConspicuousUserDatabase.updateDetectedUser(user, totalsignificance);
 
                                         // do not output any tuples
+                                        System.out.println("add new user: "+t+", sig: "+sig);
                                     }
                                 }// execute()
                             },
@@ -187,14 +217,16 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                                     @Override
                                     public Boolean evaluate(Tuple tuple ) {
+                                        System.out.println("check user: "+tuple);
+
                                         String user = tuple.getStringByField("user");
-                                        return BadUserDatabase.isDetectedUser(user);
+                                        return ConspicuousUserDatabase.isDetectedUser(user);
                                     }
                                 }),
                             "tweets"
                         )
                 ),
-            new TimeWindow<Tuple>(2000, 2000),
+            new TimeWindow<Tuple>(5000, 5000),
             KeyConfigFactory.BySource()
         );
     }
@@ -209,11 +241,11 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
-                .shuffleGrouping("tweets")
-                .shuffleGrouping("reduce_to_user_significance");
+                .shuffleGrouping("reduce_to_user_significance")
+                .shuffleGrouping("tweets");
 
-        //builder.setBolt("store_tweets", createCassandraSink(), 1)
-        //        .shuffleGrouping("filter_bad_users");
+        builder.setBolt("store_tweets", createCassandraSink(), 1)
+                .shuffleGrouping("filter_bad_users");
 
         // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
