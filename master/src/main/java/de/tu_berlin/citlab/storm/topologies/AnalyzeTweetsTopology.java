@@ -212,8 +212,8 @@ public class AnalyzeTweetsTopology implements Serializable{
                 .shuffleGrouping("tweets")
                 .shuffleGrouping("reduce_to_user_significance");
 
-        builder.setBolt("store_tweets", createCassandraSink(), 1)
-                .shuffleGrouping("filter_bad_users");
+        //builder.setBolt("store_tweets", createCassandraSink(), 1)
+        //        .shuffleGrouping("filter_bad_users");
 
         // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
