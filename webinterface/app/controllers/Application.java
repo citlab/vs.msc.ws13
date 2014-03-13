@@ -4,12 +4,13 @@ import play.*;
 import play.mvc.*;
 import play.mvc.Http.*;
 import play.mvc.Http.MultipartFormData.*;
-
 import views.html.*;
 
 import java.io.*;
 import java.util.*;
 import models.*;
+
+import com.github.kevinsawicki.http.*;
 
 public class Application extends Controller {
 
@@ -46,11 +47,22 @@ public class Application extends Controller {
             String contentType = uploaded.getContentType(); 
             File file = uploaded.getFile();
             
+            String nimbusIp = getNimbusIp();
+            String msg = sendFile(file, nimbusIp);
+
             flash("notice", "File uploaded");
-            return redirect(routes.Application.index());
+            return ok(String.format("{ip: %s, msg: %s}", nimbusIp, msg));
         } else {
             flash("notice", "Missing file");
             return redirect(routes.Application.deploy());
         }
+    }
+
+    private static String getNimbusIp() {
+        return HttpRequest.get("http://54.195.243.38:9000/lookup?type=nimbus").body().replaceAll("\\s","");
+    }
+
+    private static String sendFile(File file, String nimbusIp) {
+        return HttpRequest.post("http://"+ nimbusIp +":8081/upload").send(file).body();
     }
 }

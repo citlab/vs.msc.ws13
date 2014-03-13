@@ -5,17 +5,19 @@
     <h1>Deployment <small>Neue Topologie hochladen und starten</small></h1>
   </div>
 
-  <div id="topology-list">
-    <div class="row">
-      <div class="col-md-12 upload-topology">
-        @upload_topology_form.render()
-      </div>
-    </div>
+  <div class="row">
+    @topology_control.log_list()
+  </div>
 
-    <div class="row topology-list">
-      @for(t <- topologies) {
-        @topology.render(t)
-      }
+  <div class="row">
+    <div class="col-md-12 upload-topology">
+      @topology_control.form()
     </div>
+  </div>
+
+  <div class="row">
+    @for(t <- topologies) {
+      @topology_control.panel(t)
+    }
   </div>
 }

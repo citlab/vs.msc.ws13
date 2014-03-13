@@ -10,11 +10,11 @@
 
     $("form").ajaxForm({
       dataType: 'json',
+      success: function(response, status, xhr, form) {
+        success_message(jQuery.parseJSON(response).msg);
+      },
       error: function() {
         error_message("Etwas ist schief gelaufen");
-      },
-      success: function(response, status, xhr, form) {
-        success_message(jQuery.parseJSON(response));
       }
     });
 
