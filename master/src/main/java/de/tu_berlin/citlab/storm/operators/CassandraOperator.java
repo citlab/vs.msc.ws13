@@ -30,8 +30,8 @@ public class CassandraOperator implements IOperator {
 
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
-        //this.config.setIP("54.195.205.160");
-        this.config.setIP( loadClusterManagerIPFromProperties() );
+        this.config.setIP("127.0.0.1");
+        //this.config.setIP( loadClusterManagerIPFromProperties() );
         //System.out.println(loadClusterManagerIPFromProperties());
         //System.out.println("cluster ip: " + loadClusterManagerIPFromProperties());
     }

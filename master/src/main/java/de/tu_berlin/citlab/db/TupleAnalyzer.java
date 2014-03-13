@@ -50,9 +50,7 @@ public class TupleAnalyzer
 	{
 		for ( Object obj : objects )
 		{
-			String canonical = obj.getClass().getCanonicalName();
-			String[] parts = canonical.split( "\\." );
-			String classname = parts[ parts.length - 1 ];
+			String classname = getClassName( obj );
 			javaTypesInTuple.add( classname );
 			if ( javaToCassandraTypes.containsKey( classname ) )
 			{
@@ -64,6 +62,14 @@ public class TupleAnalyzer
 			}
 			
 		}
+	}
+	
+	public String getClassName( Object obj )
+	{
+		String canonical = obj.getClass().getCanonicalName();
+		String[] parts = canonical.split( "\\." );
+		String classname = parts[ parts.length - 1 ];
+		return classname;
 	}
 
 	public String createKeyspaceQuery( String keyspace )

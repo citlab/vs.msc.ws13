@@ -14,6 +14,7 @@ import com.datastax.driver.core.PreparedStatement;
 
 import de.tu_berlin.citlab.db.CassandraConfig;
 import de.tu_berlin.citlab.db.CassandraDAO;
+import de.tu_berlin.citlab.db.Counter;
 import de.tu_berlin.citlab.db.DAO;
 import de.tu_berlin.citlab.db.DAOFactory;
 import de.tu_berlin.citlab.db.DBConfig;
@@ -56,7 +57,7 @@ public class CassandraWithTwitterStream {
         String[] keywords = new String[] {"der", "die", "das"};
         String[] languages = new String[] {"de"};
         // String[] languages = new String[] { "en", "de" };
-        String[] outputFields = new String[] {"user", "id"};
+        String[] outputFields = new String[] {"user", "tweet_id"};
         //String[] outputFields = new String[] {"user", "id"};  // User name as string, Tweet-ID as long
         TwitterConfiguration config = new TwitterConfiguration(user, keywords,
                 languages, outputFields);
@@ -71,15 +72,16 @@ public class CassandraWithTwitterStream {
 
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "myks",
-                "mytable1",
-                new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */
-                new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                "tab1",
+                new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
+                new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                new Counter("user", "significance"), new Counter( "tweet_id", "count" )
         );
-
+        
 
         builder.setBolt("save_tweets",
                 new UDFBolt(
-                        new Fields( "user", "id" ),    //Output Fields momentan nicht verwendet
+                        new Fields( "user", "tweet_id" ),    //Output Fields momentan nicht verwendet
                         new CassandraOperator(cassandraCfg)
                 )).shuffleGrouping("tweets");
 

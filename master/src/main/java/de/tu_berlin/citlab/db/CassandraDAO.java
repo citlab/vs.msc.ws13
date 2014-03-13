@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
+
 import backtype.storm.tuple.Tuple;
+
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
@@ -99,8 +102,46 @@ public class CassandraDAO implements DAO, Serializable
 	
 	public void createDataStructures()
 	{
-		session.execute( createKeyspaceQuery );  //TODO: exeption handling
-		session.execute( createTableQueryByFields );
+		try
+		{
+			session.execute( createKeyspaceQuery );
+		}
+		catch ( Exception e )
+		{
+			// TODO Automatisch generierter Erfassungsblock
+			e.printStackTrace();
+		}  
+		try
+		{
+			session.execute( createTableQueryByFields );
+		}
+		catch ( Exception e )
+		{
+			// TODO Automatisch generierter Erfassungsblock
+			e.printStackTrace();
+		}
+		for ( Counter ctn: this.config.ctn_list ) 
+		{
+			String countkey = ctn.getCountKey();
+			String countkey_class = ta.getClassName( countkey );
+			String countkeyCassandraType = ta.javaToCassandraTypes.get( countkey_class );
+			String countname = ctn.getCountName();
+			
+			StringBuilder sb = new StringBuilder("CREATE TABLE ");
+			sb.append( config.getKeyspace() );
+			sb.append( String.format( ".%s(%s %s PRIMARY KEY,%s counter)", ""+countkey+"_"+countname, countkey, countkeyCassandraType, countname ) );
+			
+			try
+			{
+				session.execute( sb.toString() );
+			}
+			catch ( Exception e )
+			{
+				// TODO Automatisch generierter Erfassungsblock
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public byte[] serializeObject( Object obj )
