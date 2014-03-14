@@ -3,8 +3,6 @@ package de.tu_berlin.citlab.testsuite.helpers;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 

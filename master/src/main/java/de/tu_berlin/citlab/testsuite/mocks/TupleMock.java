@@ -1,8 +1,13 @@
 package de.tu_berlin.citlab.testsuite.mocks;
 
 
-import static org.mockito.Mockito.*;
-
+import backtype.storm.Constants;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,16 +18,10 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import backtype.storm.Constants;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.anyInt;
 
 
 public final class TupleMock

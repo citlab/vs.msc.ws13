@@ -1,11 +1,11 @@
 package de.tu_berlin.citlab.testsuite.helpers;
 
 
-import java.util.List;
-
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+
+import java.util.List;
 
 
 public final class LogPrinter

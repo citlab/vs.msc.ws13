@@ -16,14 +16,14 @@ import java.util.List;
 public final class TupleMockFactory
 {
 
-    public static List<Tuple> generateTupleList_ByFields(Values[] values, Fields fields)
+    public static ArrayList<Tuple> generateTupleList_ByFields(Values[] values, Fields fields)
     {
         //A maximum of values.length tickTuples will also be added to the TupleList:
         int randTickTupleCount = (int) Math.round(Math.random() * values.length);
 
         //Initialize the Tuple-List:
         int tupleListSize = values.length + randTickTupleCount;
-        List<Tuple> tupleList = new ArrayList<Tuple>(tupleListSize);
+        ArrayList<Tuple> tupleList = new ArrayList<Tuple>(tupleListSize);
 
         //First add the Value-Tuples:
         for(int n = 0 ; n < values.length ; n++){

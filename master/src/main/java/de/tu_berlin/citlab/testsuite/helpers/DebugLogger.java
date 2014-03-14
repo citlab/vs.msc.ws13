@@ -4,14 +4,6 @@ package de.tu_berlin.citlab.testsuite.helpers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
-
 
 public final class DebugLogger
 {
@@ -28,8 +20,9 @@ public final class DebugLogger
     public static final String OCOLLMOCK_ID = "TestSuite.Mocks.OutputCollector";
 
     //Testing-Classes:
+    public static final String TOPOLOGYTEST_ID = "TestSuite.TopologyTest";
     public static final String OPTEST_ID = "TestSuite.OperatorTest";
-    public static final String BOLTTEST_ID = "TestSuite.UDFBoltTest";
+    public static final String BOLTTEST_ID = "TestSuite.BoltTest";
 
 
 /* public Class-Enums */

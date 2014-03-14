@@ -1,6 +1,10 @@
 package de.tu_berlin.citlab.testsuite.mocks;
 
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
+import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -10,14 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import backtype.storm.task.OutputCollector;
-import backtype.storm.tuple.Tuple;
 
 
 public final class OutputCollectorMock

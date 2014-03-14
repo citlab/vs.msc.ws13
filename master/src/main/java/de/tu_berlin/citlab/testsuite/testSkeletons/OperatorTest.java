@@ -1,10 +1,6 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
 
-import java.util.List;
-
-import backtype.storm.tuple.Fields;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
@@ -18,8 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.junit.Assert;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import java.util.List;
 
 
 abstract public class OperatorTest implements OperatorTestMethods

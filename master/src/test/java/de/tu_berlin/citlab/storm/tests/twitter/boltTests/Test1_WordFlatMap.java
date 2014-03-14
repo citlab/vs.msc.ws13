@@ -6,12 +6,12 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
-import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
+import de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
-import de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest;
+import de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 
 import java.util.ArrayList;
@@ -20,21 +20,40 @@ import java.util.List;
 /**
  * Created by Constantin on 1/21/14.
  */
-public class Bolt1_WordFlatMap extends UDFBoltTest implements UDFBoltTestMethods
+public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTest_WordFlatMap>
 {
-
+    public static final String testName ="WordFlatMap";
     private static final Fields inputFields = new Fields("user_id", "message", "id");
     private static final Fields outputFields = new Fields("user_id", "word", "id");
 
-    private static final List<Tuple> inputTuples =  TupleMockFactory.generateTupleList_ByFields(
-                                                    new Values[]{new Values(1, "hey leute", 0),
-                                                    new Values(1, "sinnvoller Post.", 0),
-                                                    new Values(1, "bomben bauen macht spass", 0)},
-                                                    inputFields);
+    @Override
+    protected BoltTest_WordFlatMap initBoltTestDescr() {
+        return new BoltTest_WordFlatMap(testName, outputFields);
+    }
 
-    public Bolt1_WordFlatMap(String testName)
+    @Override
+    protected OpTest_WordFlatMap initOpTestDescr() {
+        return new OpTest_WordFlatMap(testName);
+    }
+
+    @Override
+    protected List<Tuple> generateInputTuples() {
+        return TupleMockFactory.generateTupleList_ByFields(
+                new Values[]{new Values(1, "hey leute", 0),
+                        new Values(1, "sinnvoller Post.", 0),
+                        new Values(1, "bomben bauen macht spass", 0)},
+                inputFields);
+    }
+}
+
+
+class BoltTest_WordFlatMap extends BoltTest implements UDFBoltTestMethods
+{
+
+
+    public BoltTest_WordFlatMap(String testName, Fields outputFields)
     {
-        super(testName, new Op1_WordMap(testName, inputFields, inputTuples), outputFields);
+        super(testName, new OpTest_WordFlatMap(testName), outputFields);
     }
 
     @Override
@@ -45,7 +64,7 @@ public class Bolt1_WordFlatMap extends UDFBoltTest implements UDFBoltTestMethods
     }
 
     @Override
-    public IKeyConfig initWindowHandler() {
+    public WindowHandler initWindowHandler() {
         return null;
     }
 
@@ -60,11 +79,17 @@ public class Bolt1_WordFlatMap extends UDFBoltTest implements UDFBoltTestMethods
     }
 }
 
-class Op1_WordMap extends OperatorTest
+class OpTest_WordFlatMap extends OperatorTest
 {
 
-    public Op1_WordMap(String testName, Fields inputFields, List<Tuple> inputTuples) {
-        super(testName, inputFields, inputTuples);
+    public OpTest_WordFlatMap(String testName) {
+        super(testName);
+    }
+
+
+    @Override
+    public List<Tuple> generateInputTuples() {
+        return null;
     }
 
     @Override

@@ -1,17 +1,17 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
-import java.util.List;
-
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.window.*;
+import de.tu_berlin.citlab.storm.udf.IOperator;
+import de.tu_berlin.citlab.storm.window.CountWindow;
+import de.tu_berlin.citlab.storm.window.TimeWindow;
+import de.tu_berlin.citlab.storm.window.Window;
+import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock;
-
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.mocks.UDFBoltMock;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 import org.apache.logging.log4j.LogManager;
@@ -19,8 +19,10 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.junit.Assert;
 
+import java.util.List;
 
-abstract public class UDFBoltTest implements UDFBoltTestMethods
+
+abstract public class BoltTest implements UDFBoltTestMethods
 {
 
 /* Global Private Constants: */
@@ -55,18 +57,18 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
      * Constructor, used to build up a Topology in a {@link TopologyTest}.
      * <p>
      *     This Topology-Constructor is taking into account, that a predecessing <b>UDFBolt</b>
-     *     (or more precisely it's predecessing {@link UDFBoltTest}) has some outputValues,
+     *     (or more precisely it's predecessing {@link BoltTest}) has some outputValues,
      *     stored in a {@link de.tu_berlin.citlab.testsuite.helpers.BoltEmission}.
      * </p>
      * <p>
-     *     <em><b>Notice:</b> If this Constructor is chosen, {@link de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest#generateInputTuples()}
+     *     <em><b>Notice:</b> If this Constructor is chosen, {@link BoltTest#generateInputTuples()}
      *     is not of relevance, as the inputTuples are the outputTuples of the predecessing bolt.</em>
      * </p>
      * @param testName The name of this Bolt-Test (later used for identification in LogFiles)
      * @param opTest The corresponding {@link OperatorTest}, being used to test the Operator, linked to that UDFBolt.
-     * @param predecessorOutput The output of the predecessing {@link de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest#testUDFBolt()}-method.
+     * @param predecessorOutput The output of the predecessing {@link BoltTest#testUDFBolt()}-method.
      */
-    public UDFBoltTest(String testName, OperatorTest opTest, BoltEmission predecessorOutput)
+    public BoltTest(String testName, OperatorTest opTest, BoltEmission predecessorOutput)
     {
         this(testName, opTest, predecessorOutput.outputFields);
         this.inputTuples = predecessorOutput.tupleList;
@@ -77,14 +79,14 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
      * <p>
      *     Standalone-tests are used outside of any topology and are thus not dependent
      *     on predecessor- or successor-bolts. As of that, only the Operator is tested by
-     *     a specified input (defined by a test-developer in {@link de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest#generateInputTuples()})
+     *     a specified input (defined by a test-developer in {@link BoltTest#generateInputTuples()})
      *     and is compared against an assertedOutput.
      * </p>
      * @param testName The name of this Bolt-Test (later used for identification in LogFiles)
      * @param opTest The corresponding {@link OperatorTest}, being used to test the Operator, linked to that UDFBolt.
      * @param outputFields The output-{@link backtype.storm.tuple.Fields}, used by the UDFBolt for it's output-emission.
      */
-    public UDFBoltTest(String testName, OperatorTest opTest, Fields outputFields)
+    public BoltTest(String testName, OperatorTest opTest, Fields outputFields)
     {
         this.logTag = "BoltTest_"+testName;
         this.testName = testName;
@@ -101,7 +103,7 @@ abstract public class UDFBoltTest implements UDFBoltTestMethods
         try{
             //Only define inputTuples via generateInputTuples(), if there are not already
             //defined in the constructor:
-            if(inputTuples != null){
+            if(inputTuples == null){
                 inputTuples = this.generateInputTuples();
             }
             LOGGER.debug(DEFAULT, "Input-Tuples are: \n\t {}", LogPrinter.toTupleListString(inputTuples));

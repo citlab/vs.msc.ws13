@@ -1,8 +1,6 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons.interfaces;
 
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
 

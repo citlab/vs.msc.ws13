@@ -12,13 +12,13 @@ import java.util.List;
  * Created by Constantin on 12.03.14.
  * Helper Data-Class for the {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest}.
  * <p>
- *     Each {@link de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest} returns a <b>BoltEmission</b>
+ *     Each {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest} returns a <b>BoltEmission</b>
  *     to with the given <b>Output-Fields</b> and the <b>Output-Values</b>, emitted by the
- *     {@link de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock} inside the UDFBoltTest.
+ *     {@link de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock} inside the BoltTest.
  * </p>
  * <p>
- *     For an UDFBoltTest, it is important to define ... in it's
- *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.UDFBoltTest#generateInputTuples()} to
+ *     For an BoltTest, it is important to define ... in it's
+ *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest#generateInputTuples()} to
  *     use the input of the predecessing Bolt in the topology.
  * </p>
  */
@@ -26,6 +26,12 @@ public class BoltEmission
 {
     public final List<Tuple> tupleList;
     public final Fields outputFields;
+
+    public BoltEmission(ArrayList<Tuple> tupleInput, Fields outputFields)
+    {
+        this.tupleList = tupleInput;
+        this.outputFields = outputFields;
+    }
 
     public BoltEmission(List<List<Object>> outputEmission, Fields outputFields)
     {
