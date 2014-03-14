@@ -3,7 +3,7 @@
   $(function () {
     global.topology_filter = $('#topology-list .filter');
 
-    topology_filter.selected = "";
+    topology_filter.selected = "*";
 
     topology_filter.add = function(name) {
       if(!topology_filter.include(name)) {
@@ -14,15 +14,16 @@
     };
 
     topology_filter.setFilter = function(filter) {
-      topology_list.find(".hidden").removeClass('hidden');
+      topology_list.find("tbody tr:hidden").show();
       if(filter != "*") {
-        topology_list.find("tbody tr").not("."+filter).addClass('hidden');
+        topology_list.find("tbody tr").not("."+filter).hide();
       }
     };
 
     topology_filter.find("li").on("click", function() {
       var filter = $(this).data("filter-value");
       topology_filter.setFilter(filter);
+      topology_filter.selected = filter;
     });
 
     topology_filter.include = function (filter) {
