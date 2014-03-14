@@ -45,7 +45,7 @@ public class CassandraDAO implements DAO, Serializable
 
 	public void connect( String node )
 	{
-		cluster = Cluster.builder().addContactPoint( node ).build();
+		cluster = Cluster.builder().addContactPoint( node ).withPort( 9042 ).build();
 		Metadata metadata = cluster.getMetadata();
 		System.out.printf( "Connected to cluster: %s\n", metadata.getClusterName() );
 		for ( Host host : metadata.getAllHosts() )
@@ -120,27 +120,7 @@ public class CassandraDAO implements DAO, Serializable
 			// TODO Automatisch generierter Erfassungsblock
 			e.printStackTrace();
 		}
-		for ( Counter ctn: this.config.ctn_list ) 
-		{
-			String countkey = ctn.getCountKey();
-			String countkey_class = ta.getClassName( countkey );
-			String countkeyCassandraType = ta.javaToCassandraTypes.get( countkey_class );
-			String countname = ctn.getCountName();
-			
-			StringBuilder sb = new StringBuilder("CREATE TABLE ");
-			sb.append( config.getKeyspace() );
-			sb.append( String.format( ".%s(%s %s PRIMARY KEY,%s counter)", ""+countkey+"_"+countname, countkey, countkeyCassandraType, countname ) );
-			
-			try
-			{
-				session.execute( sb.toString() );
-			}
-			catch ( Exception e )
-			{
-				// TODO Automatisch generierter Erfassungsblock
-				e.printStackTrace();
-			}
-		}
+
 
 	}
 
@@ -162,6 +142,19 @@ public class CassandraDAO implements DAO, Serializable
 		}
 		
 		return byteArray;
+	}
+	
+	public void executeQuery( String query )
+	{
+		try
+		{
+			session.execute( query );
+		}
+		catch ( Exception e )
+		{
+			// TODO Automatisch generierter Erfassungsblock
+			e.printStackTrace();
+		}
 	}
 	
 	public void store( List <Tuple> tuples )

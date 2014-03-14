@@ -74,8 +74,7 @@ public class CassandraWithTwitterStream {
                 "myks",
                 "tab1",
                 new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
-                new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
-                new Counter("user", "significance"), new Counter( "tweet_id", "count" )
+                new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
         );
         
 
@@ -86,6 +85,24 @@ public class CassandraWithTwitterStream {
                 )).shuffleGrouping("tweets");
 
 
+		//cassandraCfg = new CassandraConfig();
+        cassandraCfg.setParams( "mycountks", "mycounter1", new PrimaryKey( "user" ), new Fields( "significance" ) );
+        final Counter ctn = new Counter( cassandraCfg );      
+
+        builder.setBolt("test_updates",
+        		new UDFBolt(
+        				new Fields( "user", "tweed_id" ),
+        				new IOperator()
+        				{
+
+        					public void execute( List<Tuple> tuples, OutputCollector collector )
+        					{
+        						//ctn.update( "window", 1 );
+        					}
+        				})).shuffleGrouping( "tweets" );
+        
+        
+        
         Config conf = new Config();
         conf.setDebug(true);
 

@@ -23,7 +23,7 @@ public class CassandraOperator implements IOperator {
 
     private boolean initialized = false;
 
-    CassandraDAO dao = new CassandraDAO();
+    CassandraDAO dao = null;
 
     CassandraConfig config;
 
@@ -31,6 +31,7 @@ public class CassandraOperator implements IOperator {
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
         this.config.setIP("127.0.0.1");
+        this.dao = new CassandraDAO();
         //this.config.setIP( loadClusterManagerIPFromProperties() );
         //System.out.println(loadClusterManagerIPFromProperties());
         //System.out.println("cluster ip: " + loadClusterManagerIPFromProperties());

@@ -16,19 +16,15 @@ public class CassandraConfig implements DBConfig, Serializable
 	private Fields tupleFields;
 	private String keyspace;
 	private String table;
-	public List <Counter> ctn_list = new ArrayList <Counter>();
 	
 	
-	public void setParams( String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields, Counter... counters )
+	public void setParams( String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields )
 	{
 		this.primaryKeys = primaryKeys;
 		this.tupleFields = tupleFields;
 		this.keyspace = keyspace;
 		this.table = table;
-		for ( Counter ctn: counters )
-		{
-			ctn_list.add( ctn );
-		}
+
 		
 	}
 	
