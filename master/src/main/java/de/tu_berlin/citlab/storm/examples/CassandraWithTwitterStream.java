@@ -85,23 +85,6 @@ public class CassandraWithTwitterStream {
                 )).shuffleGrouping("tweets");
 
 
-		//cassandraCfg = new CassandraConfig();
-        cassandraCfg.setParams( "mycountks", "mycounter1", new PrimaryKey( "user" ), new Fields( "significance" ) );
-        final Counter ctn = new Counter( cassandraCfg );      
-
-        builder.setBolt("test_updates",
-        		new UDFBolt(
-        				new Fields( "user", "tweed_id" ),
-        				new IOperator()
-        				{
-
-        					public void execute( List<Tuple> tuples, OutputCollector collector )
-        					{
-        						//ctn.update( "window", 1 );
-        					}
-        				})).shuffleGrouping( "tweets" );
-        
-        
         
         Config conf = new Config();
         conf.setDebug(true);

@@ -5,7 +5,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
@@ -24,6 +22,7 @@ public class CassandraOperator implements IOperator {
     private boolean initialized = false;
 
     CassandraDAO dao = null;
+    Counter ctn;
 
     CassandraConfig config;
 
@@ -32,6 +31,7 @@ public class CassandraOperator implements IOperator {
         this.config = config;
         this.config.setIP("127.0.0.1");
         this.dao = new CassandraDAO();
+        this.ctn = new Counter();
         //this.config.setIP( loadClusterManagerIPFromProperties() );
         //System.out.println(loadClusterManagerIPFromProperties());
         //System.out.println("cluster ip: " + loadClusterManagerIPFromProperties());
@@ -94,15 +94,31 @@ public class CassandraOperator implements IOperator {
             dao.init();
             dao.analyzeTuple( tuples.get(0) );
             dao.createDataStructures();
+            
+            // setup new counter in any operator with a C* config
+            CassandraConfig cassandraCfg = new CassandraConfig();
+            cassandraCfg.setParams( "mycountks", "mycounter1", new PrimaryKey( "user" ), new Fields( "significance" ) );
+            cassandraCfg.setIP( "127.0.0.1" );
+            ctn.setConfig( cassandraCfg );
+            ctn.connect( cassandraCfg.getIP() );
+            ctn.createDataStructures();
 
             initialized = true;
         }
         else
         {
-            try{
+            try
+            {
                 dao.store( tuples );
+                
+                // some client logic computes positive or negative increment
+                // here the number of windows are counted and updated accordingly
+                ctn.update( "window", 1 );
+ 
+                
             } catch (Exception e ){
-                // ERROR
+                System.out.println("UPDATE EXCEPTION!!!");
+                throw e;
             }
         }
 

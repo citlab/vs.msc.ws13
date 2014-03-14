@@ -30,6 +30,16 @@ public class Counter implements Serializable
 		connect( config.getIP() );
         createDataStructures();
 	}
+	public Counter()
+	{
+		//System.out.println("NEWWWWW COUNNNTEREERRR!!!!!");
+		
+	}
+	
+	public void setConfig( CassandraConfig config )
+	{
+		this.config = config;
+	}
 	
 	public void connect( String node )
 	{
@@ -68,7 +78,8 @@ public class Counter implements Serializable
 	public void update ( String key, int number )
 	{
 		String keyspace_table = config.getKeyspace() + "." + assembledCounterTableName;
-		executeQuery( String.format( "UPDATE %s SET %s = %s + %d WHERE %s = %s;", keyspace_table, counterName, counterName, pkname, key ));
+		executeQuery( String.format( "UPDATE %s SET %s = %s + %d WHERE %s = '%s';", keyspace_table, counterName, counterName, number, pkname, key ));
+		//System.out.println(String.format( "UPDATE %s SET %s = %s + %d WHERE %s = '%s';", keyspace_table, counterName, counterName, number, pkname, key ));
 	}
 	
 	public void executeQuery( String query )
