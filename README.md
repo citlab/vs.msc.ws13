@@ -35,5 +35,17 @@ Cassandra Binding:
   * String - table name to use or
   * new PrimaryKey( String... keys )  //will change in future implementation
   * new Fields() - pass tuple field names to store (or no arguments for storing whole tuple)
-  * boolean - set true for a counting table  //to be implemented
 3. Use CassandraOperator in UDF-Bolt and pass configuration instance
+
+Counting Table:
+--------------------
+1. Create Counter object in any operator
+2. Counter Table is only for counting, use one Primary Key on what is counted and one Field name of count
+3. One time setup in the operator like this:
+  * CassandraConfig cassandraCfg = new CassandraConfig();
+  * cassandraCfg.setParams( "mycountks", "mycounter1", new PrimaryKey( "user" ), new Fields( "significance" ) );
+  * cassandraCfg.setIP( "127.0.0.1" );
+  * ctn.setConfig( cassandraCfg );
+  * ctn.connect( cassandraCfg.getIP() );
+  * ctn.createDataStructures();
+4. Compute positive or negative increment in the operator and call update method on Counter object with name of counted object and increment, e.g. ctn.update( "some_user_xy", 5 ) --> significance = significance + 5
