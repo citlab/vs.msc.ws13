@@ -25,10 +25,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	 * data structure that holds entities
 	 */
 	List<TimeEntity<I>> slots;
-	
-//	private static int instanceIdCounter = 0;
-//	
-//	public int instanceId = instanceIdCounter++;
 
 	public TimeWindow(int timeSlot) {
 		this(timeSlot, timeSlot);
@@ -36,45 +32,38 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public TimeWindow(int timeSlot, int offset) {
 		if (offset > timeSlot) {
-			System.out.println("offset ("+ offset +") must not be larger than size("+ timeSlot +")");
-			throw new IllegalArgumentException(
-					"offset ("+ offset +") must not be larger than size("+ timeSlot +")");
-			
+			System.out.println("offset (" + offset
+					+ ") must not be larger than size(" + timeSlot + ")");
+			throw new IllegalArgumentException("offset (" + offset
+					+ ") must not be larger than size(" + timeSlot + ")");
+
 		}
 		this.timeSlot = timeSlot;
 		this.offset = offset;
 		slots = new ArrayList<TimeEntity<I>>();
 	}
-	
+
 	private long getAquiredTimeSlot() {
 		long result = 0;
-		if(!slots.isEmpty()) {
+		if (!slots.isEmpty()) {
 			long youngestAquiredTime = slots.get(0).getTimestamp();
 			long oldestAquiredTime = TimeEntity.getcurrentTime();
-//			if(slots.size() == 1) {
-//				oldestAquiredTime = TimeEntity.getcurrentTime();
-//			}
-//			else {
-//				oldestAquiredTime = slots.get(slots.size() - 1).getTimestamp();
-//			}
 			result = oldestAquiredTime - youngestAquiredTime;
 		}
 		return result;
 	}
 
 	public void add(I entity) {
-		if (isSatisfied()) {
-			log.error("TimeWindow oferflow! aquiredTimeSlot: '" + getAquiredTimeSlot() + "', timeSlot: '" + timeSlot +  "'");
-			throw new ArrayIndexOutOfBoundsException();
-		}
 		slots.add(new TimeEntity<I>(entity));
 		Collections.sort(slots);
 	}
 
+	/**
+	 * this window does not decide itself when it is satisfied. It is depended
+	 * on external timing
+	 */
 	public boolean isSatisfied() {
-		boolean result = false;
-		result = getAquiredTimeSlot() >= (long) (timeSlot);
-		return result;
+		return false;
 	}
 
 	/**
@@ -86,10 +75,10 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	 */
 	public List<I> flush() {
 		List<I> result = new ArrayList<I>();
-		for(TimeEntity<I> slot : slots) {
+		for (TimeEntity<I> slot : slots) {
 			result.add(slot.getEntity());
 		}
-		while(!slots.isEmpty() && getAquiredTimeSlot() + offset >= timeSlot) {
+		while (!slots.isEmpty() && getAquiredTimeSlot() + offset >= timeSlot) {
 			slots.remove(0);
 		}
 		return result;
@@ -108,13 +97,9 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	public long getTimeSlot() {
 		return timeSlot;
 	}
-	
+
 	public List<I> addSafely(I entity) {
-		List<I> result = null;
-		if (isSatisfied()) {
-			result = flush();
-		}
 		add(entity);
-		return result;
+		return null;
 	}
 }
