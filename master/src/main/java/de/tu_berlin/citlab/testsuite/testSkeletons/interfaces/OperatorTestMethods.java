@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface OperatorTestMethods
 {
-    public List<Tuple> generateInputTuples();
+//    public List<Tuple> generateInputTuples();
 
     public IOperator initOperator(final List<Tuple> inputTuples);
 

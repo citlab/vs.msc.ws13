@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.testsuite.helpers;
 
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -35,11 +36,6 @@ public class TopologySetup
             this.boltNameOrder.add(testName);
 
             OperatorTest opTest = new OperatorTest(testName) {
-                @Override
-                public List<Tuple> generateInputTuples() {
-                    return null;
-                }
-
                 @Override
                 public IOperator initOperator(List<Tuple> inputTuples) {
                     return testBolt.getOperator();

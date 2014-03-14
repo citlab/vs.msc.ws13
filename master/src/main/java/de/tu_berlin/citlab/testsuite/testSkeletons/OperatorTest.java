@@ -56,7 +56,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 	public void initTestSetup(List<Tuple> inputTuples)
 	{
 		LOGGER.debug(LogPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
-
+        this.inputTuples = inputTuples;
 
 		try{
 			operator = this.initOperator(inputTuples);
@@ -64,7 +64,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 		}
 		catch (NullPointerException e){
 			String errorMsg = "Operator must not be null! Return it in initOperator(..)";
-            LOGGER.error(errorMsg, e);
+            LOGGER.error(BASIC, errorMsg, e);
 			throw new NullPointerException(errorMsg);
 		}
 
@@ -81,8 +81,6 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 	public void testOperator()
 	{
-//        this.initTestSetup(); TODO: add initTestSetup in tests.
-
 		AssertionError failureTrace = null;
 
         HEADLINER.debug(BASIC, LogPrinter.printHeader("Starting Operator Test [" + testName + "]...", '='));
@@ -97,7 +95,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 		try {
 			operator.execute(inputTuples, outputCollector);
 		} catch (OperatorException e) {
-			LOGGER.error("Operator execution failed!", e);
+			LOGGER.error(BASIC, "Operator execution failed!", e);
 		}
 
 
@@ -121,7 +119,7 @@ abstract public class OperatorTest implements OperatorTestMethods
 
         }
         catch (AssertionError e){
-            LOGGER.error("Operator Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
+            LOGGER.error(BASIC, "Operator Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
                     LogPrinter.toObjectWindowString(outputVals),
                     LogPrinter.toObjectWindowString(assertRes),
                     e);

@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface UDFBoltTestMethods
 {
-    public List<Tuple> generateInputTuples();
+//    public List<Tuple> generateInputTuples();
 
     public Window<Tuple, List<Tuple>> initWindow();
 

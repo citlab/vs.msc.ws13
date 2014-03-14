@@ -15,12 +15,17 @@
         <!-- Test Suite File-Appenders: -->
         <File name="bolt" fileName="logs/Bolt.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="info" />
+            <ThresholdFilter level="debug" />
+        </File>
+
+        <File name="bolt" fileName="logs/Operator.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <ThresholdFilter level="debug" />
         </File>
 
         <File name="spout" fileName="logs/Spout.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="info" />
+            <ThresholdFilter level="debug" />
         </File>
 
 
@@ -73,6 +78,9 @@
     <!-- Network Logging for the real Infrastructure: -->
         <logger name="Bolt" level="info" additivity="false">
             <AppenderRef ref="bolt" />
+        </logger>
+        <logger name="Operator" level="info" additivity="false">
+            <AppenderRef ref="operatorSocket" />
         </logger>
         <logger name="Spout" level="info" additivity="false">
             <AppenderRef ref="spout" />

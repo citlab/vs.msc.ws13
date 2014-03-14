@@ -50,7 +50,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
 	private WindowHandler windowHandler;
 
 
-    public final OperatorTest getOpTest() { return opTest; }
+//    public final OperatorTest getOpTest() { return opTest; }
 
 
     /**
@@ -68,18 +68,18 @@ abstract public class BoltTest implements UDFBoltTestMethods
      * @param opTest The corresponding {@link OperatorTest}, being used to test the Operator, linked to that UDFBolt.
      * @param predecessorOutput The output of the predecessing {@link BoltTest#testUDFBolt()}-method.
      */
-    public BoltTest(String testName, OperatorTest opTest, BoltEmission predecessorOutput)
-    {
-        this(testName, opTest, predecessorOutput.outputFields);
-        this.inputTuples = predecessorOutput.tupleList;
-    }
+//    public BoltTest(String testName, OperatorTest opTest, BoltEmission predecessorOutput)
+//    {
+//        this(testName, opTest, predecessorOutput.outputFields);
+//        this.inputTuples = predecessorOutput.tupleList;
+//    }
 
     /**
      * Constructor, used to build standalone-tests.
      * <p>
      *     Standalone-tests are used outside of any topology and are thus not dependent
      *     on predecessor- or successor-bolts. As of that, only the Operator is tested by
-     *     a specified input (defined by a test-developer in {@link BoltTest#generateInputTuples()})
+     *     a specified input (defined by a test-developer in {@link BoltTest#initTestSetup(java.util.List)})
      *     and is compared against an assertedOutput.
      * </p>
      * @param testName The name of this Bolt-Test (later used for identification in LogFiles)
@@ -96,21 +96,23 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 
 
-	private void initTestSetup()
+	public void initTestSetup(List<Tuple> inputTuples)//(List<Tuple> inputTuples, Fields outputFields)
 	{
         LOGGER.debug(DEFAULT, LogPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
 
         try{
-            //Only define inputTuples via generateInputTuples(), if there are not already
+            //Only define inputTuples via the initTestSetup parameter, if they are not already
             //defined in the constructor:
-            if(inputTuples == null){
-                inputTuples = this.generateInputTuples();
-            }
+            this.inputTuples = inputTuples;
+//            this.outputFields = outputFields;
+//            if(this.inputTuples == null){
+//                this.inputTuples = inputTuples;
+//            }
             LOGGER.debug(DEFAULT, "Input-Tuples are: \n\t {}", LogPrinter.toTupleListString(inputTuples));
         }
         catch (NullPointerException e){
             String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
-            LOGGER.error(errorMsg, e);
+            LOGGER.error(BASIC, errorMsg, e);
             throw new NullPointerException(errorMsg);
         }
 
@@ -158,8 +160,6 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 	public BoltEmission testUDFBolt()
 	{
-        this.initTestSetup();
-
         AssertionError failureTrace = null;
 
         HEADLINER.debug(BASIC, LogPrinter.printHeader("Starting Bolt Test [" + testName + "]...", '='));
@@ -196,7 +196,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
                     LogPrinter.toObjectWindowString(assertRes));
         }
         catch (AssertionError e){
-            LOGGER.error("Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
+            LOGGER.error(BASIC, "Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
                     LogPrinter.toObjectWindowString(outputVals),
                     LogPrinter.toObjectWindowString(assertRes),
                     e);
@@ -230,12 +230,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
 		window = null;
 		windowHandler = null;
 	}
-	
 
-	public List<Tuple> generateInputTuples()
-    {
-        return opTest.generateInputTuples();
-    }
 
 	public List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples)
     {
@@ -243,8 +238,10 @@ abstract public class BoltTest implements UDFBoltTestMethods
     }
 
 
-    abstract public Window<Tuple, List<Tuple>> initWindow();
+//    public abstract List<Tuple> generateInputTuples();
 
-    abstract public WindowHandler initWindowHandler();
+    public abstract Window<Tuple, List<Tuple>> initWindow();
+
+    public abstract WindowHandler initWindowHandler();
 
 }

@@ -47,14 +47,19 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     @Override
     protected List<BoltTestConfig> defineTopologySetup() {
         AnalyzeTweetsTopology topology = new AnalyzeTweetsTopology();
-
         List<BoltTestConfig> testTopology = new ArrayList<BoltTestConfig>();
 
         final UDFBolt flatMapTweetWords = topology.flatMapTweetWords();
-        final String flatMapName = "FlatMapTweetWords";
-        List<List<Object>> assertedOutput = new ArrayList<List<Object>>(); //TODO: assert something...
-        BoltTestConfig flatMapTest = new BoltTestConfig(flatMapName, flatMapTweetWords, assertedOutput);
+        BoltTestConfig flatMapTest = testMapTweetWords(flatMapTweetWords);
         testTopology.add(flatMapTest);
+
+        final UDFBolt staticHashJoin = topology.createStaticHashJoin();
+        BoltTestConfig hashJoinTest = testStaticHashJoin(staticHashJoin);
+        testTopology.add(hashJoinTest);
+
+        final UDFBolt reduceUserSign = topology.reduceUserSignificance();
+        BoltTestConfig userSignTest = testUserSign(reduceUserSign);
+        testTopology.add(userSignTest);
 
         return testTopology;
     }
@@ -69,6 +74,41 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     public static void terminateEnvironment()
     {
         terminateTopology();
+    }
+
+
+
+/* Topology Test-Configs: */
+/* ====================== */
+
+    private BoltTestConfig testMapTweetWords(UDFBolt testingBolt) {
+        final String boltTestName = "FlatMapTweetWords";
+        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
+//        assertedOutput.add(new Values(1, "hey", 0));
+//        assertedOutput.add(new Values(1, "leute", 0));
+//        assertedOutput.add(new Values(1, "heute.", 0));
+
+        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
+    }
+
+    private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
+        final String boltTestName = "createStaticHashJoin";
+        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
+        assertedOutput.add(new Values(1, "hey", 0));
+        assertedOutput.add(new Values(1, "leute", 0));
+        assertedOutput.add(new Values(1, "heute.", 0));
+
+        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
+    }
+
+    private BoltTestConfig testUserSign(UDFBolt testingBolt) {
+        final String boltTestName = "createStaticHashJoin";
+        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
+        assertedOutput.add(new Values(1, "hey", 0));
+        assertedOutput.add(new Values(1, "leute", 0));
+        assertedOutput.add(new Values(1, "heute.", 0));
+
+        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
     }
 
 }

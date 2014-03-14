@@ -8,11 +8,15 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
+import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
 import de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +26,13 @@ import java.util.List;
  */
 public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTest_WordFlatMap>
 {
+    static {
+        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
+    }
+    private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
+
     public static final String testName ="WordFlatMap";
-    private static final Fields inputFields = new Fields("user_id", "message", "id");
+    private static final Fields inputFields = new Fields("user_id", "msg", "id");
     private static final Fields outputFields = new Fields("user_id", "word", "id");
 
     @Override
@@ -84,12 +93,6 @@ class OpTest_WordFlatMap extends OperatorTest
 
     public OpTest_WordFlatMap(String testName) {
         super(testName);
-    }
-
-
-    @Override
-    public List<Tuple> generateInputTuples() {
-        return null;
     }
 
     @Override

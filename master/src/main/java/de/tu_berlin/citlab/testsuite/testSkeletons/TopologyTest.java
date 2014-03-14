@@ -43,7 +43,8 @@ abstract public class TopologyTest
             BoltTest actBoltTest;
             if(n == 0){ //For the first bolt in the topology:
                try{
-                    actBoltTest = new BoltTest(actTestName, actBoltOPTest, defineFirstBoltsInput()) {
+                   BoltEmission firstInput = defineFirstBoltsInput();
+                    actBoltTest = new BoltTest(actTestName, actBoltOPTest, firstInput.outputFields) {
                         @Override
                         public Window<Tuple, List<Tuple>> initWindow() {
                             return actBoltWinHandler.getStub();
@@ -54,6 +55,7 @@ abstract public class TopologyTest
                             return actBoltWinHandler;
                         }
                     };
+                    actBoltTest.initTestSetup(firstInput.tupleList);
                }
                catch(NullPointerException e){
                    LOGGER.error("First Bolt Inputs are neeeded to be defined in defineFirstBoltsInput()!", e);
@@ -61,7 +63,7 @@ abstract public class TopologyTest
                }
             }
             else{
-                actBoltTest = new BoltTest(actTestName, actBoltOPTest, lastBoltOutput) {
+                actBoltTest = new BoltTest(actTestName, actBoltOPTest, lastBoltOutput.outputFields) {
                     @Override
                     public Window<Tuple, List<Tuple>> initWindow() {
                         return actBoltWinHandler.getStub();
@@ -72,6 +74,7 @@ abstract public class TopologyTest
                         return actBoltWinHandler;
                     }
                 };
+                actBoltTest.initTestSetup(lastBoltOutput.tupleList);
             }
             boltTests.add(actBoltTest);
             lastBoltOutput = actBoltTest.testUDFBolt();

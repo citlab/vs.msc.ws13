@@ -18,6 +18,7 @@ abstract public class StandaloneTest<B extends BoltTest, O extends OperatorTest>
         this.boltTestDescr = initBoltTestDescr();
         this.opTestDescr = initOpTestDescr();
         this.opTestDescr.initTestSetup(generateInputTuples());
+        this.boltTestDescr.initTestSetup(generateInputTuples());
     }
 
     protected abstract B initBoltTestDescr();
