@@ -22,29 +22,81 @@ public class StaticHashJoinOperator implements IOperator {
 	private TupleProjection projection;
 	
 	private Map<Serializable,  List<Tuple> > hashTable= new Hashtable<Serializable, List<Tuple>>();
-	
-	
+
+    /**
+     * init static hash join operator with an empty hashtable
+     * @param comparator
+     * @param projection
+     */
+    public StaticHashJoinOperator(TupleComparator comparator, TupleProjection projection ) {
+        this.joinComparator = comparator;
+        this.projection = projection;
+    }
+
+    /**
+     * init static hash join operator with a tuple list
+     * @param comparator
+     * @param projection
+     * @param inMemoryTuples
+     */
 	public StaticHashJoinOperator(TupleComparator comparator, TupleProjection projection, Iterator<Tuple> inMemoryTuples) {
 		this.joinComparator = comparator;
 		this.projection = projection;
-		
-		// build one side hash table
-		while (inMemoryTuples.hasNext()) {
-			Tuple tuple = inMemoryTuples.next();
-			if( hashTable.containsKey( comparator.getTupleKey(tuple) ) ){
-				List<Tuple> tuples = hashTable.get( comparator.getTupleKey(tuple) );
-				tuples.add(tuple);
-				
-			} else {
-				List<Tuple> tuples = new ArrayList<Tuple>();
-				tuples.add(tuple);
-				hashTable.put( comparator.getTupleKey(tuple), tuples );
-			}
-		}
+
+        updateTable(inMemoryTuples);
 	}
+
+    /**
+     * init static hash join operator providing a predefined hashtable
+     *
+     * this is interesting if you want update the hashtable outside the operator
+     * @param comparator
+     * @param projection
+     */
+    public StaticHashJoinOperator(TupleComparator comparator, TupleProjection projection, Map<Serializable,  List<Tuple> > hashTable ) {
+        this.joinComparator = comparator;
+        this.projection = projection;
+
+        this.hashTable = hashTable;
+    }
+
+
+    public void buildTable(Iterator<Tuple> inMemoryTuples){
+        hashTable.clear();
+
+        // build one side hash table
+        while (inMemoryTuples.hasNext()) {
+            Tuple tuple = inMemoryTuples.next();
+            if( hashTable.containsKey( this.joinComparator.getTupleKey(tuple) ) ){
+                List<Tuple> tuples = hashTable.get( this.joinComparator.getTupleKey(tuple) );
+                tuples.add(tuple);
+
+            } else {
+                List<Tuple> tuples = new ArrayList<Tuple>();
+                tuples.add(tuple);
+                hashTable.put( this.joinComparator.getTupleKey(tuple), tuples );
+            }
+        }
+    }
+
+    public void updateTable(Iterator<Tuple> inMemoryTuples){
+        // build one side hash table
+        while (inMemoryTuples.hasNext()) {
+            Tuple tuple = inMemoryTuples.next();
+            if( hashTable.containsKey( this.joinComparator.getTupleKey(tuple) ) ){
+                List<Tuple> tuples = hashTable.get( this.joinComparator.getTupleKey(tuple) );
+                tuples.add(tuple);
+
+            } else {
+                List<Tuple> tuples = new ArrayList<Tuple>();
+                tuples.add(tuple);
+                hashTable.put( this.joinComparator.getTupleKey(tuple), tuples );
+            }
+        }
+    }
 	
 	public void execute(List<Tuple> tuples, OutputCollector collector ) {
-        UDFBolt.LOGGER.info("StaticHashJoinOperator: test");
+
 		// lookup: stream second side through and generate output
 		Iterator<Tuple> windowTuples = tuples.iterator();
 		while (windowTuples.hasNext()) {

@@ -37,7 +37,7 @@ public class AnalyzeTweetsTopology implements Serializable{
     public TwitterSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter" };
+        String[] keywords = new String[] {"ich", "du", "mein", "der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter" };
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
@@ -89,12 +89,13 @@ public class AnalyzeTweetsTopology implements Serializable{
 
 
         TupleProjection projection = new TupleProjection(){
-            public Values project(Tuple left, Tuple right) {
+            public Values project(Tuple inMemTuple, Tuple tuple) {
                 return new Values(
-                        right.getValueByField("user"),
-                        right.getValueByField("tweet_id"),
-                        right.getValueByField("word"),
-                        left.getValueByField("significance")
+                        tuple.getValueByField("user"),
+                        tuple.getValueByField("tweet_id"),
+                        tuple.getValueByField("word"),
+
+                        inMemTuple.getValueByField("significance")
                 );
             }
         };
@@ -119,20 +120,8 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("der", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("die", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );*/
-
-        /*
-        TupleComparator comparator = new TupleComparator() {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            public int compare(Tuple staticSide, Tuple tuple) {
-                    return tuple.getStringByField("word").contains( staticSide.getStringByField("word") )? 0 : -1;
-                }
-
-            @Override
-            public Serializable getTupleKey(Tuple tuple) {
-                return (Serializable) tuple.select(new Fields("word"));
-            }
-        };*/
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );
+        */
 
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "word", "significance" ),
@@ -170,6 +159,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
+                        System.out.println("delayed: "+tuples.size() );
                         for( Tuple p : tuples ){
                             collector.emit(p.getValues());
                         }//for
@@ -181,6 +171,24 @@ public class AnalyzeTweetsTopology implements Serializable{
 
 
     public UDFBolt filterBadUsers(){
+
+        final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
+
+        final TupleProjection projection = new TupleProjection(){
+            public Values project(Tuple inMemTuple, Tuple tuple) {
+                return (Values)tuple.getValues();
+           }
+        };
+
+        final TupleComparator tupleComparator = KeyConfigFactory.compareByFields(new Fields("user"));
+
+        final StaticHashJoinOperator staticHashJoinBadUsers =
+            new StaticHashJoinOperator(
+                    tupleComparator,
+                    projection,
+                    badUsersHT );
+
+
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "tweet" ), // output
                 new MultipleOperators(
@@ -193,13 +201,35 @@ public class AnalyzeTweetsTopology implements Serializable{
                                         System.out.println("add new user: "+t);
                                         String user = t.getStringByField("user");
 
-                                        int totalsignificance = t.getIntegerByField("total_significance");
 
-                                        // process detected user
-                                        int sig = ConspicuousUserDatabase.updateDetectedUser(user, totalsignificance);
+                                        int currSig = t.getIntegerByField("total_significance");
 
-                                        // do not output any tuples
-                                        System.out.println("add new user: "+t+", sig: "+sig);
+                                        // user exists?
+                                        if( badUsersHT.containsKey(tupleComparator.getTupleKey(t)) ){
+                                            List<Tuple> keyTuples =  badUsersHT.get(tupleComparator.getTupleKey(t));
+
+                                            // lets assume we have one tuple for each detected user
+                                            int lastSig = keyTuples.get(0).getIntegerByField("significance");
+                                            int totalSig = lastSig+currSig;
+
+                                            Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
+                                            keyTuples.clear();
+                                            keyTuples.add(newUserTuple);
+
+                                            // do not output any tuples
+                                            System.out.println("update user: "+t+", sig: "+totalSig);
+
+                                        } else {
+                                            int totalSig = currSig;
+                                            Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
+
+                                            List<Tuple> badUsers = new ArrayList<Tuple>();
+                                            badUsers.add(newUserTuple);
+
+                                            badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
+
+                                            System.out.println("add user: "+t+", sig: "+totalSig);
+                                        }
                                     }
                                 }// execute()
                             },
@@ -207,26 +237,11 @@ public class AnalyzeTweetsTopology implements Serializable{
                     ),
                     // process raw comping tweets
                     new OperatorProcessingDescription(
-                        new FilterOperator(
-                                new Fields("user", "tweet_id", "tweet"), // input
-                                new FilterUDF() {
-                                    @Override
-                                    public void prepare() {
-                                        //TODO: Load from database if data exists
-                                    }
-
-                                    @Override
-                                    public Boolean evaluate(Tuple tuple ) {
-                                        System.out.println("check user: "+tuple);
-
-                                        String user = tuple.getStringByField("user");
-                                        return ConspicuousUserDatabase.isDetectedUser(user);
-                                    }
-                                }),
-                            "tweets"
+                            staticHashJoinBadUsers,
+                            "delayed_tweets"
                         )
                 ),
-            new TimeWindow<Tuple>(5000, 5000),
+            WINDOW,
             KeyConfigFactory.BySource()
         );
     }
@@ -239,10 +254,13 @@ public class AnalyzeTweetsTopology implements Serializable{
         // provide twitter streaminh data
         builder.setSpout("tweets", createTwitterSpout(), 1);
 
+        builder.setBolt("delayed_tweets", delayTuplesBolt(5000, new Fields("user", "tweet_id", "tweet") ), 1 )
+                .shuffleGrouping("tweets");
+
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
                 .shuffleGrouping("reduce_to_user_significance")
-                .shuffleGrouping("tweets");
+                .shuffleGrouping("delayed_tweets");
 
         builder.setBolt("store_tweets", createCassandraSink(), 1)
                 .shuffleGrouping("filter_bad_users");
@@ -256,7 +274,6 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
                 .shuffleGrouping("join_with_badwords");
-
 
 
         return builder.createTopology();
