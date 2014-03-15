@@ -164,9 +164,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
-                        System.out.println("delayed ");
                         for( Tuple p : tuples ){
-                            System.out.println("delayed "+p);
                             collector.emit(p.getValues());
                         }//for
                     }//execute()
