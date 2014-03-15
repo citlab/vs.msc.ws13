@@ -21,6 +21,7 @@ import org.mockito.stubbing.Answer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.anyInt;
 
 
@@ -174,7 +175,29 @@ public final class TupleMock
 					try {
 						return vals.get(i);
 					} catch (IndexOutOfBoundsException e) {
-						LOGGER.error("getValue(i) with i={} and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						LOGGER.error("getValue({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					}
+				}
+			});
+			Mockito.when(tuple.getValueByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return vals.get(i);
+							}
+						}
+						LOGGER.info("getValueByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getValueByField() called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getValueByField({}) seems to have no keyfields defined!", fieldName);
 						throw e;
 					}
 				}
@@ -187,10 +210,32 @@ public final class TupleMock
 					try{
 						return (String) vals.get(i);
 					}catch(IndexOutOfBoundsException e){
-						LOGGER.error("getString(i) with i={} and values.size()={} resulted in an IndexOutOfBoundsExcp.", i, vals.size());
+						LOGGER.error("getString({}) and values.size()={} resulted in an IndexOutOfBoundsExcp.", i, vals.size());
 						throw e;
 					}catch(ClassCastException e){
-						LOGGER.error("getString(i) with i={} and values.get(i)={} resulted in a ClassCastExcp..", i, vals.get(i).toString());
+						LOGGER.error("getString({}) and values.get(i)={} resulted in a ClassCastExcp..", i, vals.get(i).toString());
+						throw e;
+					}
+				}
+			});
+			Mockito.when(tuple.getStringByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (String) vals.get(i);
+							}
+						}
+						LOGGER.info("getStringByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getStringByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getStringByField({}) seems to have no keyfields defined!", fieldName);
 						throw e;
 					}
 				}
@@ -211,6 +256,28 @@ public final class TupleMock
 					}
 				}
 			});
+			Mockito.when(tuple.getIntegerByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Integer) vals.get(i);
+							}
+						}
+						LOGGER.info("getIntegerByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getIntegerByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getIntegerByField({}) seems to have no keyfields defined!", fieldName);
+						throw e;
+					}
+				}
+			});
 
 			Mockito.when(tuple.getLong(anyInt())).thenAnswer(new Answer<Object>() {
 				@Override
@@ -223,6 +290,28 @@ public final class TupleMock
 						throw e;
 					}catch(ClassCastException e){
 						LOGGER.error("getLong(i) with i={} and values.get(i)={} resulted in a ClassCastExcp..", i, vals.get(i).toString());
+						throw e;
+					}
+				}
+			});
+			Mockito.when(tuple.getLongByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Long) vals.get(i);
+							}
+						}
+						LOGGER.info("getLongByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getLongByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getLongByField({}) seems to have no keyfields defined!", fieldName);
 						throw e;
 					}
 				}
@@ -243,6 +332,28 @@ public final class TupleMock
 					}
 				}
 			});
+			Mockito.when(tuple.getBooleanByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Boolean) vals.get(i);
+							}
+						}
+						LOGGER.info("getBooleanByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getBooleanByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getBooleanByField({}) seems to have no keyfields defined!", fieldName);
+						throw e;
+					}
+				}
+			});
 
 			Mockito.when(tuple.getShort(anyInt())).thenAnswer(new Answer<Object>() {
 				@Override
@@ -255,6 +366,28 @@ public final class TupleMock
 						throw e;
 					}catch(ClassCastException e){
 						LOGGER.error("getShort(i) with i={} and values.get(i)={} resulted in a ClassCastExcp..", i, vals.get(i).toString());
+						throw e;
+					}
+				}
+			});
+			Mockito.when(tuple.getShortByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Short) vals.get(i);
+							}
+						}
+						LOGGER.info("getShortByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getShortByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getShortByField({}) seems to have no keyfields defined!", fieldName);
 						throw e;
 					}
 				}
@@ -275,6 +408,28 @@ public final class TupleMock
 					}
 				}
 			});
+			Mockito.when(tuple.getByteByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Byte) vals.get(i);
+							}
+						}
+						LOGGER.info("getByteByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getByteByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getByteByField({}) seems to have no keyfields defined!", fieldName);
+						throw e;
+					}
+				}
+			});
 
 			Mockito.when(tuple.getDouble(anyInt())).thenAnswer(new Answer<Object>() {
 				@Override
@@ -287,6 +442,28 @@ public final class TupleMock
 						throw e;
 					}catch(ClassCastException e){
 						LOGGER.error("getDouble(i) with i={} and values.get(i)={} resulted in a ClassCastExcp..", i, vals.get(i).toString());
+						throw e;
+					}
+				}
+			});
+			Mockito.when(tuple.getDoubleByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Double) vals.get(i);
+							}
+						}
+						LOGGER.info("getDoubleByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getDoubleByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getDoubleByField({}) seems to have no keyfields defined!", fieldName);
 						throw e;
 					}
 				}
@@ -307,6 +484,28 @@ public final class TupleMock
 					}
 				}
 			});
+			Mockito.when(tuple.getFloatByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (Float) vals.get(i);
+							}
+						}
+						LOGGER.info("getFloatByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getFloatByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getFloatByField({}) seems to have no keyfields defined!", fieldName);
+						throw e;
+					}
+				}
+			});
 
 			Mockito.when(tuple.getBinary(anyInt())).thenAnswer(new Answer<Object>() {
 				@Override
@@ -323,6 +522,28 @@ public final class TupleMock
 					}
 				}
 			});
+			Mockito.when(tuple.getBinaryByField(anyString())).thenAnswer(new Answer<Object>() {
+				@Override
+				public Object answer(InvocationOnMock invocation) throws Throwable {
+					String fieldName = (String) invocation.getArguments()[0];
+					int i = 0;
+					try {
+						for (i = 0; i < keyFields.length; i++) {
+							if (keyFields[i].equals(fieldName)) {
+								return (byte[]) vals.get(i);
+							}
+						}
+						LOGGER.info("getBinaryByField({}) has no Value to return.", fieldName);
+						return null;
+					} catch (IndexOutOfBoundsException e) {
+						LOGGER.error("getBinaryByField({}) called vals.get({}) and values.size()={} resulted in IndexOutOfBoundsExcp.", i, vals.size());
+						throw e;
+					} catch (NullPointerException e){
+						LOGGER.error("Tuple, that tried to handle getBinaryByField({}) seems to have no keyfields defined!", fieldName);
+						throw e;
+					}
+				}
+			});
 
 
 			if(keyFields.length > 0){
@@ -335,6 +556,8 @@ public final class TupleMock
 						}
 						Fields fields = (Fields) invocation.getArguments()[0];
 						List<Object> retArr = new ArrayList<Object>(fields.size());
+
+
 						for(String actField : fields){
 							for (int n = 0; n < keyFields.length; n++) {
 								String keyField = keyFields[n];

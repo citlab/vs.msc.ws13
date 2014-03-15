@@ -9,6 +9,8 @@ import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.TopologySetup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import sun.security.ssl.Debug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ import java.util.List;
 abstract public class TopologyTest
 {
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.TOPOLOGYTEST_ID);
+	private static final Marker BASIC = DebugLogger.getBasicMarker();
+	private static final Marker DEFAULT = DebugLogger.getDefaultMarker();
 
     private static final ArrayList<BoltTest> boltTests = new ArrayList<BoltTest>();
     private final TopologySetup topologySetup;
@@ -44,6 +48,8 @@ abstract public class TopologyTest
             if(n == 0){ //For the first bolt in the topology:
                try{
                    BoltEmission firstInput = defineFirstBoltsInput();
+				   LOGGER.info(DEFAULT, "Initial input of topology's first node is: {}", firstInput.tupleList);
+
                     actBoltTest = new BoltTest(actTestName, actBoltOPTest, firstInput.outputFields) {
                         @Override
                         public Window<Tuple, List<Tuple>> initWindow() {
@@ -58,7 +64,7 @@ abstract public class TopologyTest
                     actBoltTest.initTestSetup(firstInput.tupleList);
                }
                catch(NullPointerException e){
-                   LOGGER.error("First Bolt Inputs are neeeded to be defined in defineFirstBoltsInput()!", e);
+                   LOGGER.error(BASIC, "First Bolt Inputs are neeeded to be defined in defineFirstBoltsInput()!", e);
                    return;
                }
             }
@@ -87,6 +93,7 @@ abstract public class TopologyTest
     {
        for(BoltTest actTest : boltTests)
        {
+		   LOGGER.debug("Terminating TestSetup for Bolt: {}...", actTest.testName);
             actTest.terminateTestSetup();
        }
 

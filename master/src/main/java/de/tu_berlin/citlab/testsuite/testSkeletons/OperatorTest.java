@@ -121,8 +121,7 @@ abstract public class OperatorTest implements OperatorTestMethods
         catch (AssertionError e){
             LOGGER.error(BASIC, "Operator Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
                     LogPrinter.toObjectWindowString(outputVals),
-                    LogPrinter.toObjectWindowString(assertRes),
-                    e);
+                    LogPrinter.toObjectWindowString(assertRes));
             failureTrace = e;
         }
 

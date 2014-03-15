@@ -38,8 +38,8 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* ================= */
 
     public final String logTag;
+    public final String testName;
 
-    private final String testName;
     private final OperatorTest opTest;
     private final Fields outputFields;
 	private UDFBoltMock udfBolt;
@@ -198,8 +198,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
         catch (AssertionError e){
             LOGGER.error(BASIC, "Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
                     LogPrinter.toObjectWindowString(outputVals),
-                    LogPrinter.toObjectWindowString(assertRes),
-                    e);
+                    LogPrinter.toObjectWindowString(assertRes));
             failureTrace = e;
         }
 

@@ -7,7 +7,9 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,10 +32,51 @@ public final class TupleMockFactory
             Values actVals = values[n];
             tupleList.add(TupleMock.mockTupleByFields(actVals, fields));
         }
-
-        //Then add the tick-Tuples at random positions:
-        //TODO.
-
         return tupleList;
     }
+
+	public static ArrayList<Tuple> generateTwitterTuples(String[] users, String[] dictionary, int wordsPerTweet, int tupleCount)
+	{
+		Fields inputFields = new Fields("user", "id", "tweet");
+		Map<String, Integer> userIDs = new HashMap<String, Integer>(users.length);
+		initUserIDs(userIDs, users);
+		ArrayList<Tuple> tupleOutput = new ArrayList<Tuple>(tupleCount);
+
+		for (int i = 0; i < tupleCount; i++) {
+
+			Values actTupleVals = generateTweet(userIDs, users, dictionary, wordsPerTweet);
+			Tuple actTuple = TupleMock.mockTupleByFields(actTupleVals, inputFields);
+			tupleOutput.add(actTuple);
+		}
+
+		return tupleOutput;
+	}
+
+
+	private static void initUserIDs(Map<String, Integer> userIDs, String[] users) {
+		for (String actUser : users) {
+			int randID = (int) Math.round(Math.random() * 10000);
+			userIDs.put(actUser, randID);
+		}
+	}
+
+	private static Values generateTweet(Map<String,Integer> userIDs, String[] users, String[] dictionary, int wordsPerTweet)
+	{
+		int randUserIndex = (int) Math.round(Math.random() * (users.length -1));
+		String randUser = users[randUserIndex];
+
+		int randUserID = userIDs.get(randUser);
+
+		String tweet = "";
+		for (int n = 0; n < wordsPerTweet; n++) {
+			int randWordIndex = (int) Math.round(Math.random() * (dictionary.length -1));
+			String randWord = dictionary[randWordIndex];
+			if(n > 0){
+				tweet += " ";
+			}
+			tweet += randWord;
+		}
+
+		return new Values(randUser, randUserID, tweet);
+	}
 }

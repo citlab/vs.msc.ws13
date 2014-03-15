@@ -9,6 +9,7 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
+import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
 import de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
@@ -29,7 +30,6 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
     static {
         System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
     }
-    private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
 
     public static final String testName ="WordFlatMap";
     private static final Fields inputFields = new Fields("user_id", "msg", "id");
@@ -58,8 +58,6 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
 
 class BoltTest_WordFlatMap extends BoltTest implements UDFBoltTestMethods
 {
-
-
     public BoltTest_WordFlatMap(String testName, Fields outputFields)
     {
         super(testName, new OpTest_WordFlatMap(testName), outputFields);
@@ -90,6 +88,7 @@ class BoltTest_WordFlatMap extends BoltTest implements UDFBoltTestMethods
 
 class OpTest_WordFlatMap extends OperatorTest
 {
+	private static final Logger LOGGER = LogManager.getLogger("Operator");
 
     public OpTest_WordFlatMap(String testName) {
         super(testName);
@@ -100,8 +99,11 @@ class OpTest_WordFlatMap extends OperatorTest
         IOperator flatMap = new IOperator(){
             public void execute(List<Tuple> input, OutputCollector collector) {
                 for(Tuple t : input){
+					LOGGER.debug("Executing Tuple t: <Values: {}> of input-Tuples...", LogPrinter.toObjectListString(t.getValues()));
                     String[] words = t.getValueByField("msg").toString().split(" ");
+
                     for( String word : words ){
+						LOGGER.debug("Emitting Word [{}] of filtered input.", word);
                         collector.emit(new Values( t.getValueByField("user_id"),
                                 word, t.getValueByField("id") ) );
                     }//for

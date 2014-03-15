@@ -32,15 +32,21 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     @Override
     protected BoltEmission defineFirstBoltsInput()
     {
-        Fields inputFields = new Fields("user_id", "message", "id");
-        Fields outputFields = new Fields("user_id", "word", "id");
-        ArrayList<Tuple> firstTuples = TupleMockFactory.generateTupleList_ByFields(
-                new Values[]{new Values(1, "hey leute", 0),
-                        new Values(1, "sinnvoller Post.", 0),
-                        new Values(1, "bomben bauen macht spass", 0)},
-                inputFields);
+//        Fields inputFields = new Fields("user", "id", "tweet");
+		String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
+		String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
+												"bombe", "berlin", "gott", "allah",
+												"Pilates", "Politik", "Kapital", "Twitter",
+												"der", "die", "das"};
+		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 10, 100);
+        Fields outputFields = new Fields("user", "id", "word");
+//        ArrayList<Tuple> firstTuples = TupleMockFactory.generateTupleList_ByFields(
+//			new Values[]{	new Values("Hennes", 123, "Wow, ich hab heute wieder einen Vogel gesehen!"),
+//							new Values("4n4rch7", 789, "Wie war gleich die Adresse für diese hübsche Bomben Anleitung?"),
+//							new Values("ReliOnkel", 666, "Gott ist groß!", 0)},
+//                inputFields);
 
-        BoltEmission firstInput = new BoltEmission(firstTuples, outputFields);
+        BoltEmission firstInput = new BoltEmission(twitterTuples, outputFields);
         return firstInput;
     }
 
