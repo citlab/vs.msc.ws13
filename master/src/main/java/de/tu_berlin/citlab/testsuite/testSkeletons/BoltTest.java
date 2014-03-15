@@ -50,29 +50,9 @@ abstract public class BoltTest implements UDFBoltTestMethods
 	private WindowHandler windowHandler;
 
 
-//    public final OperatorTest getOpTest() { return opTest; }
 
-
-    /**
-     * Constructor, used to build up a Topology in a {@link TopologyTest}.
-     * <p>
-     *     This Topology-Constructor is taking into account, that a predecessing <b>UDFBolt</b>
-     *     (or more precisely it's predecessing {@link BoltTest}) has some outputValues,
-     *     stored in a {@link de.tu_berlin.citlab.testsuite.helpers.BoltEmission}.
-     * </p>
-     * <p>
-     *     <em><b>Notice:</b> If this Constructor is chosen, {@link BoltTest#generateInputTuples()}
-     *     is not of relevance, as the inputTuples are the outputTuples of the predecessing bolt.</em>
-     * </p>
-     * @param testName The name of this Bolt-Test (later used for identification in LogFiles)
-     * @param opTest The corresponding {@link OperatorTest}, being used to test the Operator, linked to that UDFBolt.
-     * @param predecessorOutput The output of the predecessing {@link BoltTest#testUDFBolt()}-method.
-     */
-//    public BoltTest(String testName, OperatorTest opTest, BoltEmission predecessorOutput)
-//    {
-//        this(testName, opTest, predecessorOutput.outputFields);
-//        this.inputTuples = predecessorOutput.tupleList;
-//    }
+/* The Constructor: */
+/* ================ */
 
     /**
      * Constructor, used to build standalone-tests.
@@ -96,19 +76,17 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 
 
-	public void initTestSetup(List<Tuple> inputTuples)//(List<Tuple> inputTuples, Fields outputFields)
+/* Public Methods for Test-Setup: */
+/* ============================== */
+
+	public void initTestSetup(List<Tuple> inputTuples)
 	{
         LOGGER.debug(DEFAULT, LogPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
+		LOGGER.debug(DEFAULT, "Output-Fields are: \n {}", LogPrinter.toFieldsString(outputFields));
 
         try{
-            //Only define inputTuples via the initTestSetup parameter, if they are not already
-            //defined in the constructor:
             this.inputTuples = inputTuples;
-//            this.outputFields = outputFields;
-//            if(this.inputTuples == null){
-//                this.inputTuples = inputTuples;
-//            }
-            LOGGER.debug(DEFAULT, "Input-Tuples are: \n\t {}", LogPrinter.toTupleListString(inputTuples));
+            LOGGER.debug(DEFAULT, "Input-Tuples are: \n {}", LogPrinter.toTupleListString(inputTuples));
         }
         catch (NullPointerException e){
             String errorMsg = "InputTuples must not be null! \n Return them in generateInputTuples().";
@@ -189,14 +167,19 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 
         try{
-            Assert.assertTrue("UDFBolt.execute(..) result is not equal to asserted Output from OperatorTest! \n", assertRes.equals(outputVals));
-
-            LOGGER.debug(BASIC, "Bolt Test succeded! \n\t Output Results: {} \n\t Asserted Results: {}",
-                    LogPrinter.toObjectWindowString(outputVals),
-                    LogPrinter.toObjectWindowString(assertRes));
+			if(assertRes != null){
+            	Assert.assertTrue("UDFBolt.execute(..) result is not equal to asserted Output from OperatorTest! \n", assertRes.equals(outputVals));
+				LOGGER.debug(BASIC, "Bolt Test succeded! \n\t Output Results: \n {} \n\t Asserted Results: \n {}",
+						LogPrinter.toObjectWindowString(outputVals),
+						LogPrinter.toObjectWindowString(assertRes));
+			}
+			else { //If assertRes is null, outputAssertion is deactivated. TestSuite is used for local logging only then.
+				LOGGER.info(BASIC, "Assertion is deactivated, as asserted-Results are not set by user and thus null.");
+				LOGGER.debug(BASIC, "Bolt Output: \n {}", LogPrinter.toObjectWindowString(outputVals));
+			}
         }
         catch (AssertionError e){
-            LOGGER.error(BASIC, "Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
+            LOGGER.error(BASIC, "Bolt Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: \n {} \n\t Asserted Results: \n {}",
                     LogPrinter.toObjectWindowString(outputVals),
                     LogPrinter.toObjectWindowString(assertRes));
             failureTrace = e;
@@ -224,23 +207,18 @@ abstract public class BoltTest implements UDFBoltTestMethods
 //	@After
 	public void terminateTestSetup()
 	{
+		opTest.terminateTestSetup();
 		udfBolt = null;
-
 		window = null;
 		windowHandler = null;
 	}
 
 
-	public List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples)
-    {
-        return opTest.assertOperatorOutput(inputTuples);
-    }
 
-
-//    public abstract List<Tuple> generateInputTuples();
+/* Abstract UDFBoltTestMethod Interfaces : */
+/* ======================================== */
 
     public abstract Window<Tuple, List<Tuple>> initWindow();
-
     public abstract WindowHandler initWindowHandler();
-
+	public abstract List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples);
 }

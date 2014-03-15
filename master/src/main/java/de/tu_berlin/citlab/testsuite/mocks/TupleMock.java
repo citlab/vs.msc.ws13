@@ -81,7 +81,7 @@ public final class TupleMock
     {
         LOGGER.debug(DETAILED, "Created Tuple Mock by Fields. \n\t Vals: {} \n\t Fields: {}",
                 LogPrinter.toValString(vals),
-                LogPrinter.toString(fields));
+                LogPrinter.toFieldsString(fields));
 
         String[] fieldsStr = new String[fields.size()];
         for(int n = 0 ; n < fields.size() ; n++){
@@ -636,7 +636,7 @@ public final class TupleMock
 
 
 
-	//Tuple toString Methods, dependent from the kind of tuple:
+	//Tuple toFieldsString Methods, dependent from the kind of tuple:
 	//---------------------------------------------------------
 
         if((vals == null) && (componentID != null) && (streamID != null)){

@@ -138,21 +138,20 @@ public class CassandraDAO implements DAO, Serializable
 			{
 				//System.out.println("javaTypesinTuple: " + ta.javaTypesInTuple);
 				//System.out.println("switch: " + ta.javaTypesInTuple.get( i ));
-//				switch( ta.javaTypesInTuple.get( i ) )  //TODO: besser enum mit typen verwenden
-//				{
-//					case "String":
-//						values.add( tuple.getString( i ) );
-//						break;
-//					case "Integer":
-//						values.add( tuple.getInteger( i ) );
-//						break;
-//					case "Long":
-//						values.add( tuple.getLong( i ) );
-//						break;
-//					case "blob":  // Object must be serialized
-//						values.add( ByteBuffer.wrap( serializeObject( tuple.getValue( i ) ) ) );
-//						break;
-//				}
+				String s = ta.javaTypesInTuple.get(i);
+				if (s.equals("String")) {
+					values.add(tuple.getString(i));
+
+				} else if (s.equals("Integer")) {
+					values.add(tuple.getInteger(i));
+
+				} else if (s.equals("Long")) {
+					values.add(tuple.getLong(i));
+
+				} else if (s.equals("blob")) {
+					values.add(ByteBuffer.wrap(serializeObject(tuple.getValue(i))));
+
+				}
 			}
 			bindValues( values.toArray( new Object[ values.size() ] ) );
 			addToBatch( boundStatement );
@@ -179,7 +178,7 @@ public class CassandraDAO implements DAO, Serializable
 
 	public void batchExecute()
 	{
-		//System.out.println( batchStatement.toString() );
+		//System.out.println( batchStatement.toFieldsString() );
 		session.execute( batchStatement );
 	}
 
@@ -257,6 +256,6 @@ public class CassandraDAO implements DAO, Serializable
  * config.dataTypes.get( key ); sb.append( key + " " + value + "," ); }
  * sb.deleteCharAt( sb.length() - 1 ); sb.append( ") WITH COMPACT STORAGE" );
  * 
- * INSTANCE.session.execute( sb.toString() );
+ * INSTANCE.session.execute( sb.toFieldsString() );
  */
 

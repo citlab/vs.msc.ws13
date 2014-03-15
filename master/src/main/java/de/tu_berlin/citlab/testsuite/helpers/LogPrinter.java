@@ -81,15 +81,18 @@ public final class LogPrinter
 	public static String toValListString(List<Values> valList)
 	{
         if(valList != null){
-            String output = "List<Values>(";
+			if(valList.size() == 0){
+				return "List<Values>()";
+			}
+            String output = "List<Values>( \n";
             for(int n = 0 ; n < valList.size() ; n++){
                 Values actVals = valList.get(n);
-                output += LogPrinter.toValString(actVals);
+                output += "\t"+LogPrinter.toValString(actVals);
 
                 if(n+1 != valList.size())
-                    output += ", ";
+                    output += ", \n";
             }
-            output += ")";
+            output += "\n ) \n";
 
             return output;
         }
@@ -99,16 +102,18 @@ public final class LogPrinter
 	public static String toTupleListString(List<Tuple> tupleList)
 	{
         if(tupleList != null){
-            String output = "List<Tuple>(";
-
+			if(tupleList.size() == 0){
+				return "List<Tuple>()";
+			}
+            String output = "List<Tuple>( \n";
             for(int n = 0 ; n < tupleList.size() ; n++){
                 Tuple actTuple = tupleList.get(n);
-                output += actTuple.toString(); //Assumed to use TupleMock, so toValString() is valid here.
+                output += "\t"+actTuple.toString(); //Assumed to use TupleMock, so toValString() is valid here.
 
                 if(n+1 != tupleList.size())
-                    output += ", ";
+                    output += ", \n";
             }
-            output += ")";
+            output += "\n ) \n";
 
             return output;
         }
@@ -118,15 +123,17 @@ public final class LogPrinter
 	public static String toObjectListString(List<Object> objList)
 	{
         if(objList != null){
+			if(objList.size() == 0){
+				return "List<Object>()";
+			}
             String output = "List<Object>(";
-
             for(int n = 0 ; n < objList.size() ; n++){
                 Object actObj = objList.get(n);
                 if(actObj != null)
                     output += actObj.toString();
 
                 if(n+1 != objList.size())
-                    output += ", ";
+                    output += ",";
             }
             output += ")";
 
@@ -139,15 +146,18 @@ public final class LogPrinter
 	public static String toObjectWindowString(List<List<Object>> objWindow)
 	{
         if(objWindow != null){
-            String output = "List<List<Object>>((";
+			if(objWindow.size() == 0){
+				return "List<List<Object>>()";
+			}
+            String output = "List<List<Object>>((\n";
             for(int n = 0 ; n < objWindow.size(); n++){
                 List<Object> actList = objWindow.get(n);
-                output += LogPrinter.toObjectListString(actList);
+                output += "\t"+LogPrinter.toObjectListString(actList);
 
                 if(n+1 != objWindow.size())
-                    output += ", ";
+                    output += ", \n";
             }
-            output += ")";
+            output += "\n ) \n";
 
             return output;
         }
@@ -179,7 +189,7 @@ public final class LogPrinter
 	}
 	
 	
-	public static String toString(Fields fields)
+	public static String toFieldsString(Fields fields)
 	{
         if(fields != null){
             String output ="[";

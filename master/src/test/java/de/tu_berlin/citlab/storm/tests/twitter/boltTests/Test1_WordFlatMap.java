@@ -17,6 +17,7 @@ import de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 
 import java.util.ArrayList;

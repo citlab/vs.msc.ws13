@@ -12,6 +12,7 @@ import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethod
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import org.junit.Assert;
 
 import java.util.List;
@@ -35,23 +36,25 @@ abstract public class OperatorTest implements OperatorTestMethods
     public final String logTag;
 
     private final String testName;
-//    private final Fields inputFields;
     private List<Tuple> inputTuples;
 
     private IOperator operator;
 
-//    public final Fields getInputFields() { return inputFields; }
 
+
+/* The Constructor: */
+/* ================ */
 
     public OperatorTest(String testName)
     {
         this.logTag = "OperatorTest_"+testName;
         this.testName = testName;
-//        this.inputFields = inputFields;
-//        this.inputTuples = inputTuples;
     }
 
 
+
+/* Public Methods for Test-Setup: */
+/* ============================== */
 
 	public void initTestSetup(List<Tuple> inputTuples)
 	{
@@ -76,7 +79,6 @@ abstract public class OperatorTest implements OperatorTestMethods
         }
 
     }
-
 
 
 	public void testOperator()
@@ -108,18 +110,19 @@ abstract public class OperatorTest implements OperatorTestMethods
 
 
         try{
-            if(assertRes != null)
-                Assert.assertTrue("Operator.execute(..) result is not equal to asserted Output! \n", assertRes.equals(outputVals));
-            else //If assertRes is null, the output vals also needs to be null, so that assertRes == outputVals:
-                Assert.assertNull(outputVals);
-
-            LOGGER.debug(BASIC, "Operator Test succeded! \n\t Output Results: {} \n\t Asserted Results: {}",
-                    LogPrinter.toObjectWindowString(outputVals),
-                    LogPrinter.toObjectWindowString(assertRes));
-
+            if(assertRes != null){
+				Assert.assertTrue("Operator.execute(..) result is not equal to asserted Output! \n", assertRes.equals(outputVals));
+				LOGGER.debug(BASIC, "Operator Test succeded! \n\t Output Results: \n {} \n\t Asserted Results: \n {}",
+						LogPrinter.toObjectWindowString(outputVals),
+						LogPrinter.toObjectWindowString(assertRes));
+			}
+            else { //If assertRes is null, outputAssertion is deactivated. TestSuite is used for local logging only then.
+            	LOGGER.info(BASIC, "Assertion is deactivated, as asserted-Results are not set by user and thus null.");
+				LOGGER.debug(BASIC, "Operator Output: \n {}", LogPrinter.toObjectWindowString(outputVals));
+			}
         }
         catch (AssertionError e){
-            LOGGER.error(BASIC, "Operator Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: {} \n\t Asserted Results: {}",
+            LOGGER.error(BASIC, "Operator Test failed. For more infos, check the JUnit Failure Trace. \n\t Output Results: \n {} \n\t Asserted Results: \n {}",
                     LogPrinter.toObjectWindowString(outputVals),
                     LogPrinter.toObjectWindowString(assertRes));
             failureTrace = e;
@@ -145,6 +148,10 @@ abstract public class OperatorTest implements OperatorTestMethods
 		operator = null;
 	}
 
+
+
+/* Abstract OperatorTestMethods Interfaces : */
+/* ======================================== */
 
 	abstract public IOperator initOperator(final List<Tuple> inputTuples);
 	abstract public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples);

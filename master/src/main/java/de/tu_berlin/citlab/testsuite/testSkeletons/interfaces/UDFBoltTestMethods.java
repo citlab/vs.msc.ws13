@@ -11,11 +11,8 @@ import java.util.List;
  */
 public interface UDFBoltTestMethods
 {
-//    public List<Tuple> generateInputTuples();
 
     public Window<Tuple, List<Tuple>> initWindow();
-
     public WindowHandler initWindowHandler();
-
     public List<List<Object>> assertWindowedOutput(final List<Tuple> inputTuples);
 }

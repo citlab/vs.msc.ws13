@@ -1,6 +1,7 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
 import backtype.storm.tuple.Tuple;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.util.List;

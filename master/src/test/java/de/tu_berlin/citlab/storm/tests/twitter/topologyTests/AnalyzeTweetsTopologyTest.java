@@ -12,6 +12,7 @@ import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
 import de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -24,10 +25,6 @@ import java.util.List;
  */
 public class AnalyzeTweetsTopologyTest extends TopologyTest
 {
-    static {
-        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
-    }
-    private static final Logger LOGGER = LogManager.getLogger(DebugLogger.TOPOLOGYTEST_ID);
 
     @Override
     protected BoltEmission defineFirstBoltsInput()
@@ -38,13 +35,8 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 												"bombe", "berlin", "gott", "allah",
 												"Pilates", "Politik", "Kapital", "Twitter",
 												"der", "die", "das"};
-		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 10, 100);
+		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 5, 12);
         Fields outputFields = new Fields("user", "id", "word");
-//        ArrayList<Tuple> firstTuples = TupleMockFactory.generateTupleList_ByFields(
-//			new Values[]{	new Values("Hennes", 123, "Wow, ich hab heute wieder einen Vogel gesehen!"),
-//							new Values("4n4rch7", 789, "Wie war gleich die Adresse für diese hübsche Bomben Anleitung?"),
-//							new Values("ReliOnkel", 666, "Gott ist groß!", 0)},
-//                inputFields);
 
         BoltEmission firstInput = new BoltEmission(twitterTuples, outputFields);
         return firstInput;
@@ -88,33 +80,21 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 /* ====================== */
 
     private BoltTestConfig testMapTweetWords(UDFBolt testingBolt) {
-        final String boltTestName = "FlatMapTweetWords";
-        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
-//        assertedOutput.add(new Values(1, "hey", 0));
-//        assertedOutput.add(new Values(1, "leute", 0));
-//        assertedOutput.add(new Values(1, "heute.", 0));
+        final String boltTestName = "flatmap_tweet_words";
+//        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
+//        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
-        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
+        return new BoltTestConfig(boltTestName, testingBolt, null);
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
-        final String boltTestName = "createStaticHashJoin";
-        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
-        assertedOutput.add(new Values(1, "hey", 0));
-        assertedOutput.add(new Values(1, "leute", 0));
-        assertedOutput.add(new Values(1, "heute.", 0));
-
-        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
+        final String boltTestName = "join_with_badwords";
+        return new BoltTestConfig(boltTestName, testingBolt, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {
-        final String boltTestName = "createStaticHashJoin";
-        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
-        assertedOutput.add(new Values(1, "hey", 0));
-        assertedOutput.add(new Values(1, "leute", 0));
-        assertedOutput.add(new Values(1, "heute.", 0));
-
-        return new BoltTestConfig(boltTestName, testingBolt, assertedOutput);
+        final String boltTestName = "reduce_to_user_significance";
+        return new BoltTestConfig(boltTestName, testingBolt, null);
     }
 
 }

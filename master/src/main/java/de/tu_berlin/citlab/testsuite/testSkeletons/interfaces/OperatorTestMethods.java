@@ -10,9 +10,6 @@ import java.util.List;
  */
 public interface OperatorTestMethods
 {
-//    public List<Tuple> generateInputTuples();
-
     public IOperator initOperator(final List<Tuple> inputTuples);
-
     public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples);
 }

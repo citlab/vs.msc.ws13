@@ -1,15 +1,14 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
 import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
-import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
-import de.tu_berlin.citlab.testsuite.helpers.BoltTestConfig;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
-import de.tu_berlin.citlab.testsuite.helpers.TopologySetup;
+import de.tu_berlin.citlab.testsuite.helpers.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import sun.security.ssl.Debug;
 
 import java.util.ArrayList;
@@ -20,6 +19,10 @@ import java.util.List;
  */
 abstract public class TopologyTest
 {
+	static {
+		System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
+	}
+
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.TOPOLOGYTEST_ID);
 	private static final Marker BASIC = DebugLogger.getBasicMarker();
 	private static final Marker DEFAULT = DebugLogger.getDefaultMarker();
@@ -41,14 +44,15 @@ abstract public class TopologyTest
     {
         int n = 0;
         for (String actTestName : topologySetup.boltNameOrder) {
+			final UDFBolt testBolt = topologySetup.boltTests.get(actTestName);
             final OperatorTest actBoltOPTest = topologySetup.boltOPTests.get(actTestName);
-            final WindowHandler actBoltWinHandler = topologySetup.boltWindowHandler.get(actTestName);
+            final WindowHandler actBoltWinHandler = testBolt.getWindowHandler();
 
             BoltTest actBoltTest;
             if(n == 0){ //For the first bolt in the topology:
                try{
                    BoltEmission firstInput = defineFirstBoltsInput();
-				   LOGGER.info(DEFAULT, "Initial input of topology's first node is: {}", firstInput.tupleList);
+				   LOGGER.info(DEFAULT, "Initial input of topology's first node is: \n{}", LogPrinter.toTupleListString(firstInput.tupleList));
 
                     actBoltTest = new BoltTest(actTestName, actBoltOPTest, firstInput.outputFields) {
                         @Override
@@ -60,7 +64,12 @@ abstract public class TopologyTest
                         public WindowHandler initWindowHandler() {
                             return actBoltWinHandler;
                         }
-                    };
+
+						@Override
+						public List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples) {
+							return actBoltOPTest.assertOperatorOutput(inputTuples);
+						}
+					};
                     actBoltTest.initTestSetup(firstInput.tupleList);
                }
                catch(NullPointerException e){
@@ -69,7 +78,7 @@ abstract public class TopologyTest
                }
             }
             else{
-                actBoltTest = new BoltTest(actTestName, actBoltOPTest, lastBoltOutput.outputFields) {
+                actBoltTest = new BoltTest(actTestName, actBoltOPTest, testBolt.getOutputFields()) {
                     @Override
                     public Window<Tuple, List<Tuple>> initWindow() {
                         return actBoltWinHandler.getStub();
@@ -79,7 +88,12 @@ abstract public class TopologyTest
                     public WindowHandler initWindowHandler() {
                         return actBoltWinHandler;
                     }
-                };
+
+					@Override
+					public List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples) {
+						return actBoltOPTest.assertOperatorOutput(inputTuples);
+					}
+				};
                 actBoltTest.initTestSetup(lastBoltOutput.tupleList);
             }
             boltTests.add(actBoltTest);
@@ -91,11 +105,11 @@ abstract public class TopologyTest
 //Used in @AfterClass
     public static void terminateTopology()
     {
-       for(BoltTest actTest : boltTests)
-       {
-		   LOGGER.debug("Terminating TestSetup for Bolt: {}...", actTest.testName);
-            actTest.terminateTestSetup();
-       }
+		for(BoltTest actTest : boltTests)
+		{
+			LOGGER.debug("Terminating TestSetup for Bolt: {}...", actTest.testName);
+			actTest.terminateTestSetup();
+		}
 
         boltTests.clear();
     }

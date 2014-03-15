@@ -18,15 +18,16 @@ import java.util.Map;
 public class TopologySetup
 {
     public final List<String> boltNameOrder;
+	public final Map<String, UDFBolt> boltTests;
     public final Map<String, OperatorTest> boltOPTests;
-    public final Map<String, WindowHandler> boltWindowHandler;
+//    public final Map<String, WindowHandler> boltWindowHandler;
 
 
     public TopologySetup(List<BoltTestConfig> topology)
     {
         this.boltNameOrder = new ArrayList<String>(topology.size());
         this.boltOPTests = new HashMap<String, OperatorTest>();
-        this.boltWindowHandler = new HashMap<String, WindowHandler>();
+        this.boltTests = new HashMap<String, UDFBolt>();
 
         for (BoltTestConfig actTestConfig : topology) {
             final String testName = actTestConfig.testName;
@@ -47,8 +48,9 @@ public class TopologySetup
                 }
             };
 
+			this.boltTests.put(testName, testBolt);
             this.boltOPTests.put(testName, opTest);
-            this.boltWindowHandler.put(testName, testBolt.getWindowHandler());
+//            this.boltWindowHandler.put(testName, testBolt.getWindowHandler());
         }
     }
 }
