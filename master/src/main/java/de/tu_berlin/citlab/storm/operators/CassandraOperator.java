@@ -25,6 +25,8 @@ public class CassandraOperator implements IOperator {
     @Override
     public void execute(List<Tuple> tuples, OutputCollector collector) {
 
+        System.out.println("---- store "+tuples.size() );
+
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
         {
@@ -35,13 +37,13 @@ public class CassandraOperator implements IOperator {
 
             initialized = true;
         }
-        else
-        {
-            try{
-                dao.store( tuples );
-            } catch (Exception e ){
-                // ERROR
-            }
+
+        try{
+            dao.store( tuples );
+        } catch (Exception e ){
+            // ERROR
+            System.err.print("ERROR: "+e);
+            e.printStackTrace();
         }
 
         // emit tuples

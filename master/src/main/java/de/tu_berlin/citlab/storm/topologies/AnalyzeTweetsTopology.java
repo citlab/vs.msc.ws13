@@ -6,6 +6,7 @@ import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -18,6 +19,7 @@ import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
+import de.tu_berlin.citlab.storm.spouts.TwitterTestSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
@@ -30,18 +32,20 @@ public class AnalyzeTweetsTopology implements Serializable{
     private static final int windowSize = 1;
     private static final int slidingOffset = 1;
 
-    public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
+    //public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
 
-    //public Window<Tuple, List<Tuple>> TIME_WINDOW =new CountWindow<Tuple>(windowSize, slidingOffset);
+    public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(1,1);
 
-    public TwitterSpout createTwitterSpout() throws Exception {
+    public BaseRichSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"ich", "du", "mein", "der", "die", "das", "wir", "ihr", "sie", "facebook", "google", "twitter" };
+        String[] keywords = new String[] {"der", "die","das","wir","ihr","sie", "dein", "mein", "facebook", "google", "twitter" };
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
         return new TwitterSpout(config);
+
+        //return new TwitterTestSpout();
     }
 
     public UDFBolt createCassandraSink(){
@@ -56,7 +60,8 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "tweet" ),
-                new CassandraOperator(cassandraCfg)
+                new CassandraOperator(cassandraCfg),
+                WINDOW
         );
     }
 
@@ -66,6 +71,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
+
                         for( Tuple p : tuples ){
                             String[] words = p.getStringByField("tweet").split(" ");
                             for( String word : words ){
@@ -101,7 +107,6 @@ public class AnalyzeTweetsTopology implements Serializable{
         };
 
         ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD = 1;
-
 
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", 1)) );
@@ -148,24 +153,25 @@ public class AnalyzeTweetsTopology implements Serializable{
                         collector.emit(new Values(user,total_significance ));
                     }// execute()
                 },
-                new TimeWindow<Tuple>(1000, 1000),
+                WINDOW, //new TimeWindow<Tuple>(1, 1),
                 KeyConfigFactory.ByFields("user")
         );
     }
 
-    public UDFBolt delayTuplesBolt(int millisec, Fields fields){
+    public UDFBolt delayTuplesBolt(int sec, Fields fields){
         return new UDFBolt(
                 fields,
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
-                        System.out.println("delayed: "+tuples.size() );
+                        System.out.println("delayed ");
                         for( Tuple p : tuples ){
+                            System.out.println("delayed "+p);
                             collector.emit(p.getValues());
                         }//for
                     }//execute()
                 },
-                new TimeWindow<Tuple>(millisec, millisec)
+                new TimeWindow<Tuple>(sec, sec)
         );
     }
 
@@ -254,7 +260,11 @@ public class AnalyzeTweetsTopology implements Serializable{
         // provide twitter streaminh data
         builder.setSpout("tweets", createTwitterSpout(), 1);
 
-        builder.setBolt("delayed_tweets", delayTuplesBolt(5000, new Fields("user", "tweet_id", "tweet") ), 1 )
+        // find bad users
+        builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
+                .shuffleGrouping("tweets");
+
+        builder.setBolt("delayed_tweets", delayTuplesBolt(5, new Fields("user", "tweet_id", "tweet") ), 1 )
                 .shuffleGrouping("tweets");
 
         // filter and find bad users
@@ -265,9 +275,6 @@ public class AnalyzeTweetsTopology implements Serializable{
         builder.setBolt("store_tweets", createCassandraSink(), 1)
                 .shuffleGrouping("filter_bad_users");
 
-        // find bad users
-        builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
-                .shuffleGrouping("tweets");
 
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");

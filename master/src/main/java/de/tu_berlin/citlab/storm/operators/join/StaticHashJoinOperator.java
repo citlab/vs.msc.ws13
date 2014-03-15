@@ -101,13 +101,20 @@ public class StaticHashJoinOperator implements IOperator {
 		Iterator<Tuple> windowTuples = tuples.iterator();
 		while (windowTuples.hasNext()) {
 			Tuple tuple = windowTuples.next();
-			if( hashTable.containsKey( joinComparator.getTupleKey(tuple) ) ){
+
+
+            if( hashTable.containsKey( joinComparator.getTupleKey(tuple) ) ){
 				
 				List<Tuple> memoryTuples = hashTable.get( joinComparator.getTupleKey(tuple) );
 				for( Tuple memoryTuple : memoryTuples ){
 					collector.emit(projection.project(memoryTuple,tuple));
 				}
+
+                System.out.println("--- execute static join ("+joinComparator.getTupleKey(tuple)+") YES "+tuple );
 			}//if
+            else {
+                System.out.println("--- execute static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
+            }
 		}//while
 	}	
 }

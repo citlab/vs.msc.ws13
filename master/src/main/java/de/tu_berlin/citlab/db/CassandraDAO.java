@@ -126,8 +126,8 @@ public class CassandraDAO implements DAO, Serializable
 	public void store( List <Tuple> tuples )
 	{
 
-		
-		setPreparedStatement( ta.createPreparedInsertStatement( config.getKeyspace(), config.getTable() ) );
+
+		setPreparedStatement(ta.createPreparedInsertStatement(config.getKeyspace(), config.getTable()));
 		
 		for ( Tuple tuple: tuples )
 		{
@@ -156,7 +156,6 @@ public class CassandraDAO implements DAO, Serializable
 			}
 			bindValues( values.toArray( new Object[ values.size() ] ) );
 			addToBatch( boundStatement );
-			System.out.println("Values: " + values );
 		}
 
 		batchExecute();
