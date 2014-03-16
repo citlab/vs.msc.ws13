@@ -35,7 +35,7 @@ public class Application extends Controller {
     }
 
     public static Result deploy() {
-        ArrayList<Topology> topologies = Topology.readFiles();
+        ArrayList<Topology> topologies = Topology.readFiles(session("name"));
         return ok(deploy.render(topologies));
     }
 
@@ -49,6 +49,8 @@ public class Application extends Controller {
             
             String nimbusIp = getNimbusIp();
             String msg = sendFile(file, nimbusIp, fileName);
+
+            Database.getInstance().addFile(msg, fileName, session("name"));
 
             flash("notice", "File uploaded");
             return ok(String.format("{ip: %s, msg: %s}", nimbusIp, msg));

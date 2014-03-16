@@ -1,22 +1,23 @@
 package models;
 
+import models.Database;
 import java.util.*;
 
 public class Topology {
   private String title;
+  private String user;
   private String date;
+  private String name;
 
-  public Topology(String title, String date) {
+  public Topology(String title, String user, String date, String name) {
     this.title = title;
+    this.user = user;
     this.date = date;
+    this.name = name;
   }
 
-  public static ArrayList<Topology> readFiles() {
-    ArrayList<Topology> list = new ArrayList<Topology>();
-    list.add(new Topology("Blah","Heute"));
-    list.add(new Topology("Schön","Winter"));
-    list.add(new Topology("Doof","Irgendwann"));
-    list.add(new Topology("Cool","Gestern"));
+  public static ArrayList<Topology> readFiles(String user) {
+    ArrayList<Topology> list = Database.getInstance().getFilesForUser(user);
 
     return list;
   }
@@ -25,7 +26,15 @@ public class Topology {
     return this.title;
   }
 
+  public String getUser() {
+    return this.user;
+  }
+
   public String getDate() {
     return this.date;
+  }
+
+  public String getNameOnServer() {
+    return this.name;
   }
 }

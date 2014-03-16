@@ -1,4 +1,4 @@
-@helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data", 'id -> "upload-topology-form") {
+@helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data", 'id -> "upload-topology-form", 'class -> "ajax-form") {
   <div class="form-group">
     <label for="file">Datei auswählen</label>
     <input type="file" name="file">

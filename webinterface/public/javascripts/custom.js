@@ -8,22 +8,24 @@
       self.find('span').removeClass('glyphicon-play');
     })
 
-    $("form").ajaxForm({
+    $(".ajax-form").ajaxForm({
       dataType: 'json',
       success: function(response, status, xhr, form) {
-        success_message(jQuery.parseJSON(response).msg);
+        location.reload();
       },
       error: function() {
-        error_message("Etwas ist schief gelaufen");
+        location.reload();
       }
     });
 
-    function error_message(msg) {
-      $('#main_message_field').addClass('alert-danger').html(msg);
-    }
-
-    function success_message(msg) {
-      $('#main_message_field').addClass('alert-success').html(msg);
-    }
+    $(".start-form").ajaxForm({
+      dataType: 'json',
+      success: function(response, status, xhr, form) {
+        
+      },
+      error: function() {
+        
+      }
+    });
   })
 }(jQuery))
