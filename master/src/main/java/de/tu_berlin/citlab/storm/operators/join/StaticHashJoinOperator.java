@@ -109,12 +109,7 @@ public class StaticHashJoinOperator implements IOperator {
 				for( Tuple memoryTuple : memoryTuples ){
 					collector.emit(projection.project(memoryTuple,tuple));
 				}
-
-                System.out.println("--- execute static join ("+joinComparator.getTupleKey(tuple)+") YES "+tuple );
 			}//if
-            else {
-                System.out.println("--- execute static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
-            }
 		}//while
 	}	
 }

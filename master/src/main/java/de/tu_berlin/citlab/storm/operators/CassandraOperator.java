@@ -3,23 +3,30 @@ package de.tu_berlin.citlab.storm.operators;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 public class CassandraOperator implements IOperator {
 
     private boolean initialized = false;
+    private boolean isCounterBolt = false;
 
-    CassandraDAO dao = new CassandraDAO();
+    private CassandraDAO dao = new CassandraDAO();
 
-    CassandraConfig config;
+    private CassandraConfig config;
+    private Counter ctn;
+
+    private Fields keyFields;
 
 
     public CassandraOperator( CassandraConfig config ){
         /* place your code here */
         this.config = config;
+        this.ctn = new Counter();
     }
 
     @Override
@@ -30,16 +37,42 @@ public class CassandraOperator implements IOperator {
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
         {
-            dao.init();
-            dao.setConfig(config);
-            dao.analyzeTuple( tuples.get(0) );
-            dao.createDataStructures();
+            if( !config.isCounterBolt() ) {
+                dao.init();
+                dao.setConfig(config);
+                dao.analyzeTuple( tuples.get(0) );
+                dao.createDataStructures();
+            }
+            else {
+                ctn.setConfig( config );
+                ctn.connect( config.getIP() );
+                ctn.createDataStructures();
+
+                keyFields = new Fields(config.getPrimaryKeys().getPrimaryKeyFields());
+
+            }
 
             initialized = true;
         }
 
         try{
-            dao.store( tuples );
+            if( !config.isCounterBolt() ) {
+
+                dao.store( tuples );
+            } else {
+
+                // some client logic computes positive or negative increment
+                // here the number of windows are counted and updated accordingly
+
+                for( Tuple t : tuples ){
+                    List<Object> keyValues = t.select( keyFields  );
+                    List<Object> val = t.select(config.getTupleFields());
+
+                    ctn.update( keyValues, (int)val.get(0) );
+                }//for
+            }
+
+
         } catch (Exception e ){
             // ERROR
             System.err.print("ERROR: "+e);

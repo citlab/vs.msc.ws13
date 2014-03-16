@@ -63,9 +63,7 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	 * on external timing
 	 */
     public boolean isSatisfied() {
-        boolean result = false;
-        result = getAquiredTimeSlot() >= (long) (timeSlot);
-        return result;
+        return false;
     }
 
 	/**
