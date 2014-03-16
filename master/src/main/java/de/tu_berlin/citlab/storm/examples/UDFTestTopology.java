@@ -78,7 +78,12 @@ public class UDFTestTopology {
 				new FilterOperator(
 					new Fields("value"), // input
 					new FilterUDF() {
-						public Boolean evaluate(Tuple param) {
+                        @Override
+                        public void prepare() {
+
+                        }
+
+                        public Boolean evaluate(Tuple param) {
 							return (Integer) param.getValueByField("value") > 0;
 						}
 					}
