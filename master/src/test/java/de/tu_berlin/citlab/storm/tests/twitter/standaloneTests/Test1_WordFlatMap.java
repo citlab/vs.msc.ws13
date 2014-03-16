@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.tests.twitter.boltTests;
+package de.tu_berlin.citlab.storm.tests.twitter.standaloneTests;
 
 
 import backtype.storm.task.OutputCollector;
