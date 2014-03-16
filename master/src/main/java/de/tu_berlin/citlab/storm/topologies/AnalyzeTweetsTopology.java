@@ -158,21 +158,22 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public UDFBolt reduceUserSignificance(){
         return new UDFBolt(
-                new Fields( "user", "significance" ),
+                new Fields( "user", "tweet_id", "significance" ),
                 new IOperator(){
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         String user=tuples.get(0).getStringByField("user");
+                        Long tweet_id=tuples.get(0).getLongByField("tweet_id");
                         int total_significance=0;
                         for( Tuple p : tuples ){
                             int significance = p.getIntegerByField("significance");
                             total_significance+=significance;
                         }//for
-                        collector.emit(new Values(user,total_significance ));
+                        collector.emit(new Values(user,tweet_id,total_significance ));
                     }// execute()
                 },
                 WINDOW, //new TimeWindow<Tuple>(1, 1),
-                KeyConfigFactory.ByFields("user")
+                KeyConfigFactory.ByFields("user" )
         );
     }
 
@@ -239,7 +240,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                                             keyTuples.add(newUserTuple);
 
                                             // do not output any tuples
-                                            System.out.println("update user: "+t+", sig: "+totalSig);
+                                            System.out.println("debug: update user: "+t+", sig: "+totalSig);
 
                                         } else {
                                             int totalSig = currSig;
@@ -250,7 +251,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            System.out.println("add user: "+t+", sig: "+totalSig);
+                                            System.out.println("debug:  add user: "+t+", sig: "+totalSig);
                                         }
                                     }
                                 }// execute()
@@ -260,7 +261,7 @@ public class AnalyzeTweetsTopology implements Serializable{
                     // process raw comping tweets
                     new OperatorProcessingDescription(
                             staticHashJoinBadUsers,
-                            "delayed_tweets"
+                            "tweets"
                         )
                 ),
             WINDOW,
@@ -280,13 +281,13 @@ public class AnalyzeTweetsTopology implements Serializable{
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
                 .shuffleGrouping("tweets");
 
-        builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
-                .shuffleGrouping("tweets");
+        /*builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
+                .shuffleGrouping("tweets");*/
 
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
                 .shuffleGrouping("reduce_to_user_significance")
-                .shuffleGrouping("delayed_tweets");
+                .shuffleGrouping("tweets");
 
         builder.setBolt("store_tweets", createCassandraTweetsSink(), 1)
                 .shuffleGrouping("filter_bad_users");

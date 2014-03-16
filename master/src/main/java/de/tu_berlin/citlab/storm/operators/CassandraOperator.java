@@ -58,6 +58,11 @@ public class CassandraOperator implements IOperator {
         try{
             if( !config.isCounterBolt() ) {
 
+                for( Tuple t : tuples ){
+                    System.out.println("debug: store "+t);
+                }
+
+
                 dao.store( tuples );
             } else {
 
@@ -65,8 +70,11 @@ public class CassandraOperator implements IOperator {
                 // here the number of windows are counted and updated accordingly
 
                 for( Tuple t : tuples ){
+
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
+
+                    System.out.println("debug: store "+t);
 
                     ctn.update( keyValues, (int)val.get(0) );
                 }//for
