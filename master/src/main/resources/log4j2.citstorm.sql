@@ -14,8 +14,8 @@ SET time_zone = "+01:00";
 -- Datenbank: `log4j2`
 --
 
-CREATE DATABASE IF NOT EXISTS `log4j2` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `log4j2`;
+CREATE DATABASE IF NOT EXISTS `citstorm` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `citstorm`;
 
 -- --------------------------------------------------------
 
@@ -23,7 +23,7 @@ USE `log4j2`;
 -- Tabellenstruktur für Tabelle `citstorm`
 --
 
-CREATE TABLE IF NOT EXISTS `citstorm` (
+CREATE TABLE IF NOT EXISTS `log4j2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
   `milliseconds` int(11) NOT NULL,
@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS `citstorm` (
 
 GRANT USAGE ON *.* TO 'log4j2'@'%' IDENTIFIED BY PASSWORD '*69D4DBA2A0BEF21C2ADD1F483802230BF71C129E';
 
-GRANT ALL PRIVILEGES ON `log4j2`.* TO 'log4j2'@'%';
+GRANT ALL PRIVILEGES ON `citstorm`.* TO 'log4j2'@'%';

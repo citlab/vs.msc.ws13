@@ -98,7 +98,6 @@ public class ConnectionFactory {
 			if(pass == null) {
 				throw new Exception("pass not found in properties file");
 			}
-			System.out.println(serverName);
 			result = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
