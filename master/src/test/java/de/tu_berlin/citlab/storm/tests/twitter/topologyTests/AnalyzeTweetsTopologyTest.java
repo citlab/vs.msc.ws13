@@ -2,18 +2,12 @@ package de.tu_berlin.citlab.storm.tests.twitter.topologyTests;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.topologies.AnalyzeTweetsTopology;
 import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
 import de.tu_berlin.citlab.testsuite.helpers.BoltTestConfig;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
 import de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -84,17 +78,17 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 //        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
 //        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
-        return new BoltTestConfig(boltTestName, testingBolt, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
         final String boltTestName = "join_with_badwords";
-        return new BoltTestConfig(boltTestName, testingBolt, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {
         final String boltTestName = "reduce_to_user_significance";
-        return new BoltTestConfig(boltTestName, testingBolt, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 200, null);
     }
 
 }

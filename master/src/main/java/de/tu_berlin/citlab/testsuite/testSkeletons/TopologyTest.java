@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
-import sun.security.ssl.Debug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +44,7 @@ abstract public class TopologyTest
         int n = 0;
         for (String actTestName : topologySetup.boltNameOrder) {
 			final UDFBolt testBolt = topologySetup.boltTests.get(actTestName);
+			final int sleepBetweenTuples = topologySetup.boltSleepTimer.get(actTestName);
             final OperatorTest actBoltOPTest = topologySetup.boltOPTests.get(actTestName);
             final WindowHandler actBoltWinHandler = testBolt.getWindowHandler();
 
@@ -97,7 +97,7 @@ abstract public class TopologyTest
                 actBoltTest.initTestSetup(lastBoltOutput.tupleList);
             }
             boltTests.add(actBoltTest);
-            lastBoltOutput = actBoltTest.testUDFBolt();
+            lastBoltOutput = actBoltTest.testUDFBolt(sleepBetweenTuples);
             n++;
         }
     }

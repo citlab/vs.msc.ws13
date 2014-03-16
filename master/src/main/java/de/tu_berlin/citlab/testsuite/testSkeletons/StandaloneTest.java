@@ -1,7 +1,6 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
 import backtype.storm.tuple.Tuple;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -26,6 +25,7 @@ abstract public class StandaloneTest<B extends BoltTest, O extends OperatorTest>
     protected abstract O initOpTestDescr();
 
     protected abstract List<Tuple> generateInputTuples();
+	protected abstract int setSleepTimerBetweenTuples();
 
     @Test
     public void opTestWordFlatMap()
@@ -36,6 +36,6 @@ abstract public class StandaloneTest<B extends BoltTest, O extends OperatorTest>
     @Test
     public void boltTestWordFlatMap()
     {
-        boltTestDescr.testUDFBolt();
+        boltTestDescr.testUDFBolt(setSleepTimerBetweenTuples());
     }
 }

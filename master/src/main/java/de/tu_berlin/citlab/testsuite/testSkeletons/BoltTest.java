@@ -136,7 +136,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
 	}
 	
 
-	public BoltEmission testUDFBolt()
+	public BoltEmission testUDFBolt(int sleepTimeBetweenTuples)
 	{
         AssertionError failureTrace = null;
 
@@ -153,7 +153,14 @@ abstract public class BoltTest implements UDFBoltTestMethods
             if(TupleHelper.isTickTuple(actTuple))
                 tickTupleCount ++;
 
-            //Execution of the main Handler in the UDF-Bolt:
+			if(sleepTimeBetweenTuples > 0){
+				try {
+					Thread.sleep(sleepTimeBetweenTuples);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			//Execution of the main Handler in the UDF-Bolt:
 			udfBolt.execute(actTuple);
 		}
 

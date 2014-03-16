@@ -1,10 +1,8 @@
 package de.tu_berlin.citlab.testsuite.helpers;
 
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest;
 
 import java.util.ArrayList;
@@ -20,18 +18,20 @@ public class TopologySetup
     public final List<String> boltNameOrder;
 	public final Map<String, UDFBolt> boltTests;
     public final Map<String, OperatorTest> boltOPTests;
-//    public final Map<String, WindowHandler> boltWindowHandler;
+	public final Map<String, Integer> boltSleepTimer;
 
 
     public TopologySetup(List<BoltTestConfig> topology)
     {
         this.boltNameOrder = new ArrayList<String>(topology.size());
-        this.boltOPTests = new HashMap<String, OperatorTest>();
-        this.boltTests = new HashMap<String, UDFBolt>();
+        this.boltOPTests = new HashMap<String, OperatorTest>(topology.size());
+        this.boltTests = new HashMap<String, UDFBolt>(topology.size());
+		this.boltSleepTimer = new HashMap<String, Integer>(topology.size());
 
         for (BoltTestConfig actTestConfig : topology) {
             final String testName = actTestConfig.testName;
             final UDFBolt testBolt = actTestConfig.testBolt;
+			final int boltSleepTimer = actTestConfig.boltSleepTimer;
             final List<List<Object>> assertedOutput = actTestConfig.assertedOutput;
 
             this.boltNameOrder.add(testName);
@@ -50,7 +50,7 @@ public class TopologySetup
 
 			this.boltTests.put(testName, testBolt);
             this.boltOPTests.put(testName, opTest);
-//            this.boltWindowHandler.put(testName, testBolt.getWindowHandler());
+			this.boltSleepTimer.put(testName, boltSleepTimer);
         }
     }
 }

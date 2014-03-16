@@ -11,14 +11,16 @@ public class BoltTestConfig
 {
     public final String testName;
     public final UDFBolt testBolt;
+	public final int boltSleepTimer;
     public final List<List<Object>> assertedOutput;
 
 
-    public BoltTestConfig(String testName, UDFBolt testBolt,
+    public BoltTestConfig(String testName, UDFBolt testBolt, int boltSleepTimer,
                           List<List<Object>> assertedOutput)
     {
         this.testName = testName;
         this.testBolt = testBolt;
+		this.boltSleepTimer = boltSleepTimer;
         this.assertedOutput = assertedOutput;
     }
 }

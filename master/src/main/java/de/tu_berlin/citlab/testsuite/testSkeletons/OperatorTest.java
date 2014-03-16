@@ -12,7 +12,6 @@ import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.OperatorTestMethod
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import org.junit.Assert;
 
 import java.util.List;

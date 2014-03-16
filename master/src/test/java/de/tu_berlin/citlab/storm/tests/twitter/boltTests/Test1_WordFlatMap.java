@@ -8,7 +8,6 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
-import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import de.tu_berlin.citlab.testsuite.helpers.TupleMockFactory;
 import de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest;
@@ -17,7 +16,6 @@ import de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.UDFBoltTestMethods;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 
 import java.util.ArrayList;
@@ -54,6 +52,11 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
                         new Values(1, "bomben bauen macht spass", 0)},
                 inputFields);
     }
+
+	@Override
+	protected int setSleepTimerBetweenTuples() {
+		return 0;
+	}
 }
 
 
