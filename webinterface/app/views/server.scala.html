@@ -1,11 +1,11 @@
-@main("Server") {
+@main("Server")(true) {
   <div class="page-header">
     <h1>Server <small>starten, stoppen, Geld verbrennen</small></h1>
   </div>
 
   <h2>Manage Cluster:</h2>
   <div class="controls">
-    <form action="/startserver">
+    <form action="/startserver" class="start-form">
       <div class="row">
         @server_control.panel("Nimbus", "col-md-6") {
           @server_control.button.render("Start Nimbus", "start_nimbus", "play")

@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(onlyLoggedIn: Boolean)(content: Html)
 
 <!DOCTYPE html>
 
@@ -28,10 +28,11 @@
     <body>
         @menu.render
         <div class="container">
-            <div class="alert alert-info" id="main_message_field">
-                &nbsp;
-            </div>
-            @content
+            @(if(models.User.loggedIn(onlyLoggedIn, session.get("name"), session.get("session"))) {
+                content
+            } else {
+                user_control.login.render
+            })
         </div>
     </body>
 </html>
