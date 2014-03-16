@@ -1,6 +1,5 @@
 package de.tu_berlin.citlab.storm.tests.twitter.topologyTests;
 
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.topologies.AnalyzeTweetsTopology;
@@ -19,25 +18,21 @@ import java.util.List;
  */
 public class AnalyzeTweetsTopologyTest extends TopologyTest
 {
-
     @Override
-    protected BoltEmission defineFirstBoltsInput()
+    public BoltEmission defineFirstBoltsInput()
     {
-//        Fields inputFields = new Fields("user", "id", "tweet");
 		String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
 		String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
 												"bombe", "berlin", "gott", "allah",
 												"Pilates", "Politik", "Kapital", "Twitter",
 												"der", "die", "das"};
 		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 5, 12);
-        Fields outputFields = new Fields("user", "id", "word");
-
-        BoltEmission firstInput = new BoltEmission(twitterTuples, outputFields);
+        BoltEmission firstInput = new BoltEmission(twitterTuples);
         return firstInput;
     }
 
     @Override
-    protected List<BoltTestConfig> defineTopologySetup() {
+    public List<BoltTestConfig> defineTopologySetup() {
         AnalyzeTweetsTopology topology = new AnalyzeTweetsTopology();
         List<BoltTestConfig> testTopology = new ArrayList<BoltTestConfig>();
 

@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.testsuite.testSkeletons;
 
+
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
@@ -22,6 +23,36 @@ import org.junit.Assert;
 import java.util.List;
 
 
+/**
+ * <p>
+ *     The BoltTest is an <em><b>abstract Test-Skeleton</b></em> which is used to test the
+ *     {@link de.tu_berlin.citlab.storm.udf.IOperator IOperator} in it's natural environment:
+ *     Inside a {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt}.<br />
+ *     This includes the {@link de.tu_berlin.citlab.storm.window.Window Window} and
+ *     {@link de.tu_berlin.citlab.storm.window.WindowHandler WindowHandler} that is used by the Bolt's definition
+ *     on a pre-defined {@link java.util.List} of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock inputTuples}
+ *     and the respective asserted Output.
+ * </p>
+ * <p>
+ *     This BoltTest also includes the {@link de.tu_berlin.citlab.testsuite.testSkeletons.OperatorTest OperatorTest} that
+ *     should be tested in an extra test by itself. If both tests, the <b>OperatorTest</b> as well as the <b>BoltTest</b>
+ *     are running completely, one can assert that the {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt},
+ *     independent from its topology, is doing what it should.
+ * </p>
+ * <p>
+ *     A successful test is defined via the {@link BoltTest#assertWindowedOutput(java.util.List)} definition in
+ *     the BoltTest's implementation. If this method returns <b>null</b> as the asserted-Output, the assertion mechanism
+ *     will be deactivated and the test will always succeed (of interest for {@link TopologyTest TopologyTests}).
+ * </p>
+ * <p>
+ *     For a combinatorial test of both, a <b>BoltTest</b> and an <b>OperatorTest</b>, implement the
+ *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest StandaloneTest} test-skeleton.<br />
+ *     If a complete topology should be tested, take the
+ *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest} test-skeleton
+ *     as your choice.
+ * </p>
+ * @author Constantin
+ */
 abstract public class BoltTest implements UDFBoltTestMethods
 {
 
@@ -55,12 +86,12 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* ================ */
 
     /**
-     * Constructor, used to build standalone-tests.
+     * Constructor, used to build BoltTests.
      * <p>
-     *     Standalone-tests are used outside of any topology and are thus not dependent
-     *     on predecessor- or successor-bolts. As of that, only the Operator is tested by
-     *     a specified input (defined by a test-developer in {@link BoltTest#initTestSetup(java.util.List)})
-     *     and is compared against an assertedOutput.
+     *     BoltTests are used to test the {@link de.tu_berlin.citlab.storm.udf.IOperator IOperator}
+	 *     in it's natural environment: Inside a {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt}.
+	 *     This includes the {@link de.tu_berlin.citlab.storm.window.Window Window} and {@link de.tu_berlin.citlab.storm.window.WindowHandler WindowHandler}
+	 *     that is used by the Bolt's definition.
      * </p>
      * @param testName The name of this Bolt-Test (later used for identification in LogFiles)
      * @param opTest The corresponding {@link OperatorTest}, being used to test the Operator, linked to that UDFBolt.
@@ -79,6 +110,18 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* Public Methods for Test-Setup: */
 /* ============================== */
 
+	/**
+	 * The {@link BoltTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em><b>test initialization</b></em>, the <em>test-run</em> itself
+	 * and the <em>test-termination</em>.
+	 * <p>
+	 *     The initTestSetup method is initializing the input-{@link de.tu_berlin.citlab.testsuite.mocks.TupleMock TupleMock}
+	 *     as a parameter, and via the abstract methods {@link BoltTest#initWindowHandler()} & {@link BoltTest#initWindow()}
+	 *     the regarding {@link de.tu_berlin.citlab.storm.window.WindowHandler} & {@link de.tu_berlin.citlab.storm.window.Window},
+	 *	   belonging to the {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt} for that test.
+	 * </p>
+	 * @param inputTuples The inputTuples as a {@link java.util.List} of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock TupleMocks}
+	 */
 	public void initTestSetup(List<Tuple> inputTuples)
 	{
         LOGGER.debug(DEFAULT, LogPrinter.printHeader("Initializing Bolt-Test Setup [" + testName + "]...", '-'));
@@ -94,7 +137,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
             throw new NullPointerException(errorMsg);
         }
 
-		IOperator operator = opTest.initOperator(inputTuples);
+		IOperator operator = opTest.initOperator();
 		window = this.initWindow();
 		windowHandler = this.initWindowHandler();
 		
@@ -134,8 +177,27 @@ abstract public class BoltTest implements UDFBoltTestMethods
             e.printStackTrace();
         }
 	}
-	
 
+
+	/**
+	 * The {@link BoltTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em>test initialization</em>, the <em><b>test-run</b></em> itself
+	 * and the <em>test-termination</em>. <br />
+	 * <em>Being a part of the JUnit lifecycle, this method is used in a @Test method.</em>
+	 * <p>
+	 *	   This test-method is testing the {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt}, linked to this BoltTest.
+	 *	   It executes the inputTuples, previously set by the {@link BoltTest#initTestSetup(java.util.List)} by the
+	 *	   {@link de.tu_berlin.citlab.storm.bolts.UDFBolt#execute(backtype.storm.tuple.Tuple) UDFBolt.execute(Tuple)} method.
+	 * </p>
+	 * <p>
+	 *     Additionally, the parameter <em>sleepTimeBetweenTuples</em> sets the sleepTime in Milliseconds for
+	 *     {@link de.tu_berlin.citlab.storm.window.TimeWindow TimeWindow}-Tests. This should be set to zero for any other
+	 *     tests (windowless or based on a {@link de.tu_berlin.citlab.storm.window.CountWindow CountWindow}.
+	 * </p>
+	 * @param sleepTimeBetweenTuples The {@link Thread#sleep(long) Thread.sleep(int milliseconds)} time between each tuple execution.
+	 *                               This should be set to zero if no {@link de.tu_berlin.citlab.storm.window.CountWindow CountWindow} is used.
+	 * @return The {@link de.tu_berlin.citlab.testsuite.helpers.BoltEmission BoltEmission} of the {@link de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock OutputCollectorMock}.
+	 */
 	public BoltEmission testUDFBolt(int sleepTimeBetweenTuples)
 	{
         AssertionError failureTrace = null;
@@ -210,8 +272,16 @@ abstract public class BoltTest implements UDFBoltTestMethods
         return boltEmission;
 	}
 	
-	
-//	@After
+
+	/**
+	 * The {@link BoltTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em>test initialization</em>, the <em>test-run</em> itself
+	 * and the <em><b>test-termination</b></em>.
+	 * <p>
+	 *     This method terminates (sets to <b>null</b>) every object from the
+	 *     {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt} that was set up for the test.
+	 * </p>
+	 */
 	public void terminateTestSetup()
 	{
 		opTest.terminateTestSetup();
@@ -219,13 +289,4 @@ abstract public class BoltTest implements UDFBoltTestMethods
 		window = null;
 		windowHandler = null;
 	}
-
-
-
-/* Abstract UDFBoltTestMethod Interfaces : */
-/* ======================================== */
-
-    public abstract Window<Tuple, List<Tuple>> initWindow();
-    public abstract WindowHandler initWindowHandler();
-	public abstract List<List<Object>> assertWindowedOutput(List<Tuple> inputTuples);
 }

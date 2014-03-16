@@ -11,7 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Constantin on 12.03.14.
+ * Internal Data-Class for a {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest}.
+ * <p>
+ *     Creates the topology-Setup via a chain of {@link BoltTestConfig BoltTestConfigs} and uses internally
+ *     TestName -> BoltTestConfig Mappings to define this topology-chain and prepare it to be used in the
+ *     TopologyTest class.
+ * </p>
+ * @author Constantin on 12.03.14.
  */
 public class TopologySetup
 {
@@ -38,7 +44,7 @@ public class TopologySetup
 
             OperatorTest opTest = new OperatorTest(testName) {
                 @Override
-                public IOperator initOperator(List<Tuple> inputTuples) {
+                public IOperator initOperator() {
                     return testBolt.getOperator();
                 }
 

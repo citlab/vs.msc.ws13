@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.testsuite.helpers;
 
+
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -8,29 +9,30 @@ import de.tu_berlin.citlab.testsuite.mocks.TupleMock;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * Created by Constantin on 12.03.14.
- * Helper Data-Class for the {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest}.
+ * Helper Data-Class for the {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest}. <br />
+ * There are two ways to construct a BoltEmission Data-Container:
  * <p>
- *     Each {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest} returns a <b>BoltEmission</b>
- *     to with the given <b>Output-Fields</b> and the <b>Output-Values</b>, emitted by the
- *     {@link de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock} inside the BoltTest.
+ *     First: Manual generation in a TopologyTest-case: <br />
+ *     Just insert an {@link java.util.ArrayList} of {@link TupleMock TupleMocks}. <br />
+ *     <em>(Needed for the {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest#defineFirstBoltsInput() TopologyTest.defineFirstBoltsInput()}-method).</em>
  * </p>
  * <p>
- *     For an BoltTest, it is important to define ... in it's
- *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest#generateInputTuples()} to
- *     use the input of the predecessing Bolt in the topology.
+ *     Second: Automatic generation via a {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest BoltTest}: <br />
+ *     Each {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest BoltTest} returns a <b>BoltEmission</b>
+ *     with the given <b>Output-Fields</b> and the <b>Output-Values</b>, emitted by the
+ *     {@link de.tu_berlin.citlab.testsuite.mocks.OutputCollectorMock OutputCollectorMock} inside the BoltTest.
  * </p>
+ * @author Constantin on 12.03.14.
  */
 public class BoltEmission
 {
     public final List<Tuple> tupleList;
-    public final Fields outputFields;
 
-    public BoltEmission(ArrayList<Tuple> tupleInput, Fields outputFields)
+    public BoltEmission(ArrayList<Tuple> tupleInput)
     {
         this.tupleList = tupleInput;
-        this.outputFields = outputFields;
     }
 
     public BoltEmission(List<List<Object>> outputEmission, Fields outputFields)
@@ -44,6 +46,5 @@ public class BoltEmission
             Tuple actTuple = TupleMock.mockTupleByFields(outputVals, outputFields);
             this.tupleList.add(actTuple);
         }
-        this.outputFields = outputFields;
     }
 }

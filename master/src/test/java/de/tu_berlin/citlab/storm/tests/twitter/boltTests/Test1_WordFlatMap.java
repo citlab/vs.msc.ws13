@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.storm.tests.twitter.boltTests;
 
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -21,6 +22,7 @@ import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by Constantin on 1/21/14.
  */
@@ -35,17 +37,17 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
     private static final Fields outputFields = new Fields("user_id", "word", "id");
 
     @Override
-    protected BoltTest_WordFlatMap initBoltTestDescr() {
+    public BoltTest_WordFlatMap initBoltTestDescr() {
         return new BoltTest_WordFlatMap(testName, outputFields);
     }
 
     @Override
-    protected OpTest_WordFlatMap initOpTestDescr() {
+	public OpTest_WordFlatMap initOpTestDescr() {
         return new OpTest_WordFlatMap(testName);
     }
 
     @Override
-    protected List<Tuple> generateInputTuples() {
+	public List<Tuple> generateInputTuples() {
         return TupleMockFactory.generateTupleList_ByFields(
                 new Values[]{new Values(1, "hey leute", 0),
                         new Values(1, "sinnvoller Post.", 0),
@@ -54,7 +56,7 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
     }
 
 	@Override
-	protected int setSleepTimerBetweenTuples() {
+	public int setSleepTimerBetweenTuples() {
 		return 0;
 	}
 }
@@ -99,7 +101,7 @@ class OpTest_WordFlatMap extends OperatorTest
     }
 
     @Override
-    public IOperator initOperator(List<Tuple> inputTuples) {
+    public IOperator initOperator() {
         IOperator flatMap = new IOperator(){
             public void execute(List<Tuple> input, OutputCollector collector) {
                 for(Tuple t : input){

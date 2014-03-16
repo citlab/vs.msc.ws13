@@ -17,6 +17,28 @@ import org.junit.Assert;
 import java.util.List;
 
 
+/**
+ * <p>
+ *     The OperatorTest is an <em><b>abstract Test-Skeleton</b></em> whose implementation class is representing a test case
+ *     with a given {@link de.tu_berlin.citlab.storm.udf.IOperator IOperator}, the pre-defined {@link java.util.List}
+ *     of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock inputTuples} and the respective asserted Output.
+ * </p>
+ * <p>
+ *     A successful test is defined via the {@link OperatorTest#assertOperatorOutput(java.util.List)} definition
+ *     in the OperatorTests's implementation: If the asserted Output is equal to the real output from the OutputCollector's
+ *     emission, the test will succeed. <br />
+ *     On the other hand, if this method returns <b>null</b> as the asserted-Output, the assertion
+ *     mechanism will be deactivated and the test will always succeed (of interest for {@link TopologyTest TopologyTests}).
+ * </p>
+ * <p>
+ *     For a combinatorial test of both, a <b>BoltTest</b> and an <b>OperatorTest</b>, implement the
+ *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.StandaloneTest StandaloneTest} test-skeleton.<br />
+ *     If a complete topology should be tested, take the
+ *     {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest} test-skeleton
+ *     as your choice.
+ * </p>
+ * @author Constantin
+ */
 abstract public class OperatorTest implements OperatorTestMethods
 {
 
@@ -55,13 +77,25 @@ abstract public class OperatorTest implements OperatorTestMethods
 /* Public Methods for Test-Setup: */
 /* ============================== */
 
+	/**
+	 * The {@link OperatorTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em><b>test initialization</b></em>, the <em>test-run</em> itself
+	 * and the <em>test-termination</em>.
+	 * <p>
+	 *     The initTestSetup method is initializing the {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock inputTuples}
+	 *     as a parameter, and via the abstract method {@link OperatorTest#initOperator()}
+	 *     the regarding {@link de.tu_berlin.citlab.storm.udf.IOperator}, representing the
+	 *     {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt}'s user-defined-function for that test.
+	 * </p>
+	 * @param inputTuples The inputTuples as a {@link java.util.List} of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock TupleMocks}
+	 */
 	public void initTestSetup(List<Tuple> inputTuples)
 	{
 		LOGGER.debug(LogPrinter.printHeader("Initializing Operator-Test Setup [" + testName + "]...", '-'));
         this.inputTuples = inputTuples;
 
 		try{
-			operator = this.initOperator(inputTuples);
+			operator = this.initOperator();
             LOGGER.debug(DEFAULT, "Operator successfully initialized.");
 		}
 		catch (NullPointerException e){
@@ -80,6 +114,18 @@ abstract public class OperatorTest implements OperatorTestMethods
     }
 
 
+	/**
+	 * The {@link OperatorTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em>test initialization</em>, the <em><b>test-run</b></em> itself
+	 * and the <em>test-termination</em>. <br />
+	 * <em>Being a part of the JUnit lifecycle, this method is used in a @Test method.</em>
+	 * <p>
+	 *	   This test-method is testing the {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt}'s
+	 *	   {@link de.tu_berlin.citlab.storm.udf.IOperator}, linked to this BoltTest. <br />
+	 *	   It executes the inputTuples, previously set by the {@link BoltTest#initTestSetup(java.util.List)} by the
+	 *	   {@link de.tu_berlin.citlab.storm.udf.IOperator#execute(java.util.List, backtype.storm.task.OutputCollector)} method.
+	 * </p>
+	 */
 	public void testOperator()
 	{
 		AssertionError failureTrace = null;
@@ -140,18 +186,19 @@ abstract public class OperatorTest implements OperatorTestMethods
 		if(failureTrace != null)
 			throw failureTrace;
 	}
-	
 
+
+	/**
+	 * The {@link OperatorTest} is implemented as a <b>JUnit</b>-TestSkeleton and thus runs through the
+	 * complete UnitTest-lifecycle. This includes a <em>test initialization</em>, the <em>test-run</em> itself
+	 * and the <em><b>test-termination</b></em>.
+	 * <p>
+	 *     This method terminates (sets to <b>null</b>) every object from the
+	 *     {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt} that was set up for the test.
+	 * </p>
+	 */
 	public void terminateTestSetup()
 	{
 		operator = null;
 	}
-
-
-
-/* Abstract OperatorTestMethods Interfaces : */
-/* ======================================== */
-
-	abstract public IOperator initOperator(final List<Tuple> inputTuples);
-	abstract public List<List<Object>> assertOperatorOutput(final List<Tuple> inputTuples);
 }

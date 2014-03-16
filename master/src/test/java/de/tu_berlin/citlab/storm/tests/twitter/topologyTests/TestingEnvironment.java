@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.storm.tests.twitter;
+package de.tu_berlin.citlab.storm.tests.twitter.topologyTests;
 
 import de.tu_berlin.citlab.storm.tests.twitter.helpers.BadWord;
 import de.tu_berlin.citlab.storm.tests.twitter.helpers.STORAGE;
@@ -26,7 +26,6 @@ public class TestingEnvironment extends TopologyTest
     @BeforeClass
     public static void initEnvironment()
     {
-
         STORAGE.badWords.put("bombe", new BadWord("bombe", 100));
         STORAGE.badWords.put("nuklear", new BadWord("nuklear", 1000));
         STORAGE.badWords.put("anschlag", new BadWord("anschlag", 200));
@@ -36,12 +35,12 @@ public class TestingEnvironment extends TopologyTest
     }
 
     @Override
-    protected BoltEmission defineFirstBoltsInput() {
+    public BoltEmission defineFirstBoltsInput() {
         return null;
     }
 
     @Override
-    protected List<BoltTestConfig> defineTopologySetup() {
+    public List<BoltTestConfig> defineTopologySetup() {
         return null;
     }
 }
