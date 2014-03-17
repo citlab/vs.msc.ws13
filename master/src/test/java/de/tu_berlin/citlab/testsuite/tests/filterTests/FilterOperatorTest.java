@@ -8,7 +8,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
-import de.tu_berlin.citlab.storm.operators.FilterUDF;
+import de.tu_berlin.citlab.storm.operators.Filter;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger.LoD;
@@ -39,11 +39,11 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 	@Override
 	public IOperator initOperator(final List<Tuple> inputTuples) {
 
-		FilterUDF filter= new FilterUDF(){
+		Filter filter= new Filter(){
 			private static final long	serialVersionUID	= 1L;
 			private int count = 0;
 			
-			public Boolean evaluate(Tuple t)
+			public Boolean predicate(Tuple t)
 			{
 				//Test that inputTuples and Tuple t is the same for each iteration:
 				if(t.equals(inputTuples.get(count))){
@@ -56,7 +56,7 @@ public class FilterOperatorTest extends OperatorTest implements OperatorTestMeth
 			}
 		};
 		
-		FilterOperator testFilterOp = new FilterOperator(this.getInputFields(), filter);
+		FilterOperator testFilterOp = new FilterOperator(filter);
 		return testFilterOp;
 	}
 	

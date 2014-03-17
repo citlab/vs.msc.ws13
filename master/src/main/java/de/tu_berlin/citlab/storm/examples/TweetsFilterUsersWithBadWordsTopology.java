@@ -8,7 +8,7 @@ import java.util.Random;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
-import de.tu_berlin.citlab.storm.operators.FilterUDF;
+import de.tu_berlin.citlab.storm.operators.Filter;
 import de.tu_berlin.citlab.storm.operators.join.JoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.NestedLoopJoin;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
@@ -252,14 +252,8 @@ public class TweetsFilterUsersWithBadWordsTopology {
 			new UDFBolt(
 				new Fields("user_id", "total_significance" ), // output
 				new FilterOperator(
-					new Fields("user_id", "total_significance" ), // input
-					new FilterUDF() {
-                        @Override
-                        public void prepare() {
-
-                        }
-
-                        public Boolean evaluate(Tuple tuple) {
+					new Filter() {
+                        public Boolean predicate(Tuple tuple) {
 							return (Integer) 
 							tuple.getValueByField("total_significance") > 100;
 						}

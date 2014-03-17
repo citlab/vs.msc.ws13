@@ -10,7 +10,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
-import de.tu_berlin.citlab.storm.operators.FilterUDF;
+import de.tu_berlin.citlab.storm.operators.Filter;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import backtype.storm.task.OutputCollector;
@@ -74,16 +74,10 @@ public class UDFTestTopology {
 		builder.setBolt(
 			"filter",
 			new UDFBolt(
-				new Fields("value"), // output
+				new Fields("key", "value"), // output
 				new FilterOperator(
-					new Fields("value"), // input
-					new FilterUDF() {
-                        @Override
-                        public void prepare() {
-
-                        }
-
-                        public Boolean evaluate(Tuple param) {
+					new Filter() {
+                        public Boolean predicate(Tuple param) {
 							return (Integer) param.getValueByField("value") > 0;
 						}
 					}
