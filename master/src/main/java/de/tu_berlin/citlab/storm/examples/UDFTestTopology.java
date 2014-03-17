@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.storm.examples;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import backtype.storm.Config;
@@ -11,6 +12,8 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.Filter;
+import de.tu_berlin.citlab.storm.operators.FlatMapOperator;
+import de.tu_berlin.citlab.storm.operators.FlatMapper;
 import de.tu_berlin.citlab.storm.operators.MapOperator;
 import de.tu_berlin.citlab.storm.operators.Mapper;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -50,25 +53,29 @@ public class UDFTestTopology {
 			"flatmap",
 			new UDFBolt(
 				new Fields("key", "value"),
-				new IOperator() {
-					public void execute(List<Tuple> param, OutputCollector collector ) {
-						String inputKey = (String) param.get(0).getValues().get(0);
-						int inputValue = (Integer) param.get(0).getValues().get(1);
-						collector.emit( new Values(inputKey + "flatmapped1",
-								myExistingFunction1(inputValue)) ) ;
+				new FlatMapOperator(
+					new FlatMapper() {
+						public List<List<Object>> flatMap(Tuple tuple) {
+							List<List<Object>> result = new ArrayList<List<Object>>();
+							
+							String inputKey = tuple.getStringByField("key");
+							int inputValue = tuple.getIntegerByField("value");
+							
+							result.add(new Values(inputKey + "flatmapped1", myExistingFunction1(inputValue)));
+							result.add(new Values(inputKey + "flatmapped2", myExistingFunction2(inputValue)));
+							
+							return result;
+						}
 						
-						collector.emit( new Values(inputKey + "flatmapped2",
-								myExistingFunction2(inputValue)));
-					}
+						private int myExistingFunction1(int param) {
+							return param *= 10;
+						}
 
-					private int myExistingFunction1(int param) {
-						return param *= 10;
+						private int myExistingFunction2(int param) {
+							return param *= -1;
+						}
 					}
-
-					private int myExistingFunction2(int param) {
-						return param *= -1;
-					}
-				}
+				)
 			),
 		1).shuffleGrouping("map");
 		
