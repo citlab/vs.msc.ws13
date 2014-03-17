@@ -2,10 +2,12 @@ package de.tu_berlin.citlab.storm.operators;
 
 import java.util.List;
 
+import de.tu_berlin.citlab.storm.udf.IOperator;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 
-public class ReduceOperator {
+@SuppressWarnings("serial")
+public class ReduceOperator implements IOperator {
 	
 	protected Reducer reducer;
 	protected List<Object> init;
