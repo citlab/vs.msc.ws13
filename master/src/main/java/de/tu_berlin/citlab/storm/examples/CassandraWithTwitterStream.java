@@ -70,9 +70,8 @@ public class CassandraWithTwitterStream {
         CassandraConfig cassandraCfg = new CassandraConfig();
 
 
-
+        cassandraCfg.setIP( "127.0.0.1" );
         cassandraCfg.setParams(  //optional, but defaults not always sensable
-                "127.0.0.1",
                 "citstorm",
                 "tweets",
                 new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */

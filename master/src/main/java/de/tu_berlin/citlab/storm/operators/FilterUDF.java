@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import backtype.storm.tuple.Tuple;
 
-public interface FilterUDF extends Serializable {
-	Boolean evaluate(Tuple t);
+public abstract class FilterUDF implements Serializable {
+    public void prepare () {}
+	public abstract Boolean evaluate(Tuple t);
 }

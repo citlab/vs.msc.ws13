@@ -16,8 +16,9 @@ public class TwitterConfiguration implements Serializable {
 
         // a list of valid field names for the output tuple
         private static final List<String> validOutputFields = new ArrayList<String>(
-                        Arrays.asList(new String[] { "user", "tweet", "date", "lang", "id",
-                                        "geolocation" }));
+                Arrays.asList(new String[] { "user", "tweet", "date", "lang", "user_id", "tweet_id",
+                        "geolocation" }));
+
 
         private final Properties twitterUser;
         private final String[] keywords;

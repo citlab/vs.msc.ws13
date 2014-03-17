@@ -21,11 +21,16 @@ import de.tu_berlin.citlab.storm.window.WindowHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 
 public class UDFBolt extends BaseRichBolt {
 
+    static {
+        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2.xml");
+    }
+
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LogManager.getLogger("UDFBolt");
+    public static final Logger LOGGER = LogManager.getLogger("UDFBolt");
 
 
 /* Global Variables: */
@@ -93,15 +98,14 @@ public class UDFBolt extends BaseRichBolt {
         return conf;
     }
 
-
     public void execute(Tuple input) {
         if (TupleHelper.isTickTuple(input)) {
             executeBatches(windowHandler.flush());
         }
         else {
-            windowHandler.add(input);
-            if (windowHandler.isSatisfied()) {
-                executeBatches(windowHandler.flush());
+            List<List<Tuple>> windows = windowHandler.addSafely(input);
+            if (windows != null) {
+                executeBatches(windows);
             }
         }
 

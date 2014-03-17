@@ -76,7 +76,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         List<List<Tuple>> result = new ArrayList<List<Tuple>>();
         for (Object key : windows.keySet()) {
             Window<Tuple, List<Tuple>> window = windows.get(key);
-            if (window.isSatisfied()) {
+            if (window instanceof TimeWindow || window.isSatisfied()) {
                 Map<Serializable, List<Tuple>> groups = new HashMap<Serializable, List<Tuple>>();
                 for(Tuple tuple : window.flush()) {
                     Serializable groupKey = groupByKey.getKeyOf(tuple);
@@ -91,7 +91,6 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
             }
         }
         return result;
-
     }
 
     public Window<Tuple, List<Tuple>> getStub() {
@@ -101,5 +100,14 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
     public WindowHandler clone() {
         return null;
     }
+
+	public List<List<Tuple>> addSafely(Tuple input) {
+		List<List<Tuple>> result = null;
+		if (isSatisfied()) {
+			result = flush();
+		}
+		add(input);
+		return result;
+	}
 
 }
