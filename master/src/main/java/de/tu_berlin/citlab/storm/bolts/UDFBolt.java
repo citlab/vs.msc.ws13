@@ -110,7 +110,6 @@ public class UDFBolt extends BaseRichBolt {
         return conf;
     }
 
-
     public void execute(Tuple input) {
         if (TupleHelper.isTickTuple(input)) {
             executeBatches(windowHandler.flush());

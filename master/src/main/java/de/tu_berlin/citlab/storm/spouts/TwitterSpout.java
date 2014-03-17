@@ -106,52 +106,55 @@ public class TwitterSpout extends BaseRichSpout {
 					collector.emit(outputVals);
 			}
 	}
-
+	
 	private Values createOutputValues(Status ret) {
+		final String[] outputFields = config.getOutputFields();
+		Object[] values = new Object[outputFields.length];
+		
+                for (int i = 0; i < outputFields.length; i++) {
+                        if( outputFields[i].compareTo("user") == 0)
+                            values[i] = ret.getUser().getName();
+                        if( outputFields[i].compareTo("tweet") == 0)
+                            values[i] = ret.getText();
+                        if( outputFields[i].compareTo("date") == 0)
+                            values[i] = ret.getCreatedAt().getTime();
+                        if( outputFields[i].compareTo("lang") == 0)
+                            values[i] = ret.getIsoLanguageCode();
+                        if( outputFields[i].compareTo("geolocation") == 0)
+                            values[i] = ret.getGeoLocation();
+                        if( outputFields[i].compareTo("id") == 0)
+                            values[i] = ret.getUser().getId();
+                        if( outputFields[i].compareTo("user_id") == 0)
+                            values[i] = ret.getUser().getId();
+                        if( outputFields[i].compareTo("tweet_id") == 0)
+                            values[i] = ret.getId();
+                }//for
 
-			final String[] outputFields = config.getOutputFields();
-			Object[] values = new Object[outputFields.length];
+                return new Values(values);
+        }
 
-			for (int i = 0; i < outputFields.length; i++) {
-					if( outputFields[i].compareTo("user") == 0)
-						values[i] = ret.getUser().getName();
-					if( outputFields[i].compareTo("tweet") == 0)
-						values[i] = ret.getText();
-					if( outputFields[i].compareTo("date") == 0)
-						values[i] = ret.getCreatedAt().getTime();
-					if( outputFields[i].compareTo("lang") == 0)
-						values[i] = ret.getIsoLanguageCode();
-					if( outputFields[i].compareTo("geolocation") == 0)
-						values[i] = ret.getGeoLocation();
-					if( outputFields[i].compareTo("id") == 0)
-						values[i] = ret.getUser().getId();
-			}//for
+        @Override
+        public void close() {
+                twitterStream.shutdown();
+        }
 
-			return new Values(values);
-	}
+        @Override
+        public Map<String, Object> getComponentConfiguration() {
+                Config ret = new Config();
+                ret.setMaxTaskParallelism(1);
+                return ret;
+        }
 
-	@Override
-	public void close() {
-			twitterStream.shutdown();
-	}
+        @Override
+        public void ack(Object id) {
+        }
 
-	@Override
-	public Map<String, Object> getComponentConfiguration() {
-			Config ret = new Config();
-			ret.setMaxTaskParallelism(1);
-			return ret;
-	}
+        @Override
+        public void fail(Object id) {
+        }
 
-	@Override
-	public void ack(Object id) {
-	}
-
-	@Override
-	public void fail(Object id) {
-	}
-
-	@Override
-	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-			declarer.declare(new Fields(config.getOutputFields()));
-	}
+        @Override
+        public void declareOutputFields(OutputFieldsDeclarer declarer) {
+                declarer.declare(new Fields(config.getOutputFields()));
+        }
 }

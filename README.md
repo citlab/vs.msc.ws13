@@ -27,3 +27,6 @@ Code Composition:
   </tr>
 </table>
 
+MySQL Logging:
+-----------------------
+The default log4j2 configuration (src/main/resources/log4j2.xml) is set to log to a MySQL database. A schema file including MySQL commands to create the necessary database, table and it's user is available at src/main/log4j2.citstorm.sql. At runtime the server's hostname, the database's name, it's user and password are read from a properties-config file at src/main/resources/log4j2_mysql.properties to establish a connection. **Note:** I didn't found a way to programmatically set the table's name. So the name of the table is set by the log4j2 configuration (src/main/resources/log4j2.xml) regardless from what is defined in the properties-config (src/main/resources/log4j2_mysql.properties)!
