@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class TimeWindow<I> implements Window<I, List<I>> {
 
 	private static final long serialVersionUID = 3210792646347151651L;
+	private static final Logger log = Logger.getLogger(TimeWindow.class);
 
 	/**
 	 * maximum amount of slots within this windows
@@ -22,10 +25,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	 * data structure that holds entities
 	 */
 	List<TimeEntity<I>> slots;
-	
-//	private static int instanceIdCounter = 0;
-//	
-//	public int instanceId = instanceIdCounter++;
 
 	public TimeWindow(int timeSlot) {
 		this(timeSlot, timeSlot);
@@ -33,57 +32,53 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public TimeWindow(int timeSlot, int offset) {
 		if (offset > timeSlot) {
-			throw new IllegalArgumentException(
-					"offset must not be larger than size");
+			System.out.println("offset (" + offset
+					+ ") must not be larger than size(" + timeSlot + ")");
+			throw new IllegalArgumentException("offset (" + offset
+					+ ") must not be larger than size(" + timeSlot + ")");
+
 		}
 		this.timeSlot = timeSlot;
 		this.offset = offset;
 		slots = new ArrayList<TimeEntity<I>>();
 	}
-	
+
 	private long getAquiredTimeSlot() {
 		long result = 0;
-		if(!slots.isEmpty()) {
+		if (!slots.isEmpty()) {
 			long youngestAquiredTime = slots.get(0).getTimestamp();
-			long oldestAquiredTime;
-			if(slots.size() == 1) {
-				oldestAquiredTime = TimeEntity.getcurrentTime();
-			}
-			else {
-				oldestAquiredTime = slots.get(slots.size() - 1).getTimestamp();
-			}
+			long oldestAquiredTime = TimeEntity.getcurrentTime();
 			result = oldestAquiredTime - youngestAquiredTime;
 		}
 		return result;
 	}
 
 	public void add(I entity) {
-		if (isSatisfied()) {
-			throw new ArrayIndexOutOfBoundsException();
-		}
 		slots.add(new TimeEntity<I>(entity));
 		Collections.sort(slots);
 	}
 
-	public boolean isSatisfied() {
-		boolean result = false;
-		result = getAquiredTimeSlot() >= (long) (timeSlot);
-		return result;
-	}
+	/**
+	 * this window does not decide itself when it is satisfied. It is depended
+	 * on external timing
+	 */
+    public boolean isSatisfied() {
+        return false;
+    }
 
 	/**
 	 * returns the current load of entities and removes as much entities from
 	 * the first slots as configured by the second parameter of
 	 * {@link TimeWindow#Window(int, int)}
-	 * 
+	 *
 	 * @return
 	 */
 	public List<I> flush() {
 		List<I> result = new ArrayList<I>();
-		for(TimeEntity<I> slot : slots) {
+		for (TimeEntity<I> slot : slots) {
 			result.add(slot.getEntity());
 		}
-		while(!slots.isEmpty() && getAquiredTimeSlot() + offset >= timeSlot) {
+		while (!slots.isEmpty() && getAquiredTimeSlot() + offset >= timeSlot) {
 			slots.remove(0);
 		}
 		return result;
@@ -102,13 +97,9 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 	public long getTimeSlot() {
 		return timeSlot;
 	}
-	
+
 	public List<I> addSafely(I entity) {
-		List<I> result = null;
-		if (isSatisfied()) {
-			result = flush();
-		}
 		add(entity);
-		return result;
+		return null;
 	}
 }

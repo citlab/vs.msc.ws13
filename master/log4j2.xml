@@ -11,6 +11,11 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
 
+        <File name="bolt" fileName="logs/Bolt.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <ThresholdFilter level="info" />
+        </File>
+
 
 
     <!-- Network Socket Appenders for the real Infrastructure -->
@@ -32,6 +37,10 @@
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
+
+        <logger name="Bolt" level="info" additivity="false">
+            <AppenderRef ref="bolt" />
+        </logger>
 
         <!-- Network Logging for the real Infrastructure: -->
         <logger name="Bolt" level="info" additivity="false">
