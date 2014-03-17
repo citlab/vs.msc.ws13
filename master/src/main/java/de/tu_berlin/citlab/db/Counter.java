@@ -23,19 +23,10 @@ public class Counter implements Serializable
 
 	public Counter( CassandraConfig config )
 	{
-
 		this.config = config;
 		this.config.setIP( "127.0.0.1" );
-		//this.dao = new CassandraDAO();
-        //dao.setConfig(this.config);
-        //dao.init();
 		connect( config.getIP() );
         createDataStructures();
-	}
-	public Counter()
-	{
-		//System.out.println("NEWWWWW COUNNNTEREERRR!!!!!");
-
 	}
 
 	public void setConfig( CassandraConfig config )
@@ -51,30 +42,30 @@ public class Counter implements Serializable
 		for ( Host host : metadata.getAllHosts() )
 		{
 			System.out.printf( "Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(),
-					host.getAddress(), host.getRack() );
+            host.getAddress(), host.getRack() );
 		}
 		session = cluster.connect();
 	}
 
 	public void createDataStructures()
 	{
-		counterName = config.getTupleFields().get( 0 );
-		pkname = config.getPrimaryKeys().getPrimaryKeyFields()[0];
-		assembledCounterTableName = pkname+"_"+counterName;
-		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-		sb.append( config.getKeyspace() );
-		sb.append( String.format( ".%s(%s text PRIMARY KEY,%s counter)", 
-				""+assembledCounterTableName,
-				config.getPrimaryKeys().getPrimaryKeyFields()[0],
-				config.getTupleFields().get( 0 ) ) );
+        counterName = config.getTupleFields().get( 0 );
+        pkname = config.getPrimaryKeys().getPrimaryKeyFields()[0];
+        assembledCounterTableName = pkname+"_"+counterName;
+        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
+        sb.append( config.getKeyspace() );
+        sb.append( String.format( ".%s(%s text PRIMARY KEY,%s counter)",
+                    ""+assembledCounterTableName,
+                    config.getPrimaryKeys().getPrimaryKeyFields()[0],
+                    config.getTupleFields().get( 0 ) ) );
 
-		String createTableQuery = sb.toString();
-		String createKeyspaceQuery = String.format(
-				"CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3}",
-				config.getKeyspace() );
+        String createTableQuery = sb.toString();
+        String createKeyspaceQuery = String.format(
+                "CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3}",
+                config.getKeyspace() );
 
-		executeQuery( createKeyspaceQuery );
-		executeQuery( createTableQuery );
+        executeQuery( createKeyspaceQuery );
+        executeQuery( createTableQuery );
 	}
 
 	public void update ( List<Object> keyValues, int number )

@@ -24,15 +24,14 @@ public class CassandraOperator implements IOperator {
 
 
     public CassandraOperator( CassandraConfig config ){
-        /* place your code here */
         this.config = config;
-        this.ctn = new Counter();
+        this.ctn = new Counter( config );
     }
 
     @Override
     public void execute(List<Tuple> tuples, OutputCollector collector) {
 
-        System.out.println("---- store "+tuples.size() );
+        System.out.println("debug: store "+tuples.size() );
 
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
@@ -44,7 +43,6 @@ public class CassandraOperator implements IOperator {
                 dao.createDataStructures();
             }
             else {
-                ctn.setConfig( config );
                 ctn.connect( config.getIP() );
                 ctn.createDataStructures();
 
@@ -62,12 +60,8 @@ public class CassandraOperator implements IOperator {
                     System.out.println("debug: store "+t);
                 }
 
-
                 dao.store( tuples );
             } else {
-
-                // some client logic computes positive or negative increment
-                // here the number of windows are counted and updated accordingly
 
                 for( Tuple t : tuples ){
 
