@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.storm.operators;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -9,8 +10,8 @@ import backtype.storm.tuple.Tuple;
 @SuppressWarnings("serial")
 public class ReduceOperator implements IOperator {
 	
-	protected Reducer reducer;
-	protected List<Object> init;
+	protected final Reducer reducer;
+	protected final List<Object> init;
 	protected boolean chaining = false;
 
 	public ReduceOperator(Reducer reducer, List<Object> init) {
@@ -24,7 +25,7 @@ public class ReduceOperator implements IOperator {
 	}
 
 	public void execute(List<Tuple> input, OutputCollector emitter) {
-		List<Object> result = init;
+		List<Object> result = new ArrayList<Object>(init);
 		for (Tuple param : input) {
 			result = reducer.reduce(param, result);
 		}

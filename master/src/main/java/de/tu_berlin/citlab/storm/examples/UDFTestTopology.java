@@ -3,6 +3,9 @@ package de.tu_berlin.citlab.storm.examples;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -16,6 +19,8 @@ import de.tu_berlin.citlab.storm.operators.FlatMapOperator;
 import de.tu_berlin.citlab.storm.operators.FlatMapper;
 import de.tu_berlin.citlab.storm.operators.MapOperator;
 import de.tu_berlin.citlab.storm.operators.Mapper;
+import de.tu_berlin.citlab.storm.operators.ReduceOperator;
+import de.tu_berlin.citlab.storm.operators.Reducer;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import backtype.storm.task.OutputCollector;
@@ -100,15 +105,14 @@ public class UDFTestTopology {
 			"reducer",
 			new UDFBolt(
 				new Fields("value"),
-				new IOperator() {
-					public void execute(List<Tuple> param, OutputCollector collector ) {
-						int reduced = 0;
-						for (Tuple tupel : param) {
-							reduced += (Integer) tupel.getValueByField("value");
+				new ReduceOperator(
+					new Reducer() {
+						public List<Object> reduce(Tuple tuple, List<Object> values) {
+							return new Values((Integer) values.get(0) + + tuple.getIntegerByField("value"));
 						}
-						collector.emit( new Values(reduced) );
-					}
-				},
+					},
+					new Values(0)
+				),
 				new CountWindow<Tuple>(2)
 			),
 			1
@@ -122,7 +126,7 @@ public class UDFTestTopology {
 		conf.setMaxSpoutPending(1);
 
 		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("overflow-test", conf, builder.createTopology());
+		cluster.submitTopology("udf-test", conf, builder.createTopology());
 	}
 
 }
