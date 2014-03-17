@@ -16,7 +16,7 @@ public class FilterOperator implements IOperator {
 		this.filter = filter;
 	}
 	
-	public FilterOperator setChaining(boolean chaining) {
+	public FilterOperator setChainingAndReturnInstance(boolean chaining) {
 		this.chaining = chaining;
 		return this;
 	}

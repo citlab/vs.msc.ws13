@@ -19,7 +19,7 @@ public class ReduceOperator implements IOperator {
 		this.init = init;
 	}
 
-	public ReduceOperator setChaining(boolean chaining) {
+	public ReduceOperator setChainingAndReturnInstance(boolean chaining) {
 		this.chaining = chaining;
 		return this;
 	}

@@ -43,7 +43,7 @@ public class UDFTestTopology {
 							return param + 10;
 						}
 					}
-				).setChaining(true)
+				).setChainingAndReturnInstance(true)
 			),
 			1
 		).shuffleGrouping("spout");
@@ -90,7 +90,7 @@ public class UDFTestTopology {
 							return (Integer) param.getValueByField("value") > 0;
 						}
 					}
-				).setChaining(true)
+				).setChainingAndReturnInstance(true)
 			),
 			1
 		).shuffleGrouping("flatmap");
@@ -107,7 +107,7 @@ public class UDFTestTopology {
 						}
 					},
 					new Values(0)
-				).setChaining(true),
+				).setChainingAndReturnInstance(true),
 				new CountWindow<Tuple>(2)
 			),
 			1

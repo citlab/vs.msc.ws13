@@ -16,7 +16,7 @@ public class MapOperator implements IOperator {
 		this.mapper = mapper;
 	}
 
-	public MapOperator setChaining(boolean chaining) {
+	public MapOperator setChainingAndReturnInstance(boolean chaining) {
 		this.chaining = chaining;
 		return this;
 	}
