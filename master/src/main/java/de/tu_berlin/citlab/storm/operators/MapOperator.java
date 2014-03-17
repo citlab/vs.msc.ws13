@@ -23,7 +23,7 @@ public class MapOperator implements IOperator {
 
 	public void execute(List<Tuple> input, OutputCollector emitter) {
 		for (Tuple param : input) {
-			List<Object> mapped = mapper.map(param.getValues());
+			List<Object> mapped = mapper.map(param);
 			if (chaining) {
 				emitter.emit(param, mapped);
 			} else {

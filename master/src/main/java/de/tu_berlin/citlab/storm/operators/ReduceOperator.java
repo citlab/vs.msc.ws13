@@ -24,7 +24,7 @@ public class ReduceOperator {
 	public void execute(List<Tuple> input, OutputCollector emitter) {
 		List<Object> result = init;
 		for (Tuple param : input) {
-			result = reducer.reduce(param.getValues(), result);
+			result = reducer.reduce(param, result);
 		}
 		if (chaining) {
 			emitter.emit(input, result);
