@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" name="CIT-Storm">
+<Configuration status="WARN" name="CIT-Storm" monitorInterval="30">
+
     <Properties>
         <Property name="hostIP">192.168.1.1</Property>
         <Property name="hostPort">8000</Property>
@@ -20,6 +21,11 @@
 
     <!-- Network Socket Appenders for the real Infrastructure -->
         <Socket name="boltSocket" host="${hostIP}" port="${hostPort}" protocol="TCP">
+            <SerializedLayout />
+            <ThresholdFilter level="info" />
+        </Socket>
+
+        <Socket name="operatorSocket" host="${hostIP}" port="${hostPort}" protocol="TCP">
             <SerializedLayout />
             <ThresholdFilter level="info" />
         </Socket>
@@ -46,8 +52,12 @@
         <logger name="Bolt" level="info" additivity="false">
             <AppenderRef ref="boltSocket" />
         </logger>
+        <logger name="Operator" level="info" additivity="false">
+            <AppenderRef ref="operatorSocket" />
+        </logger>
         <logger name="Spout" level="info" additivity="false">
             <AppenderRef ref="spoutSocket" />
         </logger>
     </Loggers>
+
 </Configuration>

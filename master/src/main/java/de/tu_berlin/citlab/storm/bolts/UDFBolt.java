@@ -3,6 +3,9 @@ package de.tu_berlin.citlab.storm.bolts;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import backtype.storm.Config;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -10,6 +13,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -18,19 +22,14 @@ import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
+import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
+
 
 public class UDFBolt extends BaseRichBolt {
 
-    static {
-        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2.xml");
-    }
-
     private static final long serialVersionUID = 1L;
-    public static final Logger LOGGER = LogManager.getLogger("UDFBolt");
+    private static final Logger LOGGER = LogManager.getLogger("Bolt");
 
 
 /* Global Variables: */
@@ -42,9 +41,7 @@ public class UDFBolt extends BaseRichBolt {
 /* ================= */
 
     final protected Fields outputFields;
-
     final protected IOperator operator;
-
     final protected WindowHandler windowHandler;
 
 
@@ -71,6 +68,21 @@ public class UDFBolt extends BaseRichBolt {
         this.outputFields = outputFields;
         this.operator = operator;
         windowHandler = new WindowHandler(window, windowKey, groupByKey);
+    }
+
+
+
+/* Getters & Setters */
+/* ================= */
+
+    public Fields getOutputFields() {
+        return outputFields;
+    }
+    public IOperator getOperator() {
+        return operator;
+    }
+    public WindowHandler getWindowHandler() {
+        return windowHandler;
     }
 
 
@@ -118,12 +130,18 @@ public class UDFBolt extends BaseRichBolt {
 
     protected void executeBatches(List<List<Tuple>> windows) {
         for (List<Tuple> window : windows) {
-            operator.execute(window, collector );
+			LOGGER.info("Executing Operator with window {}", LogPrinter.toTupleListString(window));
+			try {
+				operator.execute(window, collector );
 
-            // if succeed i can always say i processed it
-            for (Tuple tuple : window) {
-                collector.ack(tuple);
-            }
+				for (Tuple tuple : window) {
+					collector.ack(tuple);
+				}
+			}
+			catch (OperatorException e) {
+				LOGGER.error("Operator Execution resulted in an error!", e);
+			}
+
         }//for
     }
 

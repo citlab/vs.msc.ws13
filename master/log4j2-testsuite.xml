@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" name="TestSuite">
-    <Properties>
-        <Property name="hostIP">192.168.1.1</Property>
-        <Property name="hostPort">8000</Property>
-    </Properties>
 
     <Appenders>
     <!-- The Root-Appender: Console Output -->
@@ -16,15 +12,17 @@
 
 
     <!-- Network Socket replacements for Testing: -->
-        <!-- Test Suite File-Appenders: -->
-        <File name="bolt" fileName="logs/Bolt.log">
+        <!-- Storm-Architecture File-Appenders: -->
+        <File name="boltFile" fileName="logs/Bolt.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="info" />
         </File>
 
-        <File name="spout" fileName="logs/Spout.log">
+        <File name="operatorFile" fileName="logs/Operator.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <ThresholdFilter level="info" />
+        </File>
+
+        <File name="spoutFile" fileName="logs/Spout.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
 
 
@@ -75,11 +73,14 @@
         </Root>
 
     <!-- Network Logging for the real Infrastructure: -->
-        <logger name="Bolt" level="info" additivity="false">
-            <AppenderRef ref="bolt" />
+        <logger name="Bolt" level="debug" additivity="false">
+            <AppenderRef ref="boltFile" />
         </logger>
-        <logger name="Spout" level="info" additivity="false">
-            <AppenderRef ref="spout" />
+        <logger name="Operator" level="debug" additivity="false">
+            <AppenderRef ref="operatorFile" />
+        </logger>
+        <logger name="Spout" level="debug" additivity="false">
+            <AppenderRef ref="spoutFile" />
         </logger>
 
     <!-- TestSuite Logging: -->
@@ -103,4 +104,5 @@
             <AppenderRef ref="OCollMockFile" />
         </logger>
     </Loggers>
+
 </Configuration>

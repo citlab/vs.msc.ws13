@@ -14,16 +14,24 @@ Code Composition:
 
 <table>
   <tr>
-    <th>Code Path</th><th>Description</th>
+    <th>Path</th><th>Description</th>
+  </tr>
+
+
+  <tr>
+  	<td>Infrastructure</td><td>Services and Deployment setups for the CIT-Storm cloud deployment.</td>
   </tr>
   <tr>
-    <td>Playground</td><td>First Code tries. Every Programmer has its own directory</td>
+  	<td>Documentation</td><td>Project Documentation and JavaDoc. <em>(currently in Branch "Documentation")</em></td>
   </tr>
   <tr>
-    <td>Testing</td><td>Test-Suite for Storm-Free Debugging (currently WIP!)</td>
+    <td>Master</td><td>The Master-Code directory of the Project.</td>
   </tr>
   <tr>
-    <td>Master</td><td>The Joint Master Directory of Code</td>
+    <td>Playground</td><td>First Code tries. Every Programmer has its own directory. <em>(May be deleted soon.)</em></td>
+  </tr>
+  <tr>
+    <td>Webinterface</td><td>Web-Handling for the Cloud-Deployment.</td>
   </tr>
 </table>
 

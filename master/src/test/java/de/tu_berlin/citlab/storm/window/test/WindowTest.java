@@ -1,13 +1,12 @@
 package de.tu_berlin.citlab.storm.window.test;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.ArrayList;
-
+import de.tu_berlin.citlab.storm.window.CountWindow;
 import org.junit.Test;
 
-import de.tu_berlin.citlab.storm.window.CountWindow;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class WindowTest {
 
