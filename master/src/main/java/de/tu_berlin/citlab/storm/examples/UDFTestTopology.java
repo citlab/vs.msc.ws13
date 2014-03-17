@@ -3,9 +3,6 @@ package de.tu_berlin.citlab.storm.examples;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
@@ -13,17 +10,15 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.Filter;
+import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.FlatMapOperator;
 import de.tu_berlin.citlab.storm.operators.FlatMapper;
 import de.tu_berlin.citlab.storm.operators.MapOperator;
 import de.tu_berlin.citlab.storm.operators.Mapper;
 import de.tu_berlin.citlab.storm.operators.ReduceOperator;
 import de.tu_berlin.citlab.storm.operators.Reducer;
-import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-import backtype.storm.task.OutputCollector;
 public class UDFTestTopology {
 
 	@SuppressWarnings("serial")
@@ -48,7 +43,7 @@ public class UDFTestTopology {
 							return param + 10;
 						}
 					}
-				)
+				).setChaining(true)
 			),
 			1
 		).shuffleGrouping("spout");
@@ -80,7 +75,7 @@ public class UDFTestTopology {
 							return param *= -1;
 						}
 					}
-				)
+				).setChaining(true)
 			),
 		1).shuffleGrouping("map");
 		
@@ -95,7 +90,7 @@ public class UDFTestTopology {
 							return (Integer) param.getValueByField("value") > 0;
 						}
 					}
-				)
+				).setChaining(true)
 			),
 			1
 		).shuffleGrouping("flatmap");
@@ -112,7 +107,7 @@ public class UDFTestTopology {
 						}
 					},
 					new Values(0)
-				),
+				).setChaining(true),
 				new CountWindow<Tuple>(2)
 			),
 			1
