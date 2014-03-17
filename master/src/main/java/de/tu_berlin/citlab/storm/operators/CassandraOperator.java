@@ -5,6 +5,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.*;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class CassandraOperator implements IOperator {
     }
 
     @Override
-    public void execute(List<Tuple> tuples, OutputCollector collector) {
+    public void execute(List<Tuple> tuples, OutputCollector collector) throws OperatorException {
 
         System.out.println("debug: store "+tuples.size() );
 
@@ -76,9 +77,9 @@ public class CassandraOperator implements IOperator {
 
 
         } catch (Exception e ){
-            // ERROR
-            System.err.print("ERROR: "+e);
-            e.printStackTrace();
+			throw new OperatorException("Storing of tuples into Cassandra DB failed!");
+//            System.err.print("ERROR: "+e);
+//            e.printStackTrace();
         }
 
         // emit tuples

@@ -2,6 +2,7 @@ package de.tu_berlin.citlab.storm.operators;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class MultipleOperators implements IOperator {
     }
 
     @Override
-    public void execute(List<Tuple> input, OutputCollector collector) {
+    public void execute(List<Tuple> input, OutputCollector collector) throws OperatorException {
 
         String source = input.get(0).getSourceComponent();
         if( operators.containsKey( source ) ){
