@@ -11,6 +11,8 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.operators.FilterOperator;
 import de.tu_berlin.citlab.storm.operators.Filter;
+import de.tu_berlin.citlab.storm.operators.MapOperator;
+import de.tu_berlin.citlab.storm.operators.Mapper;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.CountWindow;
 import backtype.storm.task.OutputCollector;
@@ -26,19 +28,19 @@ public class UDFTestTopology {
 			"map",
 			new UDFBolt(
 				new Fields("key", "value"),
-				new IOperator() {
-					public void execute(List<Tuple> param, OutputCollector collector ) {
-						String newKey = param.get(0).getStringByField("key") + " mapped";
-						int newValue = myExistingFunction((Integer) param
-								.get(0).getValues().get(1));
-
-						collector.emit( new Values(newKey, newValue));
-
+				new MapOperator(
+					new Mapper() {
+						public List<Object> map(Tuple tuple) {
+							String newKey = tuple.getStringByField("key") + " mapped";
+							int newValue = myExistingFunction((Integer) tuple.getValues().get(1));
+							return new Values(newKey, newValue);
+						}
+						
+						public int myExistingFunction(int param) {
+							return param + 10;
+						}
 					}
-					public int myExistingFunction(int param) {
-						return param + 10;
-					}
-				}
+				)
 			),
 			1
 		).shuffleGrouping("spout");
