@@ -36,7 +36,7 @@ public final class TupleMockFactory
 
 	public static ArrayList<Tuple> generateTwitterTuples(String[] users, String[] dictionary, int wordsPerTweet, int tupleCount)
 	{
-		Fields inputFields = new Fields("user", "id", "tweet");
+		Fields inputFields = new Fields("user", "tweet_id", "tweet");
 		Map<String, Integer> userIDs = new HashMap<String, Integer>(users.length);
 		initUserIDs(userIDs, users);
 		ArrayList<Tuple> tupleOutput = new ArrayList<Tuple>(tupleCount);
