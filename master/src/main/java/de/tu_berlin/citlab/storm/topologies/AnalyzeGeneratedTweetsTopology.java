@@ -15,19 +15,22 @@ import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.operators.*;
+import de.tu_berlin.citlab.storm.operators.CassandraOperator;
+import de.tu_berlin.citlab.storm.operators.MultipleOperators;
+import de.tu_berlin.citlab.storm.operators.OperatorProcessingDescription;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
-import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
+import de.tu_berlin.citlab.storm.spouts.TwitterGeneratorSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
-import de.tu_berlin.citlab.storm.window.*;
-import de.tu_berlin.citlab.twitter.TwitterConfiguration;
-import de.tu_berlin.citlab.twitter.TwitterUserLoader;
+import de.tu_berlin.citlab.storm.window.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.TimeWindow;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
+import de.tu_berlin.citlab.storm.window.Window;
 
 import java.io.Serializable;
 import java.util.*;
 
-public class AnalyzeTweetsTopology implements Serializable{
+public class AnalyzeGeneratedTweetsTopology implements Serializable{
     private static final int windowSize = 1;
     private static final int slidingOffset = 1;
 
@@ -37,12 +40,14 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public BaseRichSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
-        Properties user = TwitterUserLoader.loadUser("twitter.config");
-        String[] keywords = new String[] {"der", "die","das","wir","ihr","sie", "dein", "mein", "facebook", "google", "twitter" };
-        String[] languages = new String[] {"de"};
-        String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
-        TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
-        return new TwitterSpout(config);
+        String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
+        String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
+                                                "bombe", "berlin", "gott", "allah",
+                                                "Pilates", "Politik", "Kapital", "Twitter",
+                                                "der", "die", "das"};
+        int tweetLength = 10;
+        int tweetsPerSecond = 10;
+        return new TwitterGeneratorSpout(twitterUsers, dictionary, tweetLength, tweetsPerSecond);
     }
 
     public UDFBolt createCassandraTweetsSink(){
@@ -318,6 +323,6 @@ public class AnalyzeTweetsTopology implements Serializable{
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("analyzte-twitter-stream", conf,
-            new AnalyzeTweetsTopology().createTopology() );
+            new AnalyzeGeneratedTweetsTopology().createTopology() );
     }
 }
