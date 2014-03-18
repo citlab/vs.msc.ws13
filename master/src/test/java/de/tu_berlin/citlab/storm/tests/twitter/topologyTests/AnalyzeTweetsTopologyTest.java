@@ -25,7 +25,7 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 		String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
 												"bombe", "berlin", "gott", "allah",
 												"Pilates", "Politik", "Kapital", "Twitter",
-												"der", "die", "das"};
+												"der", "die", "das", "google", "microsoft", "facebook"};
 		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 5, 12);
         BoltEmission firstInput = new BoltEmission(twitterTuples);
         return firstInput;
@@ -73,12 +73,12 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 //        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
 //        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
-        return new BoltTestConfig(boltTestName, testingBolt, 10, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
         final String boltTestName = "join_with_badwords";
-        return new BoltTestConfig(boltTestName, testingBolt, 10, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {

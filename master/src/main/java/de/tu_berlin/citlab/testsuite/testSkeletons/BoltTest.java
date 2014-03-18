@@ -60,6 +60,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* ========================= */
 
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
+    private  Logger log = LogManager.getLogger("lol");
     private static final Logger HEADLINER = LogManager.getLogger(DebugLogger.HEADER_ID);
     private static final Marker BASIC = DebugLogger.getBasicMarker();
     private static final Marker DEFAULT = DebugLogger.getDefaultMarker();
