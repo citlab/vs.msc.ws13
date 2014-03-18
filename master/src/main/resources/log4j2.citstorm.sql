@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS `log4j2` (
   `milliseconds` int(11) NOT NULL,
   `logger` varchar(255) NOT NULL,
   `level` varchar(255) NOT NULL,
-  `message` varchar(2000) NOT NULL,
+  `message` text NOT NULL,
+  `exception` text NOT NULL,
+  `thread` varchar(255) NOT NULL,
+  `marker` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
