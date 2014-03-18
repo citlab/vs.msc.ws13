@@ -9,6 +9,9 @@
 			<Column name="logger" pattern="%logger" />
 			<Column name="level" pattern="%level" />
 			<Column name="message" pattern="%message" />
+			<Column name="exception" pattern="%exception" />
+			<Column name="thread" pattern="%thread" />
+			<Column name="marker" pattern="%marker" />
 		</JDBC>
 	</Appenders>
 
