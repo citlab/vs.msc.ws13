@@ -32,7 +32,7 @@ public class AnalyzeTweetsTopology implements Serializable{
     private static final int windowSize = 1;
     private static final int slidingOffset = 1;
 
-    //public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
+//    public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
 
     public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(1,1);
 

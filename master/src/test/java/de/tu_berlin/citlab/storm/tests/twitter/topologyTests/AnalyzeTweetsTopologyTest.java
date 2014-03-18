@@ -73,12 +73,12 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 //        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
 //        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
-        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 10, null);
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
         final String boltTestName = "join_with_badwords";
-        return new BoltTestConfig(boltTestName, testingBolt, 0, null);
+        return new BoltTestConfig(boltTestName, testingBolt, 10, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {
