@@ -26,7 +26,9 @@ public class CassandraOperator implements IOperator {
 
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
-        this.ctn = new Counter( config );
+        if(this.config.isCounterBolt() ){
+            this.ctn = new Counter( config );
+        }
     }
 
     @Override
@@ -44,10 +46,10 @@ public class CassandraOperator implements IOperator {
                 dao.createDataStructures();
             }
             else {
+                keyFields = new Fields(config.getPrimaryKeys().getPrimaryKeyFields());
+
                 ctn.connect( config.getIP() );
                 ctn.createDataStructures();
-
-                keyFields = new Fields(config.getPrimaryKeys().getPrimaryKeyFields());
 
             }
 

@@ -22,6 +22,8 @@ public class CassandraConfig implements DBConfig, Serializable
 
     public void setParams( String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields, boolean isCntBolt )
     {
+        System.out.println("tupleFields: "+tupleFields);
+
         this.primaryKeys = primaryKeys;
         this.tupleFields = tupleFields;
         this.keyspace = keyspace;
