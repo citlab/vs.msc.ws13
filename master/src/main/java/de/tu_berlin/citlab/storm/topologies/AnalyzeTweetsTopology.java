@@ -48,7 +48,8 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public UDFBolt createCassandraTweetsSink(){
         CassandraConfig cassandraCfg = new CassandraConfig();
-        cassandraCfg.setIP( "127.0.0.1" );
+        //cassandraCfg.setIP( "127.0.0.1" );
+        cassandraCfg.setIP(CassandraOperator.getCassandraClusterIPFromClusterManager());
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "tweets",
@@ -66,7 +67,8 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public UDFBolt createCassandraUserSignificanceSink(){
         CassandraConfig cassandraCfg = new CassandraConfig();
-        cassandraCfg.setIP( "127.0.0.1" );
+        //cassandraCfg.setIP( "127.0.0.1" );
+        cassandraCfg.setIP(CassandraOperator.getCassandraClusterIPFromClusterManager());
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "user_significance",
