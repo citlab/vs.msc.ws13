@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `log4j2` (
   `exception` text NOT NULL,
   `thread` varchar(255) NOT NULL,
   `marker` varchar(255) NOT NULL,
+  `session` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

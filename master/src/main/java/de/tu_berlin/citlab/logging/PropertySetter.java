@@ -3,6 +3,7 @@ package de.tu_berlin.citlab.logging;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.UUID;
 
 public class PropertySetter {
 
@@ -11,14 +12,15 @@ public class PropertySetter {
 	private static final String defaultPropertiesFile = "/log4j2_mysql.properties";
 	
 	public static void setLog4j2Properties() {
-		setLog4j2Properties(defaultPropertiesFile);
+		setLog4j2Properties(UUID.randomUUID().toString());
 	}
 	
-	public static void setLog4j2Properties(String fileNameInClassPathRoot) throws RuntimeException {
+	public static void setLog4j2Properties(String session) throws RuntimeException {
+		System.setProperty("log4j2.session", session);
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
-			input = PropertySetter.class.getResourceAsStream(fileNameInClassPathRoot);
+			input = PropertySetter.class.getResourceAsStream(defaultPropertiesFile);
 			prop.load(input);
 			for(String field : fields) {
 				String value = prop.getProperty(field);
@@ -26,7 +28,7 @@ public class PropertySetter {
 					System.setProperty(String.format("log4j2.%s", field), value);
 				}
 				else {
-					throw new Exception(String.format("Required field '%s' was not found in properties file (%s)", field, fileNameInClassPathRoot));
+					throw new Exception(String.format("Required field '%s' was not found in properties file (%s)", field, defaultPropertiesFile));
 				}
 			}
 		} catch (Exception ex) {

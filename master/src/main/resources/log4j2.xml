@@ -12,6 +12,7 @@
 			<Column name="exception" pattern="%exception" />
 			<Column name="thread" pattern="%thread" />
 			<Column name="marker" pattern="%marker" />
+			<Column name="session" pattern="${sys:log4j2.session}" />
 		</JDBC>
 	</Appenders>
 
