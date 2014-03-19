@@ -2,7 +2,6 @@ package de.tu_berlin.citlab.storm.topologies;
 
 
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.TopologyBuilder;
@@ -19,16 +18,18 @@ import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
-import de.tu_berlin.citlab.storm.spouts.TwitterTestSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.*;
+import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
 import java.io.Serializable;
 import java.util.*;
 
-public class AnalyzeTweetsTopology implements Serializable{
+
+public class AnalyzeTweetsTopology implements TopologyCreation
+{
     private static final int windowSize = 1;
     private static final int slidingOffset = 1;
 
@@ -36,7 +37,7 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(1,1);
 
-    public BaseRichSpout createTwitterSpout() throws Exception {
+    public BaseRichSpout createTwitterSpout() throws InvalidTwitterConfigurationException {
         // Setup up Twitter configuration
         Properties user = TwitterUserLoader.loadUser("twitter.config");
         String[] keywords = new String[] {"der", "die","das","wir","ihr","sie", "dein", "mein", "facebook", "google", "twitter" };
@@ -272,11 +273,17 @@ public class AnalyzeTweetsTopology implements Serializable{
 
 
 
-    public StormTopology createTopology() throws Exception {
+    @Override
+    public StormTopology createTopology()
+    {
         TopologyBuilder builder = new TopologyBuilder();
 
         // provide twitter streaminh data
-        builder.setSpout("tweets", createTwitterSpout(), 1);
+        try {
+            builder.setSpout("tweets", createTwitterSpout(), 1);
+        } catch (InvalidTwitterConfigurationException e) {
+            e.printStackTrace();
+        }
 
         // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
@@ -306,20 +313,5 @@ public class AnalyzeTweetsTopology implements Serializable{
 
 
         return builder.createTopology();
-    }
-
-
-    @SuppressWarnings("serial")
-    public static void main(String[] args) throws Exception {
-
-        Config conf = new Config();
-        conf.setDebug(true);
-
-        conf.setMaxTaskParallelism(1);
-        conf.setMaxSpoutPending(1);
-
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("analyzte-twitter-stream", conf,
-            new AnalyzeTweetsTopology().createTopology() );
     }
 }
