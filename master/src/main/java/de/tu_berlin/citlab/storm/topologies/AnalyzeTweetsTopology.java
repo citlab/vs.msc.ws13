@@ -313,4 +313,19 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         return builder.createTopology();
     }
+
+
+    @SuppressWarnings("serial")
+    public static void main(String[] args) throws Exception {
+
+        Config conf = new Config();
+        conf.setDebug(true);
+
+        conf.setMaxTaskParallelism(1);
+        conf.setMaxSpoutPending(1);
+
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("analyzte-twitter-stream", conf,
+            new AnalyzeTweetsTopology().createTopology() );
+    }
 }

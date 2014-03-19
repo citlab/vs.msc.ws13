@@ -1,0 +1,5 @@
+<p class="navbar-text">
+  @if(session.get("name") != null) {
+    <a href="/logout">Logout @session.get("name")</a>
+  }
+</p>

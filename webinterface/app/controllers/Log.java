@@ -4,11 +4,38 @@ import play.*;
 import play.mvc.*;
 
 import views.html.*;
+import models.LogEntry;
+import models.Database;
+
+import play.libs.Json;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.ArrayList;
 
 public class Log extends Controller {
 
-    public static Result get() {
-        return TODO;
+  @BodyParser.Of(BodyParser.Json.class)
+  public static Result getLatest(long lastId) {
+    ObjectNode result = Json.newObject();
+
+    //int lastId = Integer.parseInt(request().getQueryString("lastId"));
+    ArrayList<LogEntry> list = Database.getInstance().getLogs(lastId);
+
+    for(LogEntry entry : list) {
+      ObjectNode message = Json.newObject();
+
+      message.put("id", entry.getId());
+      message.put("time", entry.getDatetime());
+      message.put("bolt", entry.getLogger());
+      message.put("message", entry.getMessage());
+
+      boolean hasError = entry.getException() != null && !entry.getException().isEmpty();
+      message.put("hasError", hasError);
+
+      result.put(new Integer(entry.getId()).toString(), message);
     }
+    return ok(result);
+  }
 
 }
