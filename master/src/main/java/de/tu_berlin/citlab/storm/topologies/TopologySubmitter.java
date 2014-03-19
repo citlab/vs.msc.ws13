@@ -9,12 +9,12 @@ import backtype.storm.StormSubmitter;
  */
 public class TopologySubmitter
 {
-//    private static AnalyzeTweetsTopology topology = new AnalyzeTweetsTopology();
-    private static TopologyCreation topology;
+    private static AnalyzeTweetsTopology topology = new AnalyzeTweetsTopology();
+//    private static TopologyCreation topology;
 
-    public TopologySubmitter(TopologyCreation topologyCreation)
+    public TopologySubmitter()
     {
-        topology = topologyCreation;
+        topology = new AnalyzeTweetsTopology();
     }
 
 
