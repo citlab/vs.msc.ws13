@@ -512,4 +512,56 @@ public class Database {
 
     return list;
   }
+
+  public ArrayList<LogEntry> getLogs(long lastId) {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+
+    ArrayList<LogEntry> list = new ArrayList<LogEntry>();
+
+    try {
+      // Register JDBC driver
+      Class.forName("com.mysql.jdbc.Driver");
+
+      // Open a connection
+      conn = DriverManager.getConnection(getConnectionString());
+
+      // Execute SQL query
+      stmt = conn.prepareStatement("SELECT * FROM log4j2 WHERE id>?");
+      stmt.setLong(1, lastId);
+
+      ResultSet rs = stmt.executeQuery();
+
+      while(rs.next()) {
+        list.add(new LogEntry(rs.getInt("id"))
+          .datetime(rs.getTimestamp("datetime").toString())
+          .milliseconds(new Integer(rs.getInt("milliseconds")).toString())
+          .logger(rs.getString("logger"))
+          .level(rs.getString("level"))
+          .message(rs.getString("message"))
+          .exception(rs.getString("exception"))
+          .thread(rs.getString("thread"))
+          .marker(rs.getString("marker"))
+        );
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException e) {
+      }
+      try {
+        if (conn != null)
+          conn.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return list;
+  }  
 }

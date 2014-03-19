@@ -20,7 +20,7 @@
       }
     };
 
-    topology_filter.find("li").on("click", function() {
+    topology_filter.on("click", "li", function() {
       var filter = $(this).data("filter-value");
       topology_filter.setFilter(filter);
       topology_filter.selected = filter;
@@ -35,6 +35,16 @@
         }
       });
       return r;
+    };
+
+    topology_filter.tableStyle = function(filter) {
+      if(topology_filter.selected == filter) {
+        return "";
+      } else if(topology_filter.selected == "*") {
+        return "";
+      } else {
+        return "style='display: none'";
+      }
     };
   });
 }(jQuery, this))

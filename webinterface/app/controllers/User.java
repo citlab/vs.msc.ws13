@@ -5,8 +5,8 @@ import play.mvc.*;
 import play.mvc.Http.*;
 
 import views.html.*;
-import models.Cluster;
 
+import models.Cluster;
 import models.Database;
 
 import java.util.Map;

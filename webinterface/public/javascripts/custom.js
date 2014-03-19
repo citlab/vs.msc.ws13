@@ -1,4 +1,4 @@
-(function($) {
+(function($, global) {
   $(document).ready(function() {
     $(".start-deployment").not('disabled').on('click', function() {
       self = $(this);
@@ -27,5 +27,5 @@
         
       }
     });
-  })
-}(jQuery))
+  });
+}(jQuery, this))
