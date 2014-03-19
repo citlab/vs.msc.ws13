@@ -8,11 +8,17 @@ public class PropertySetter {
 
 	private static String[] fields = {"serverName", "serverPort", "databaseName", "tableName", "user", "pass"};
 	
+	private static final String defaultPropertiesFile = "/log4j2_mysql.properties";
+	
+	public static void setLog4j2Properties() {
+		setLog4j2Properties(defaultPropertiesFile);
+	}
+	
 	public static void setLog4j2Properties(String fileNameInClassPathRoot) throws RuntimeException {
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
-			input = ConnectionFactory.class.getResourceAsStream(fileNameInClassPathRoot);
+			input = PropertySetter.class.getResourceAsStream(fileNameInClassPathRoot);
 			prop.load(input);
 			for(String field : fields) {
 				String value = prop.getProperty(field);
@@ -33,6 +39,13 @@ public class PropertySetter {
 					
 				}
 			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		setLog4j2Properties();
+		for(String field : fields) {
+			System.out.println(System.getProperty(String.format("log4j2.%s", field)));
 		}
 	}
 	

@@ -21,17 +21,17 @@ public class ConnectionFactory {
 	}
 
 	// overridden by config file
-	private String serverName = "";
-	private String serverPort = "";
-	private String databaseName = "";
-	private String tableName = "";
-	private String user = "";
-	private String pass = "";
+	private String serverName;
+	private String serverPort;
+	private String databaseName;
+	private String tableName;
+	private String user;
+	private String pass;
 
-	private BoneCP connectionPool = null;
+	private BoneCP connectionPool;
 
 	private ConnectionFactory() {
-		if (databaseDriverLoadable()) {
+		if (databaseDriverLoadable() && propertiesLoaded()) {
 			try {
 				connectionPool = new BoneCP(getConfig());
 				// connectionPool.shutdown();
@@ -55,32 +55,31 @@ public class ConnectionFactory {
 
 	private BoneCPConfig getConfig() {
 		BoneCPConfig config = new BoneCPConfig();
-		if (loadProperties()) {
-			config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
-					serverName, serverPort, databaseName));
-			config.setUsername(user);
-			config.setPassword(pass);
-			config.setMinConnectionsPerPartition(5);
-			config.setMaxConnectionsPerPartition(10);
-			config.setPartitionCount(1);
-		}
+		config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
+				serverName, serverPort, databaseName));
+		config.setUsername(user);
+		config.setPassword(pass);
+		config.setMinConnectionsPerPartition(5);
+		config.setMaxConnectionsPerPartition(10);
+		config.setPartitionCount(1);
 		return config;
 	}
 
-	private boolean loadProperties() {
+	private boolean propertiesLoaded() {
 		boolean result = true;
 		try {
-			serverName = System.getProperty("servername");
-			serverPort = System.getProperty("serverPort");
-			databaseName = System.getProperty("databaseName");
-			tableName = System.getProperty("tableName");
-			user = System.getProperty("user");
-			pass = System.getProperty("pass");
+			serverName = System.getProperty("log4j2.serverName");
+			serverPort = System.getProperty("log4j2.serverPort");
+			databaseName = System.getProperty("log4j2.databaseName");
+			tableName = System.getProperty("log4j2.tableName");
+			user = System.getProperty("log4j2.user");
+			pass = System.getProperty("log4j2.pass");
 			if(serverName == null || serverPort == null || databaseName == null || tableName == null || user == null || pass == null) {
-				result = false;
+				throw new Exception(String.format("Invalid db credentials: serverName='%s', serverPort='%s', databaseName='%s', tableName= '%s', user='%s', pass='%s'", serverName, serverPort, databaseName, tableName, user, pass));
 			}
 		}
 		catch(Exception ex) {
+			ex.printStackTrace();
 			result = false;
 		}
 		return result;
@@ -101,6 +100,7 @@ public class ConnectionFactory {
 	}
 
 	public static void main(String[] args) {
+		PropertySetter.setLog4j2Properties();
 		getConnectionStatic();
 	}
 
