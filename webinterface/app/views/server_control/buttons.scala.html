@@ -1,0 +1,15 @@
+@(content: String)(server: String)(serverRunning: Boolean)
+<button class="btn btn-primary" @(if(serverRunning) "disabled='disabled'") type="submit" name="action" value="start_@server">
+  <span class="glyphicon glyphicon-play"></span>
+  Start @content
+</button>
+
+<button class="btn btn-primary" @(if(!serverRunning) "disabled='disabled'") type="submit" name="action" value="stop_@server">
+  <span class="glyphicon glyphicon-stop"></span>
+  Stop @content
+</button>
+
+<button class="btn btn-primary" @(if(!serverRunning) "disabled='disabled'") type="submit" name="action" value="reboot_@server">
+  <span class="glyphicon glyphicon-repeat"></span>
+  Reboot @content
+</button>

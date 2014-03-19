@@ -1,14 +1,57 @@
-.topology-list {
-  margin-top: 30px;
+#upload-topology-form {
+  margin-bottom: 0px;
 }
 
-.topology {
-  margin-bottom: 20px;
-  display: block;
+#topology-list {
+  margin-bottom: 30px;
 }
 
-.topology strong {
-  display: block;
+#topology-list table {
+  margin: 0;
+}
+
+#topology-list .log-list {
+  font-size: 10px;
+  height: 300px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: 0 0 2px #ddd;
+}
+
+#topology-list .time {
+  width: 150px;
+}
+
+#topology-list .bolt {
+  width: 200px;
+}
+
+#topology-list ul {
+  font-size: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  padding: 3px 0 5px;
+}
+
+#topology-list ul li {
+  margin: 0 5px;
+  padding: 3px 15px;
+  float: left;
+  box-shadow: 0 0 2px #ccc;
+  cursor: pointer;
+  font-weight: bold;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+#topology-list ul li:hover {
+  background: #428bca;
+  color: #fff;
 }
 
 .rotating {
