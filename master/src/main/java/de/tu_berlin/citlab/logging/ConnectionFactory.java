@@ -68,47 +68,20 @@ public class ConnectionFactory {
 	}
 
 	private boolean loadProperties() {
-		boolean result = false;
-		Properties prop = new Properties();
-		InputStream input = null;
+		boolean result = true;
 		try {
-			input = ConnectionFactory.class.getResourceAsStream("/log4j2_mysql.properties");
-			prop.load(input);
-			serverName = prop.getProperty("serverName");
-			if(serverName == null) {
-				throw new Exception("serverName not found in properties file");
+			serverName = System.getProperty("servername");
+			serverPort = System.getProperty("serverPort");
+			databaseName = System.getProperty("databaseName");
+			tableName = System.getProperty("tableName");
+			user = System.getProperty("user");
+			pass = System.getProperty("pass");
+			if(serverName == null || serverPort == null || databaseName == null || tableName == null || user == null || pass == null) {
+				result = false;
 			}
-			serverPort = prop.getProperty("serverPort");
-			if(serverPort == null) {
-				throw new Exception("serverPort not found in properties file");
-			}
-			databaseName = prop.getProperty("databaseName");
-			if(databaseName == null) {
-				throw new Exception("databaseName not found in properties file");
-			}
-			tableName = prop.getProperty("tableName");
-			if(tableName == null) {
-				throw new Exception("tableName not found in properties file");
-			}
-			user = prop.getProperty("user");
-			if(user == null) {
-				throw new Exception("user not found in properties file");
-			}
-			pass = prop.getProperty("pass");
-			if(pass == null) {
-				throw new Exception("pass not found in properties file");
-			}
-			result = true;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		}
+		catch(Exception ex) {
+			result = false;
 		}
 		return result;
 	}
