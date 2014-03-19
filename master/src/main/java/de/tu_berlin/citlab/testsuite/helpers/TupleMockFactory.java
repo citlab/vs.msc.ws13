@@ -34,18 +34,36 @@ public final class TupleMockFactory
         return tupleList;
     }
 
-	public static ArrayList<Tuple> generateTwitterTuples(String[] users, String[] dictionary, int wordsPerTweet, int tupleCount)
+    /**
+     *
+     * @param users
+     * @param dictionary
+     * @param wordsPerTweet
+     * @param tupleCount
+     * @param tickTupleRatio
+     * @return
+     */
+	public static ArrayList<Tuple> generateTwitterTuples(String[] users, String[] dictionary, int wordsPerTweet, int tupleCount, int tickTupleRatio)
 	{
 		Fields inputFields = new Fields("user", "tweet_id", "tweet");
 		Map<String, Integer> userIDs = new HashMap<String, Integer>(users.length);
 		initUserIDs(userIDs, users);
-		ArrayList<Tuple> tupleOutput = new ArrayList<Tuple>(tupleCount);
+        int tickTupleCount = (tickTupleRatio == 0) ? 0 : tupleCount/tickTupleRatio;
+		ArrayList<Tuple> tupleOutput = new ArrayList<Tuple>(tupleCount + tickTupleCount);
 
 		for (int i = 0; i < tupleCount; i++) {
 
 			Values actTupleVals = generateTweet(userIDs, users, dictionary, wordsPerTweet);
 			Tuple actTuple = TupleMock.mockTupleByFields(actTupleVals, inputFields);
 			tupleOutput.add(actTuple);
+
+
+            if(tickTupleRatio > 0) {
+                if ((i % tickTupleRatio) == 0) {
+                    Tuple tickTuple = TupleMock.mockTickTuple();
+                    tupleOutput.add(tickTuple);
+                }
+            }
 		}
 
 		return tupleOutput;

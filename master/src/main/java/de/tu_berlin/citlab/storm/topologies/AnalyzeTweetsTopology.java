@@ -19,7 +19,6 @@ import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
-import de.tu_berlin.citlab.storm.spouts.TwitterTestSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
@@ -29,12 +28,12 @@ import java.io.Serializable;
 import java.util.*;
 
 public class AnalyzeTweetsTopology implements Serializable{
-    private static final int windowSize = 1;
-    private static final int slidingOffset = 1;
+    private static final int windowSize = 10;
+    private static final int slidingOffset = 5;
 
 //    public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
 
-    public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(1,1);
+    public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(2,1);
 
     public BaseRichSpout createTwitterSpout() throws Exception {
         // Setup up Twitter configuration
