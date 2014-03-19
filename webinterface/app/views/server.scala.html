@@ -1,88 +1,19 @@
-@main("Server") {
+@main("Server")(true) {
   <div class="page-header">
     <h1>Server <small>starten, stoppen, Geld verbrennen</small></h1>
   </div>
 
   <h2>Manage Cluster:</h2>
   <div class="controls">
-    <form action="/startserver">
+    <form action="/startserver" class="start-form">
       <div class="row">
-        <div class="col-md-3">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Nimbus</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="start_nimbus">
-                <span class="glyphicon glyphicon-play"></span>
-                Start Nimbus
-              </button>
-            </div>
-          </div>
-        </div>
+        @server_control.nimbus_panel()
 
+        @server_control.cassandra_panel()
 
-        <div class="col-md-3">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Cassandra</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="start_cassandra">
-                <span class="glyphicon glyphicon-play"></span>
-                Start Cassandra
-              </button>
-            </div>
-          </div>
-        </div>
+        @server_control.supervisor_panel()
 
-        <div class="col-md-6">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Cluster</h3>
-            </div>
-            <div class="panel-body">
-              <button class="btn btn-primary" type="submit" name="action" value="reboot_cluster">
-                <span class="glyphicon glyphicon-repeat"></span>
-                Reboot Cluster
-              </button>
-
-              <button class="btn btn-primary" type="submit" name="action" value="shutdown_cluster">
-                <span class="glyphicon glyphicon-stop"></span>
-                Shutdown Cluster
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title">Supvisor</h3>
-        </div>
-        <div class="panel-body">
-          <p>
-            <label for="n_sv">Anzahl</label>
-            <input type="number" name="n_sv" id="n_sv" value="1">
-          </p>
-
-          <button class="btn btn-primary" type="submit" name="action" value="start_supervisor">
-            <span class="glyphicon glyphicon-play"></span>
-            Start Supervisors
-          </button>
-
-          <button class="btn btn-primary" type="submit" name="action" value="terminate_supervisor">
-            <span class="glyphicon glyphicon-remove"></span>
-            Terminate Supervisors
-          </button>
-
-          <button class="btn btn-primary" type="submit" name="action" value="reboot_supervisor">
-            <span class="glyphicon glyphicon-repeat"></span>
-            Reboot Supervisors
-          </button>
-        </div>
-      </div>
+        @server_control.cluster_panel()
     </form>
   </div>
 }
