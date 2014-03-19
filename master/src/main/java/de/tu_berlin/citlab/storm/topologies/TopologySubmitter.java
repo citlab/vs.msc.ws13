@@ -12,17 +12,16 @@ public class TopologySubmitter
 //    private static AnalyzeTweetsTopology topology = new AnalyzeTweetsTopology();
     private static TopologyCreation topology;
 
-    public TopologySubmitter(TopologyCreation topologySub)
+    public TopologySubmitter(TopologyCreation topologyCreation)
     {
-        topology = topologySub;
+        topology = topologyCreation;
     }
 
 
     @SuppressWarnings("serial")
     public static void main(String[] args) throws Exception
     {
-
-        Config conf = topology.getConfig();
+        Config conf = new Config();
 
         if (args == null || args.length == 0) {
             conf.setDebug(true);

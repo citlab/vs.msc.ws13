@@ -271,10 +271,6 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
 
-    @Override
-    public Config getConfig() {
-        return new Config();
-    }
 
     @Override
     public StormTopology createTopology()
