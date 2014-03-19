@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 import org.apache.commons.lang.StringUtils;
 import backtype.storm.tuple.Tuple;
 import com.datastax.driver.core.BatchStatement;
@@ -178,7 +181,7 @@ public class CassandraDAO implements DAO, Serializable
 	public void batchExecute()
 	{
 		//System.out.println( batchStatement.toFieldsString() );
-		session.execute( batchStatement );
+		session.execute(batchStatement);
 	}
 
 	public void bindValues( Object... objects )
@@ -211,7 +214,7 @@ public class CassandraDAO implements DAO, Serializable
  * 
  * public void batchExecute() { this.getSession().execute( batchStatement ); }
  * 
- * public void bindValues( Object... objects ) { assert this.preparedStatement
+ * public void bedValues( Object... objects ) { assert this.preparedStatement
  * != null : "Prepared Statement darf beim Binden nicht Null sein!";
  * boundStatement = new BoundStatement( preparedStatement ).bind( objects ); }
  * 

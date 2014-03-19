@@ -44,6 +44,7 @@ public class CassandraOperator implements IOperator {
                 dao.setConfig(config);
                 dao.analyzeTuple( tuples.get(0) );
                 dao.createDataStructures();
+
             }
             else {
                 keyFields = new Fields(config.getPrimaryKeys().getPrimaryKeyFields());
