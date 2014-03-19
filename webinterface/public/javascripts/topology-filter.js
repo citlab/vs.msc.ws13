@@ -20,10 +20,16 @@
       }
     };
 
-    topology_filter.on("click", "li", function() {
+    topology_filter.on("click", "[data-filter-value]", function() {
       var filter = $(this).data("filter-value");
       topology_filter.setFilter(filter);
       topology_filter.selected = filter;
+    });
+
+    topology_filter.on("click", ".toggleLogging", function(e) {
+      global.topology_list.toggleLogging();
+      $(this).find("span").toggleClass("glyphicon-play");
+      $(this).find("span").toggleClass("glyphicon-pause");
     });
 
     topology_filter.include = function (filter) {

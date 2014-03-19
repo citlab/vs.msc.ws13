@@ -3,20 +3,20 @@
 <div class="col-md-3">
   <div class="panel panel-primary">
     <div class="panel-heading">
-      <h3 class="panel-title">@t.getTitle()</h3>
+      <h3 class="panel-title">@t.getName</h3>
     </div>
     <div class="panel-body">
-      <strong>Datum:</strong> @t.getDate()
-      <strong>Servername: </strong> @t.getNameOnServer();
+      <strong>Datum:</strong> @t.getDate
+      <strong>Servername: </strong> @t.getTitle;
     </div>
     <div class="panel-footer">
       <div class="btn btn-default start-deployment">
         <span class="glyphicon glyphicon-play"></span>
       </div>
 
-      <div class="btn btn-danger delete-topology pull-right">
+      <a href="/deployment/delete/@t.getTitle" class="btn btn-danger delete-topology pull-right">
         <span class="glyphicon glyphicon-remove"></span>
-      </div>
+      </a>
     </div>
   </div>
 </div>

@@ -10,11 +10,8 @@
   </div>
 
   <div class="row">
-    <div class="col-md-12 upload-topology">
-      @topology_control.form()
-    </div>
+    @topology_control.form()
   </div>
-
   <div class="row">
     @for(t <- topologies) {
       @topology_control.panel(t)

@@ -14,7 +14,11 @@ import java.util.Map;
 public class User extends Controller {
 
     public static Result user() {
-        return ok(user.render());
+        if(models.User.isAdmin(session("name"))) {
+            return ok(user.render());
+        } else {
+            return redirect("/");
+        }
     }
 
     public static Result create() {

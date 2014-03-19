@@ -5,6 +5,8 @@
 
     global.topology_list.lastId = 0;
 
+    global.topology_list.logging = true;
+
     topology_list.add = function(time, bolt, msg, id, hasError) {
       var list = topology_list.find("tbody");
       var style = topology_filter.tableStyle();
@@ -37,11 +39,20 @@
         global.topology_list.add(v.time, v.bolt, v.message, v.id, v.hasError);
       });
 
-      window.setTimeout(function() {global.topology_list.fetchLatest();}, 1000);
+      if(topology_list.logging) {
+        window.setTimeout(function() {global.topology_list.fetchLatest();}, 1000);
+      }
+    }
+
+    topology_list.toggleLogging = function() {
+      topology_list.logging = !topology_list.logging;
+      if(topology_list.logging) {
+        topology_list.fetchLatest();
+      }
     }
 
     if(!$('#topology-list').length == 0) {
-      topology_list.fetchLatest();
+      global.topology_list.fetchLatest();
     }
   });
 }(jQuery, this))

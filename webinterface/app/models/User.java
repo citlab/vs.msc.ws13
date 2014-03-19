@@ -11,4 +11,8 @@ public class User {
     if (!onlyLoggedIn) return true;
     return name!=null && Database.getInstance().checkSession(name, sessionId);
   }
+
+  public static boolean isAdmin(String name) {
+    return name.equals("admin");
+  }
 }

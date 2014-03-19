@@ -10,12 +10,16 @@ import models.Cluster;
 public class Server extends Controller {
 
     public static Result startServer() {
-        // action is in form 'action_server', for example 'start_nimbus'
-        String[] action = request().getQueryString("action").split("_");
-        return startServerByAction(action[0], action[1]);
+        if(!models.User.loggedIn(false, session("name"), session("session"))) {
+            return TODO;
+        } else {
+            // action is in form 'action_server', for example 'start_nimbus'
+            String[] action = request().getQueryString("action").split("_");
+            return startServerByAction(action[0], action[1]);
+        }
     }
 
-    public static Result startServerByAction(String action, String server) {
+    private static Result startServerByAction(String action, String server) {
         if(server.equals("cluster")) {
             if(action.equals("reboot")) {
                 Cluster.rebootCluster();

@@ -16,6 +16,7 @@ GET    /impressum                   controllers.Application.impressum()
 GET     /server                     controllers.Application.server()
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
+GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
 
 GET     /startserver                controllers.Server.startServer()
 

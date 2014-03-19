@@ -34,7 +34,7 @@ public class Topology {
     return this.date;
   }
 
-  public String getNameOnServer() {
+  public String getName() {
     return this.name;
   }
 }

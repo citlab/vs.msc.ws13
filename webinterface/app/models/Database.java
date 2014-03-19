@@ -490,7 +490,7 @@ public class Database {
       ResultSet rs = stmt.executeQuery();
 
       while(rs.next()) {
-        list.add(new Topology(rs.getString("name"), user, rs.getTimestamp("date").toString(), rs.getString("title")));
+        list.add(new Topology(rs.getString("title"), user, rs.getTimestamp("date").toString(), rs.getString("name")));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -563,5 +563,45 @@ public class Database {
     }
 
     return list;
-  }  
+  }
+
+  public String deleteFile(String title) {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    boolean result = false;
+
+    try {
+      // Register JDBC driver
+      Class.forName("com.mysql.jdbc.Driver");
+
+      // Open a connection
+      conn = DriverManager.getConnection(getConnectionString());
+
+      // Execute SQL query
+      stmt = conn.prepareStatement("DELETE FROM files WHERE title=?");
+
+      stmt.setString(1, title);
+
+      stmt.executeUpdate();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException e) {
+      }
+      try {
+        if (conn != null)
+          conn.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return title;
+  }
 }
