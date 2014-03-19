@@ -1,11 +1,12 @@
 package de.tu_berlin.citlab.logging;
 
-import org.slf4j.Logger;
 
 
 public class LoggingTest {
 
 	public static void main(String[] args) {
+		PropertySetter.setLog4j2Properties("logsessionXY");
+		
 		SLF4JLoggerTest();
 		Log4J12LoggerTest();
 		Log4J2LoggerTest();
