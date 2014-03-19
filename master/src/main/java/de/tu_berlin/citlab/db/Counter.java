@@ -26,7 +26,7 @@ public class Counter implements Serializable
 	public Counter( CassandraConfig config )
 	{
 		this.config = config;
-		this.config.setIP( "127.0.0.1" );
+		//this.config.setIP( "127.0.0.1" );
 		//connect( config.getIP() );
 	}
 
