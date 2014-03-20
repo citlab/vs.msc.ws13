@@ -12,7 +12,7 @@
       var style = topology_filter.tableStyle();
       var cssClass = bolt;
       if(hasError) cssClass += " danger";
-      var elem = $("<tr " + style + " class='" + cssClass + "'><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
+      var elem = $("<tr data-toggle='modal' data-target='#myModal' " + style + " data-value='" + cssClass + "'><td>" + id + "</td><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
       elem.data("filter-value", bolt);
       list.prepend(elem)
 
@@ -50,6 +50,19 @@
         topology_list.fetchLatest();
       }
     }
+
+    topology_list.on("click", "tr", function() {
+      var id = $($(this).find("td")[0]).html();
+      $.ajax({
+        url: 'log/single/' + id,
+        dataType: 'json',
+        type: 'POST',
+        success: function(data) {
+          global.modal.setTitle("Weitere Log Details");
+          global.modal.setContent(data);
+        }
+      });
+    });
 
     if(!$('#topology-list').length == 0) {
       global.topology_list.fetchLatest();
