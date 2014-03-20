@@ -188,10 +188,28 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                         collector.emit(new Values(user,tweet_id,total_significance ));
                     }// execute()
                 },
-                WINDOW, //new TimeWindow<Tuple>(1, 1),
-                KeyConfigFactory.ByFields("user" )
+                WINDOW,
+                KeyConfigFactory.ByFields( "user" )
         );
     }
+
+    public UDFBolt filterUserSignificanceByThreshold( final int threshold ){
+        return new UDFBolt(
+                new Fields( "user", "tweet_id", "significance" ),
+                new FilterOperator( new Filter(){
+                    @Override
+                    public Boolean predicate(Tuple t) {
+                        if( t.getLongByField("significance") >= threshold ){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }),
+                WINDOW
+        );
+    }
+
 
     public UDFBolt delayTuplesBolt(int sec, int slide, Fields fields){
         return new UDFBolt(
@@ -278,7 +296,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                     }
                                 }// execute()
                             },
-                            "reduce_to_user_significance", "persistent_tuple_provider"
+                            "filter_significant_user", "persistent_tuple_provider"
                     ),
                     // process raw comping tweets
                     new OperatorProcessingDescription(
@@ -320,7 +338,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
-                .fieldsGrouping("reduce_to_user_significance", fieldsGroupByUser)
+                .fieldsGrouping("filter_significant_user", fieldsGroupByUser)
                 .fieldsGrouping("delayed_tweets", fieldsGroupByUser)
                 .fieldsGrouping("persistent_tuple_provider", fieldsGroupByUser );
 
@@ -334,9 +352,12 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
+        // filter only user with a specific significance
+        builder.setBolt("filter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
+                .shuffleGrouping("reduce_to_user_significance");
 
         builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)
-                .shuffleGrouping("reduce_to_user_significance");
+                .shuffleGrouping("filter_significant_user");
 
 
         return builder.createTopology();
