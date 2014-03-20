@@ -345,7 +345,6 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         builder.setBolt("store_tweets", createCassandraTweetsSink(), 1)
                 .shuffleGrouping("filter_bad_users");
 
-
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");
 
@@ -358,7 +357,6 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)
                 .shuffleGrouping("filter_significant_user");
-
 
         return builder.createTopology();
     }
