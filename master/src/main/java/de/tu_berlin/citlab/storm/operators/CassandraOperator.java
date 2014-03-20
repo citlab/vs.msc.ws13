@@ -8,7 +8,14 @@ import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 
 public class CassandraOperator extends IOperator {
@@ -26,6 +33,7 @@ public class CassandraOperator extends IOperator {
 
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
+        
         if(this.config.isCounterBolt() ){
             this.ctn = new Counter( config );
         }
@@ -90,4 +98,5 @@ public class CassandraOperator extends IOperator {
             collector.emit(p.getValues());
         }
     }
+
 }

@@ -6,12 +6,12 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import org.apache.commons.lang.StringUtils;
@@ -19,12 +19,18 @@ import backtype.storm.tuple.Tuple;
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ColumnDefinitions;
+import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Host;
 import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 
 public class CassandraDAO implements DAO, Serializable
 {
@@ -37,6 +43,8 @@ public class CassandraDAO implements DAO, Serializable
 	public String createKeyspaceQuery;
 	public String createTableQueryByFields;
 	public TupleAnalyzer ta;
+	private Select select;
+	private Map <String, String> table_inf = new HashMap <String, String>();
 
 	public CassandraDAO()
 	{
@@ -55,17 +63,22 @@ public class CassandraDAO implements DAO, Serializable
 		}
 		session = cluster.connect();
 	}
+	
+	public void shutdown()
+	{
+		session.shutdown();
+	}
 
 	public void createKeyspace( String query )
 	{
-		System.out.println( query );
-		// session.execute( query );
+		//System.out.println( query );
+		session.execute( query );
 	}
 
 	public void createTable( String query )
 	{
-		System.out.println( query );
-		// session.execute( query );
+		//System.out.println( query );
+		session.execute( query );
 	}
 
 	public void init()
@@ -76,7 +89,7 @@ public class CassandraDAO implements DAO, Serializable
 		}
 		else
 		{
-			connect( "127.0.0.1" );
+			//connect( "127.0.0.1" );
 		}
 		
 	}
@@ -194,70 +207,84 @@ public class CassandraDAO implements DAO, Serializable
 	{
 		preparedStatement = this.session.prepare( query );
 	}
+	
+
+//List<Values> = CassandraDAO.source("citstorm", "user_significance").findAll()
+
+//List<Values> = CassandraDAO.source("citstorm", "user_significance").findBy( KeyFields, Values )
+
+	
+	public CassandraDAO source(String keyspace, String table)
+	{
+		this.table_inf.put( "keyspace", keyspace );
+		this.table_inf.put( "table", table );
+		//select =  QueryBuilder.select().from( keyspace, table );
+		return this;
+	}
+	
+	public List <Values> findAll()
+	{
+		Statement st = QueryBuilder.select().all().from( table_inf.get( "keyspace" ), table_inf.get( "table" ) );
+		return getValuesFromStatement( st );
+	}
+	
+
+	public List <Values> findBy( String rowkey, String rowkey_value )
+	{
+		Statement st = QueryBuilder.select().all().from( table_inf.get( "keyspace" ), table_inf.get( "table" ) )
+				.where( QueryBuilder.eq( rowkey, rowkey_value  ) );
+				
+		return getValuesFromStatement( st );
+		
+	}
+	
+	private List <Values> getValuesFromStatement( Statement st )
+	{
+		List <Values> listOfValues = new ArrayList <Values>();
+
+		ResultSet rs = this.session.execute( st );
+		List<Row> all = new ArrayList<Row>();
+		all = rs.all();
+		for ( int i = 0; i < all.size(); i++ )
+		{
+			Values values = new Values();
+			
+			Row row = all.get( i );
+
+			ColumnDefinitions cd = row.getColumnDefinitions();
+
+			int j = 0;
+			for (ColumnDefinitions.Definition def : cd)
+			{
+				if ( def.getType().getName().toString().equals( "text" ) )
+				{
+					values.add( row.getString( j ) );
+				}
+				else if ( def.getType().getName().toString().equals( "int" ) )
+				{
+					values.add( row.getInt( j ) );
+				}
+				else if ( def.getType().getName().toString().equals( "bigint" ) )
+				{
+					values.add( row.getLong( j ) );
+				}
+				else if ( def.getType().getName().toString().equals( "blob" ) )
+				{
+					values.add( row.getBytes( j ).array() );
+				}
+				else if ( def.getType().getName().toString().equals( "varchar" ) )
+				{
+					values.add( row.getString( j ) );
+				}
+				j++;
+			}
+			listOfValues.add( values );
+		}
+		return listOfValues;
+	}
+
 
 }
 
-/*
- * private Session session; private Cluster cluster; private String db; private
- * String table; private Map<String, String> tableFields; private List<Tuple>
- * tuples; private Map<String, String> fieldsFromTuple; private
- * PreparedStatement preparedStatement; public List<String> queries; public
- * BoundStatement boundStatement; public CassandraConfig config; public
- * BatchStatement batchStatement;
- */
 
-/*
- * public BoundStatement getBoundStatement() { return boundStatement; }
- * 
- * public void addToBatch( BoundStatement boundStatement ) { batchStatement.add(
- * boundStatement ); }
- * 
- * public void batchExecute() { this.getSession().execute( batchStatement ); }
- * 
- * public void bedValues( Object... objects ) { assert this.preparedStatement
- * != null : "Prepared Statement darf beim Binden nicht Null sein!";
- * boundStatement = new BoundStatement( preparedStatement ).bind( objects ); }
- * 
- * public void makeBatch() { this.batchStatement = new BatchStatement(); }
- * 
- * public Session getSession() { return session; }
- * 
- * public void connect( String node ) { cluster =
- * Cluster.builder().addContactPoint( node ).build(); Metadata metadata =
- * cluster.getMetadata(); System.out.printf( "Connected to cluster: %s\n",
- * metadata.getClusterName() ); for ( Host host : metadata.getAllHosts() ) {
- * System.out.printf( "Datacenter: %s; Host: %s; Rack: %s\n",
- * host.getDatacenter(), host.getAddress(), host.getRack() ); } session =
- * cluster.connect(); }
- * 
- * public void setPreparedStatement( String query ) { preparedStatement =
- * this.session.prepare( query ); }
- * 
- * public void createDbFromConfig() { String strategy = config.storingStrategy;
- * if ( strategy.equalsIgnoreCase( "simple" ) ) { strategy = "SimpleStrategy"; }
- * // else if ..
- * 
- * int replicationFactor = config.replicationFactor;
- * 
- * Pattern pattern = Pattern.compile( "\\." ); String[] st = pattern.split(
- * config.query ); String db = st[ 0 ].split( " " )[ 2 ]; this.db = db;
- * INSTANCE.session .execute( String .format(
- * "CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class':'%s', 'replication_factor':%d};"
- * , db, strategy, replicationFactor ) ); }
- * 
- * public void createTableFromConfig() { String strategy =
- * config.storingStrategy; int replicationFactor = config.replicationFactor;
- * 
- * Pattern pattern = Pattern.compile( "\\." ); String[] st = pattern.split(
- * config.query ); String table = st[ 1 ].split( " " )[ 0 ]; this.table = table;
- * 
- * String str = String.format( "CREATE TABLE IF NOT EXISTS %s.%s (", this.db,
- * this.table ); StringBuilder sb = new StringBuilder( str ); Set<String> keys =
- * config.dataTypes.keySet(); Iterator<String> it = keys.iterator(); while (
- * it.hasNext() ) { String key = it.next(); String value = ( String )
- * config.dataTypes.get( key ); sb.append( key + " " + value + "," ); }
- * sb.deleteCharAt( sb.length() - 1 ); sb.append( ") WITH COMPACT STORAGE" );
- * 
- * INSTANCE.session.execute( sb.toFieldsString() );
- */
 
