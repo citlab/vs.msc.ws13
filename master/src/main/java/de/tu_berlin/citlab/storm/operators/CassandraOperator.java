@@ -98,32 +98,5 @@ public class CassandraOperator implements IOperator {
             collector.emit(p.getValues());
         }
     }
-    
-    static public String getCassandraClusterIPFromClusterManager() 
-	{
-		String USER_AGENT = "Mozilla/5.0";
-		String url_string = "http://citstorm.dd-dns.de:9000/lookup?type=cassandra";
-		StringBuffer sb = null;
-		try {
-			URL url = new URL(url_string);
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestProperty("User-Agent", USER_AGENT);
-			int responseCode = con.getResponseCode();  //TODO: check response code
-			BufferedReader in = new BufferedReader( new InputStreamReader( con.getInputStream() ) );
-			String inputLine;
-			sb = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				sb.append(inputLine);
-			}
-			in.close();
-		} catch (MalformedURLException e) {
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Automatisch generierter Erfassungsblock
-			e.printStackTrace();
-		}
- 
-		return sb.toString();
-	}
+
 }
