@@ -2,6 +2,7 @@ package de.tu_berlin.citlab.storm.topologies;
 
 
 import backtype.storm.Config;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.TopologyBuilder;
@@ -10,6 +11,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.CassandraConfig;
+import de.tu_berlin.citlab.db.CassandraDAO;
 import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
@@ -47,11 +49,16 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         return new TwitterSpout(config);
     }
 
-    public UDFBolt createCassandraTweetsSink(){
+    public CassandraConfig getCassandraConfig(){
         CassandraConfig cassandraCfg = new CassandraConfig();
-        //cassandraCfg.setIP( "54.217.116.243" );
-        cassandraCfg.setIP( "127.0.0.1" );
+        cassandraCfg.setIP("127.0.0.1");
         //cassandraCfg.setIP(CassandraConfig.getCassandraClusterIPFromClusterManager());
+
+        return cassandraCfg;
+    }
+
+    public UDFBolt createCassandraTweetsSink(){
+        CassandraConfig cassandraCfg = getCassandraConfig();
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "tweets",
@@ -62,16 +69,13 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "tweet" ),
-                new CassandraOperator(cassandraCfg),
+                new CassandraOperator( cassandraCfg  ),
                 WINDOW
         );
     }
 
     public UDFBolt createCassandraUserSignificanceSink(){
-        CassandraConfig cassandraCfg = new CassandraConfig();
-        cassandraCfg.setIP( "127.0.0.1" );
-        //cassandraCfg.setIP( "54.217.116.243" );
-        //cassandraCfg.setIP(CassandraConfig.getCassandraClusterIPFromClusterManager());
+        CassandraConfig cassandraCfg = getCassandraConfig();
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "user_significance",
@@ -207,7 +211,14 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
 
         // load data from cassandra
-        // List<Values> = CassandraDAO.source("citstorm", "user_significance").findAll() => List<Values>
+        CassandraDAO dao = new CassandraDAO();
+        dao.init();
+        dao.setConfig( getCassandraConfig() );
+
+        List<Values> stored = dao.source("citstorm", "user_significance").findAll();
+
+        System.out.println(stored);
+
 
         final TupleProjection projection = new TupleProjection(){
             public Values project(Tuple inMemTuple, Tuple tuple) {
@@ -322,15 +333,13 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         return builder.createTopology();
     }
-<<<<<<< Updated upstream
-=======
 
 
     @SuppressWarnings("serial")
     public static void main(String[] args) throws Exception {
 
         Config conf = new Config();
-        conf.setDebug(false);
+        conf.setDebug(true);
 
         conf.setMaxTaskParallelism(1);
         conf.setMaxSpoutPending(1);
@@ -339,5 +348,5 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         cluster.submitTopology("analyzte-twitter-stream", conf,
             new AnalyzeTweetsTopology().createTopology() );
     }
->>>>>>> Stashed changes
+
 }
