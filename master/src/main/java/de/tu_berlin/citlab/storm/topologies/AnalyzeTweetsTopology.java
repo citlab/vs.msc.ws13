@@ -20,6 +20,7 @@ import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
+import de.tu_berlin.citlab.storm.spouts.UDFSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
@@ -137,9 +138,9 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
 
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", 1)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", 1)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", 1)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", new Long(1) )) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", new Long(1) )) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", new Long(1) )) );
 
         /*badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 500)) );
@@ -174,9 +175,10 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         String user=tuples.get(0).getStringByField("user");
                         Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        int total_significance=0;
+                        Long total_significance = new Long(0);
+
                         for( Tuple p : tuples ){
-                            int significance = p.getIntegerByField("significance");
+                            Long significance = p.getLongByField("significance");
                             total_significance+=significance;
                         }//for
 
@@ -205,28 +207,53 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         );
     }
 
+    public UDFSpout persistentTupleProvider(){
+        final Fields fields = new Fields("user", "significance");
+
+        return new UDFSpout(fields){
+            private CassandraDAO dao = new CassandraDAO();
+            private Iterator<Values> stored_data;
+            private boolean ready=false;
+
+            @Override
+            public void open(){
+                // load data from cassandra
+                dao.setConfig(getCassandraConfig());
+                dao.init();
+                stored_data = dao.source("citstorm", "user_significance", fields ).findAll();
+                ready=true;
+            }
+            @Override
+            public void nextTuple(){
+                if(ready){
+                    if(stored_data.hasNext() ){
+                        Values val = stored_data.next();
+                        Long sig = (Long)val.get(1);
+
+                        getOutputCollector().emit(new Values(val.get(0), sig) );
+                    } else {
+                        //this.close();
+                    }
+                }
+            }
+            @Override
+            public void close(){
+                //stored_data.clear();
+            }
+        };
+    }
 
     public UDFBolt filterBadUsers(){
-
-        final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
-
-        // load data from cassandra
-        CassandraDAO dao = new CassandraDAO();
-        dao.init();
-        dao.setConfig( getCassandraConfig() );
-
-        List<Values> stored = dao.source("citstorm", "user_significance").findAll();
-
-        System.out.println(stored);
-
 
         final TupleProjection projection = new TupleProjection(){
             public Values project(Tuple inMemTuple, Tuple tuple) {
                 return (Values)tuple.getValues();
-           }
+            }
         };
 
         final TupleComparator tupleComparator = KeyConfigFactory.compareByFields(new Fields("user"));
+
+        final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
 
         final StaticHashJoinOperator staticHashJoinBadUsers =
             new StaticHashJoinOperator(
@@ -246,15 +273,15 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                     for( Tuple t : tuples ){
                                         getUDFBolt().log_info("operator", "add new user: " + t);
                                         String user = t.getStringByField("user");
-                                        int currSig = t.getIntegerByField("significance");
+                                        Long currSig = t.getLongByField("significance");
 
                                         // user exists?
                                         if( badUsersHT.containsKey(tupleComparator.getTupleKey(t)) ){
                                             List<Tuple> keyTuples =  badUsersHT.get(tupleComparator.getTupleKey(t));
 
                                             // lets assume we have one tuple for each detected user
-                                            int lastSig = keyTuples.get(0).getIntegerByField("significance");
-                                            int totalSig = lastSig+currSig;
+                                            Long lastSig = keyTuples.get(0).getLongByField("significance");
+                                            Long totalSig = lastSig+currSig;
 
                                             Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
                                             keyTuples.clear();
@@ -264,7 +291,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                             getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
                                         } else {
-                                            int totalSig = currSig;
+                                            Long totalSig = currSig;
                                             Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
 
                                             List<Tuple> badUsers = new ArrayList<Tuple>();
@@ -272,12 +299,14 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
+                                            System.out.println("add new user");
+
                                             getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }
                                     }
                                 }// execute()
                             },
-                            "reduce_to_user_significance"
+                            "reduce_to_user_significance", "persistent_tuple_provider"
                     ),
                     // process raw comping tweets
                     new OperatorProcessingDescription(
@@ -297,12 +326,16 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     {
         TopologyBuilder builder = new TopologyBuilder();
 
-        // provide twitter streaminh data
+        // provide twitter streaming data
         try {
             builder.setSpout("tweets", createTwitterSpout(), 1);
+
         } catch (InvalidTwitterConfigurationException e) {
             e.printStackTrace();
         }
+
+        // find bad users
+        builder.setSpout("persistent_tuple_provider", persistentTupleProvider(), 1);
 
         // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
@@ -311,10 +344,13 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         /*builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
                 .shuffleGrouping("tweets");*/
 
+        Fields fieldsGroupByUser = new Fields("user");
+
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
-                .shuffleGrouping("reduce_to_user_significance")
-                .shuffleGrouping("tweets");
+                .fieldsGrouping("reduce_to_user_significance", fieldsGroupByUser)
+                .fieldsGrouping("tweets", fieldsGroupByUser)
+                .fieldsGrouping("persistent_tuple_provider", fieldsGroupByUser );
 
         builder.setBolt("store_tweets", createCassandraTweetsSink(), 1)
                 .shuffleGrouping("filter_bad_users");
@@ -324,7 +360,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                 .shuffleGrouping("flatmap_tweet_words");
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
-                .shuffleGrouping("join_with_badwords");
+                .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
 
         builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)

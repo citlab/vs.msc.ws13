@@ -41,15 +41,12 @@ public class CassandraOperator extends IOperator {
 
     @Override
     public void execute(List<Tuple> tuples, OutputCollector collector) throws OperatorException {
-
-        System.out.println("debug: store "+tuples.size() );
-
         // First tuple used to initialize datastructures and derive data types
         if ( !initialized )
         {
             if( !config.isCounterBolt() ) {
-                dao.init();
                 dao.setConfig(config);
+                dao.init();
                 dao.analyzeTuple( tuples.get(0) );
                 dao.createDataStructures();
 
@@ -69,7 +66,7 @@ public class CassandraOperator extends IOperator {
             if( !config.isCounterBolt() ) {
 
                 for( Tuple t : tuples ){
-                    System.out.println("debug: store "+t);
+                    this.getUDFBolt().log_debug("operator", "store " + t);
                 }
 
                 dao.store( tuples );
@@ -80,7 +77,7 @@ public class CassandraOperator extends IOperator {
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
 
-                    System.out.println("debug: store "+t);
+                    this.getUDFBolt().log_debug("debug: store " + t);
 
                     ctn.update( keyValues, (int)val.get(0) );
                 }//for
@@ -88,9 +85,9 @@ public class CassandraOperator extends IOperator {
 
 
         } catch (Exception e ){
+            this.getUDFBolt().log_error("Storing of tuples into Cassandra DB failed!", e );
+
 			throw new OperatorException("Storing of tuples into Cassandra DB failed!");
-//            System.err.print("ERROR: "+e);
-//            e.printStackTrace();
         }
 
         // emit tuples

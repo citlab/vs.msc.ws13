@@ -19,7 +19,7 @@ public class TestSelect
 		List<Values> listOfValues = new ArrayList<Values>();
 		
 		//listOfValues = dao.source( "myks", "tab1" ).findBy( "user", "Jules" );
-		listOfValues = dao.source( "myks", "tab1" ).findAll();
+		//listOfValues = dao.source( "myks", "tab1" ).findAll();
 		
 		System.out.println(listOfValues);
 		

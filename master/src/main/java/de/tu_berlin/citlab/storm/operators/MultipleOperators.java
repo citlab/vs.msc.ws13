@@ -18,7 +18,9 @@ public class MultipleOperators extends IOperator {
     public MultipleOperators( OperatorProcessingDescription... descs ) {
 
         for( OperatorProcessingDescription desc : descs ) {
-            operators.put(desc.getSource(), desc );
+            for( String source : desc.getSources() ){
+                operators.put( source, desc );
+            }
         }
     }
 
@@ -27,6 +29,7 @@ public class MultipleOperators extends IOperator {
         Iterator it =  operators.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pairs = (Map.Entry)it.next();
+
             operators.get(pairs.getKey()).getOperator().setUDFBolt(bolt);
         }//while
     }

@@ -42,6 +42,7 @@ public class CassandraDAO implements DAO, Serializable
 	public CassandraConfig config = null;
 	public String createKeyspaceQuery;
 	public String createTableQueryByFields;
+    public String[] selectFields;
 	public TupleAnalyzer ta;
 	private Select select;
 	private Map <String, String> table_inf = new HashMap <String, String>();
@@ -71,13 +72,11 @@ public class CassandraDAO implements DAO, Serializable
 
 	public void createKeyspace( String query )
 	{
-		//System.out.println( query );
 		session.execute( query );
 	}
 
 	public void createTable( String query )
 	{
-		//System.out.println( query );
 		session.execute( query );
 	}
 
@@ -89,7 +88,7 @@ public class CassandraDAO implements DAO, Serializable
 		}
 		else
 		{
-			//connect( "127.0.0.1" );
+            System.err.println("Could not connect to cassandra server, invalid config ");
 		}
 		
 	}
@@ -209,32 +208,28 @@ public class CassandraDAO implements DAO, Serializable
 	}
 	
 
-//List<Values> = CassandraDAO.source("citstorm", "user_significance").findAll()
-
-//List<Values> = CassandraDAO.source("citstorm", "user_significance").findBy( KeyFields, Values )
-
-	
-	public CassandraDAO source(String keyspace, String table)
+	public CassandraDAO source(String keyspace, String table, Fields fields )
 	{
 		this.table_inf.put( "keyspace", keyspace );
 		this.table_inf.put( "table", table );
-		//select =  QueryBuilder.select().from( keyspace, table );
+        selectFields = new String[fields.size()];
+        fields.toList().toArray(selectFields );
 		return this;
 	}
 	
-	public List <Values> findAll()
+	public Iterator <Values> findAll()
 	{
-		Statement st = QueryBuilder.select().all().from( table_inf.get( "keyspace" ), table_inf.get( "table" ) );
-		return getValuesFromStatement( st );
+		Statement st = QueryBuilder.select(selectFields).from( table_inf.get( "keyspace" ), table_inf.get( "table" ) );
+		return getValuesFromStatement( st ).iterator();
 	}
 	
 
-	public List <Values> findBy( String rowkey, String rowkey_value )
+	public Iterator <Values> findBy( String rowkey, String rowkey_value )
 	{
-		Statement st = QueryBuilder.select().all().from( table_inf.get( "keyspace" ), table_inf.get( "table" ) )
+		Statement st = QueryBuilder.select(selectFields).from( table_inf.get( "keyspace" ), table_inf.get( "table" ) )
 				.where( QueryBuilder.eq( rowkey, rowkey_value  ) );
 				
-		return getValuesFromStatement( st );
+		return getValuesFromStatement( st ).iterator();
 		
 	}
 	
@@ -276,6 +271,10 @@ public class CassandraDAO implements DAO, Serializable
 				{
 					values.add( row.getString( j ) );
 				}
+                else if ( def.getType().getName().toString().equals( "counter" ) )
+                {
+                    values.add( row.getLong( j ) );
+                }
 				j++;
 			}
 			listOfValues.add( values );
