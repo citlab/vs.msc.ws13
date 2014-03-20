@@ -13,7 +13,7 @@ import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
-public class StaticHashJoinOperator implements IOperator {
+public class StaticHashJoinOperator extends IOperator {
 	
 	private static final long serialVersionUID = -1921795142772743781L;
 

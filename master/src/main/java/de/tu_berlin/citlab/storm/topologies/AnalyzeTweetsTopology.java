@@ -92,7 +92,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
 
                         for( Tuple p : tuples ){
-                            String[] words = p.getStringByField("tweet").split(" ");
+                            String[] words = p.getStringByField("tweet").replaceAll("[^a-zA-Z0-9 ]", "").split(" ");
                             for( String word : words ){
                                 collector.emit(new Values(p.getValueByField("user"),p.getValueByField("tweet_id"), word.trim().toLowerCase() ));
                             }//for
@@ -171,6 +171,9 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                             int significance = p.getIntegerByField("significance");
                             total_significance+=significance;
                         }//for
+
+                        getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
+
                         collector.emit(new Values(user,tweet_id,total_significance ));
                     }// execute()
                 },
@@ -199,6 +202,9 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
 
+        // load data from cassandra
+        // List<Values> = CassandraDAO.source("citstorm", "user_significance").findAll() => List<Values>
+
         final TupleProjection projection = new TupleProjection(){
             public Values project(Tuple inMemTuple, Tuple tuple) {
                 return (Values)tuple.getValues();
@@ -223,10 +229,8 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                 @Override
                                 public void execute(List<Tuple> tuples, OutputCollector collector) {
                                     for( Tuple t : tuples ){
-                                        System.out.println("add new user: "+t);
+                                        getUDFBolt().log_info("operator", "add new user: " + t);
                                         String user = t.getStringByField("user");
-
-
                                         int currSig = t.getIntegerByField("significance");
 
                                         // user exists?
@@ -242,7 +246,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                             keyTuples.add(newUserTuple);
 
                                             // do not output any tuples
-                                            System.out.println("debug: update user: "+t+", sig: "+totalSig);
+                                            getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
                                         } else {
                                             int totalSig = currSig;
@@ -253,7 +257,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            System.out.println("debug:  add user: "+t+", sig: "+totalSig);
+                                            getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }
                                     }
                                 }// execute()
@@ -314,4 +318,22 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         return builder.createTopology();
     }
+<<<<<<< Updated upstream
+=======
+
+
+    @SuppressWarnings("serial")
+    public static void main(String[] args) throws Exception {
+
+        Config conf = new Config();
+        conf.setDebug(false);
+
+        conf.setMaxTaskParallelism(1);
+        conf.setMaxSpoutPending(1);
+
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("analyzte-twitter-stream", conf,
+            new AnalyzeTweetsTopology().createTopology() );
+    }
+>>>>>>> Stashed changes
 }

@@ -11,7 +11,7 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
-public class CassandraOperator implements IOperator {
+public class CassandraOperator extends IOperator {
 
     private boolean initialized = false;
     private boolean isCounterBolt = false;
