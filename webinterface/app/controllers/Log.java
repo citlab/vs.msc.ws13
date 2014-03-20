@@ -38,4 +38,21 @@ public class Log extends Controller {
     return ok(result);
   }
 
+  @BodyParser.Of(BodyParser.Json.class)
+  public static Result getLog(long lastId) {
+    ObjectNode result = Json.newObject();
+    LogEntry entry = Database.getInstance().getLog(lastId);;
+
+    result.put("id", entry.getId());
+    result.put("time", entry.getDatetime());
+    result.put("milliseconds", entry.getMilliseconds());
+    result.put("logger", entry.getLogger());
+    result.put("level", entry.getLevel());
+    result.put("exception", entry.getException());
+    result.put("thread", entry.getThread());
+    result.put("marker", entry.getMarker());
+
+    return ok(result);
+  }
+
 }

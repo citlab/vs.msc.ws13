@@ -8,7 +8,7 @@
     topology_filter.add = function(name) {
       if(!topology_filter.include(name)) {
         var elem = $("<li>" + name + "</li>");
-        elem.data("filter-value", name);
+        elem.attr("data-filter-value", name);
         topology_filter.append(elem);
       }
     };
@@ -16,7 +16,7 @@
     topology_filter.setFilter = function(filter) {
       topology_list.find("tbody tr:hidden").show();
       if(filter != "*") {
-        topology_list.find("tbody tr").not("."+filter).hide();
+        topology_list.find("tbody tr").not("[data-value='" + filter+"']").hide();
       }
     };
 
