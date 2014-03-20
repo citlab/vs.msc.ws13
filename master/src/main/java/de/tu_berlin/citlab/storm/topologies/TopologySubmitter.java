@@ -41,7 +41,10 @@ public class TopologySubmitter
             cluster.shutdown();
         }
         else{
-        	LoggingConfigurator.activateDataBaseLogger();
+        	String session = "";
+        	// TODO: read session from args, then set session field, then add session as parameter to this call:
+        	// session = args[1]; // or something like that
+        	LoggingConfigurator.activateDataBaseLogger(/* session */);
             conf.setNumWorkers(3);
             StormSubmitter.submitTopology(args[0], conf, topology.createTopology());
         }
