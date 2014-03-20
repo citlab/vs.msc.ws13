@@ -283,7 +283,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     // process raw comping tweets
                     new OperatorProcessingDescription(
                             staticHashJoinBadUsers,
-                            "tweets"
+                            "delayed_tweets"
                         )
                 ),
             WINDOW,
