@@ -12,7 +12,7 @@
       var style = topology_filter.tableStyle();
       var cssClass = bolt;
       if(hasError) cssClass += " danger";
-      var elem = $("<tr data-toggle='modal' data-target='#myModal' " + style + " class='" + cssClass + "'><td>" + id + "</td><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
+      var elem = $("<tr data-toggle='modal' data-target='#myModal' " + style + " data-value='" + cssClass + "'><td>" + id + "</td><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
       elem.data("filter-value", bolt);
       list.prepend(elem)
 
