@@ -8,7 +8,7 @@ import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 
 import java.util.Iterator;
 
-abstract public class CassandraDataProviderSpout extends UDFSpout {
+public class CassandraDataProviderSpout extends UDFSpout {
 
     private CassandraDAO dao = new CassandraDAO();
     private Iterator<Values> stored_data;
@@ -26,6 +26,7 @@ abstract public class CassandraDataProviderSpout extends UDFSpout {
         dao.setConfig(this.Cassandracfg);
         dao.init();
         stored_data = dao.source( Cassandracfg.getKeyspace(), Cassandracfg.getTable(), outputFields ).findAll();
+
         ready=true;
     }
     @Override

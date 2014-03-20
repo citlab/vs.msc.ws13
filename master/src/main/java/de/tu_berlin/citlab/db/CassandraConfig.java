@@ -27,17 +27,18 @@ public class CassandraConfig implements DBConfig, Serializable
 
     public void setParams( String keyspace, String table, PrimaryKey primaryKeys, Fields tupleFields, boolean isCntBolt )
     {
-        System.out.println("tupleFields: "+tupleFields);
-
         this.primaryKeys = primaryKeys;
         this.tupleFields = tupleFields;
         this.keyspace = keyspace;
         this.table = table;
         this.isCounterBolt = isCntBolt;
     }
-    
-    
-    static public String getCassandraClusterIPFromClusterManager() 
+
+    public void setParams( String keyspace, String table ){
+        setParams( keyspace, table, null, null, false );
+    }
+
+    static public String getCassandraClusterIPFromClusterManager()
 	{
 		String USER_AGENT = "Mozilla/5.0";
 		String url_string = "http://citstorm.dd-dns.de:9000/lookup?type=cassandra";

@@ -19,6 +19,7 @@ import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.spouts.CassandraDataProviderSpout;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
 import de.tu_berlin.citlab.storm.spouts.UDFSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -208,39 +209,10 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFSpout persistentTupleProvider(){
-        final Fields fields = new Fields("user", "significance");
-
-        return new UDFSpout(fields){
-            private CassandraDAO dao = new CassandraDAO();
-            private Iterator<Values> stored_data;
-            private boolean ready=false;
-
-            @Override
-            public void open(){
-                // load data from cassandra
-                dao.setConfig(getCassandraConfig());
-                dao.init();
-                stored_data = dao.source("citstorm", "user_significance", fields ).findAll();
-                ready=true;
-            }
-            @Override
-            public void nextTuple(){
-                if(ready){
-                    if(stored_data.hasNext() ){
-                        Values val = stored_data.next();
-                        Long sig = (Long)val.get(1);
-
-                        getOutputCollector().emit(new Values(val.get(0), sig) );
-                    } else {
-                        //this.close();
-                    }
-                }
-            }
-            @Override
-            public void close(){
-                //stored_data.clear();
-            }
-        };
+        Fields fields = new Fields("user", "significance");
+        CassandraConfig cassandraCfg = getCassandraConfig();
+        cassandraCfg.setParams("citstorm", "user_significance" );
+        return new CassandraDataProviderSpout(fields, cassandraCfg );
     }
 
     public UDFBolt filterBadUsers(){
@@ -341,15 +313,15 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
                 .shuffleGrouping("tweets");
 
-        /*builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
-                .shuffleGrouping("tweets");*/
+        builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
+                .shuffleGrouping("tweets");
 
         Fields fieldsGroupByUser = new Fields("user");
 
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
                 .fieldsGrouping("reduce_to_user_significance", fieldsGroupByUser)
-                .fieldsGrouping("tweets", fieldsGroupByUser)
+                .fieldsGrouping("delayed_tweets", fieldsGroupByUser)
                 .fieldsGrouping("persistent_tuple_provider", fieldsGroupByUser );
 
         builder.setBolt("store_tweets", createCassandraTweetsSink(), 1)
