@@ -1,5 +1,6 @@
 package de.tu_berlin.citlab.storm.topologies;
 
+import de.tu_berlin.citlab.logging.LoggingConfigurator;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
@@ -24,6 +25,10 @@ public class TopologySubmitter
         Config conf = new Config();
 
         if (args == null || args.length == 0) {
+        	
+        	// uncomment to enable DB logging
+        	// LoggingConfigurator.activateDataBaseLogger();
+        	
             conf.setDebug(true);
 
             conf.setMaxTaskParallelism(1);
@@ -36,6 +41,7 @@ public class TopologySubmitter
             cluster.shutdown();
         }
         else{
+        	LoggingConfigurator.activateDataBaseLogger();
             conf.setNumWorkers(3);
             StormSubmitter.submitTopology(args[0], conf, topology.createTopology());
         }
