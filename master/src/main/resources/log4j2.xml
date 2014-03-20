@@ -14,12 +14,17 @@
 			<Column name="marker" pattern="%marker" />
 			<Column name="session" pattern="${sys:log4j2.session}" />
 		</JDBC>
+
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
 	</Appenders>
 
 	<Loggers>
 		<Root level="info">
-			<AppenderRef ref="databaseAppender" />
+			<AppenderRef ref="Console" />
+			<!-- <AppenderRef ref="databaseAppender" /> -->
 		</Root>
 	</Loggers>
-	
+
 </Configuration>

@@ -12,6 +12,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.CassandraConfig;
 import de.tu_berlin.citlab.db.PrimaryKey;
+import de.tu_berlin.citlab.logging.LoggingConfigurator;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
@@ -310,7 +311,10 @@ public class AnalyzeTweetsTopology implements Serializable{
 
     @SuppressWarnings("serial")
     public static void main(String[] args) throws Exception {
-
+    	
+    	// uncomment to enable DB logging
+    	// LoggingConfigurator.activateDataBaseLogger();
+    	
         Config conf = new Config();
         conf.setDebug(true);
 

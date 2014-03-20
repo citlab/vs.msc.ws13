@@ -14,7 +14,7 @@ SET time_zone = "+01:00";
 -- Datenbank: `log4j2`
 --
 
-CREATE DATABASE IF NOT EXISTS `citstorm` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS `citstorm` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `citstorm`;
 
 -- --------------------------------------------------------
@@ -27,15 +27,15 @@ CREATE TABLE IF NOT EXISTS `log4j2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
   `milliseconds` int(11) NOT NULL,
-  `logger` varchar(255) NOT NULL,
-  `level` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `exception` text NOT NULL,
-  `thread` varchar(255) NOT NULL,
-  `marker` varchar(255) NOT NULL,
-  `session` varchar(255) NOT NULL,
+  `logger` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `level` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `exception` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `thread` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `marker` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `session` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
 
 -- Rechte für `log4j2`@`%`
 

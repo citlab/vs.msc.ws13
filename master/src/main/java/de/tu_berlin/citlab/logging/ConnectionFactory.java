@@ -1,10 +1,7 @@
 package de.tu_berlin.citlab.logging;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
@@ -55,6 +52,9 @@ public class ConnectionFactory {
 
 	private BoneCPConfig getConfig() {
 		BoneCPConfig config = new BoneCPConfig();
+		config.setInitSQL("SET CHARACTER SET utf8mb4, character_set_client = utf8mb4, character_set_connection = utf8mb4, " +
+                "character_set_results = utf8mb4, NAMES utf8mb4, collation_connection = utf8mb4_general_ci, " +
+                "collation_database = utf8mb4_general_ci");
 		config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
 				serverName, serverPort, databaseName));
 		config.setUsername(user);
@@ -97,11 +97,6 @@ public class ConnectionFactory {
 
 	public static Connection getConnectionStatic() {
 		return getInstance().getConnection();
-	}
-
-	public static void main(String[] args) {
-		PropertySetter.setLog4j2Properties();
-		getConnectionStatic();
 	}
 
 }
