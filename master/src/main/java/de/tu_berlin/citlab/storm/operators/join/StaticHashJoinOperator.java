@@ -110,10 +110,10 @@ public class StaticHashJoinOperator extends IOperator {
 					collector.emit(projection.project(memoryTuple,tuple));
 				}
 
-                System.out.println("debug: static join ("+joinComparator.getTupleKey(tuple)+") YES "+tuple );
+                this.getUDFBolt().log_debug("static join ("+joinComparator.getTupleKey(tuple)+") YES "+tuple );
 			}//if
             else {
-                System.out.println("debug: static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
+                this.getUDFBolt().log_debug("static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
             }
 		}//while
 	}	

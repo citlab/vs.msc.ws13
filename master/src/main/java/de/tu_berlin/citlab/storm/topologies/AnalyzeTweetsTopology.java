@@ -121,14 +121,12 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFBolt createStaticHashJoin(){
-
         IKeyConfig groupKey = new IKeyConfig(){
             public Serializable getKeyOf( Tuple tuple) {
                 Serializable key = tuple.getSourceComponent();
                 return key;
             }
         };
-
 
         TupleProjection projection = new TupleProjection(){
             public Values project(Tuple inMemTuple, Tuple tuple) {
@@ -142,7 +140,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
             }
         };
 
-        ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD = 1;
+        ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD =  1;
 
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
 
@@ -150,11 +148,12 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", new Long(1) )) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", new Long(1) )) );
 
-        /*badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 500)) );
+        /*
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 1000)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 5000)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", 1000)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", 10)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", 100)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", 10)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("religion", 200)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("gott", 50)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", 1000)) );
@@ -162,8 +161,8 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("der", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("die", 100)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );
-        */
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("das", 100)) );*/
+
 
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "word", "significance" ),
@@ -175,7 +174,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         );
     }
 
-    public UDFBolt reduceUserSignificance(){
+    public UDFBolt reduceAndCalculateUserSignificance(){
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "significance" ),
                 new IOperator(){
@@ -187,7 +186,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                         for( Tuple p : tuples ){
                             Long significance = p.getLongByField("significance");
-                            total_significance+=significance;
+                            total_significance*=significance;
                         }//for
 
                         getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
@@ -244,12 +243,12 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                         }
 
                         this.getUDFBolt().log_debug("operator", "delayed tuples: queue-size: "+queue.size() );
-
                      }//execute()
                 },
                 new TimeWindow<Tuple>(sec, sec)
         );
     }
+
 
     public UDFSpout persistentTupleProvider(){
         Fields fields = new Fields("user", "significance");
@@ -373,7 +372,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");
 
-        builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
+        builder.setBolt("reduce_to_user_significance", reduceAndCalculateUserSignificance(), 1)
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
         // filter only user with a specific significance
