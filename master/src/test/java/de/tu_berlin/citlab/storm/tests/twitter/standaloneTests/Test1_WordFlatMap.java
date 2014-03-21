@@ -28,10 +28,6 @@ import java.util.List;
  */
 public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTest_WordFlatMap>
 {
-    static {
-        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
-    }
-
     public static final String testName ="WordFlatMap";
     private static final Fields inputFields = new Fields("user_id", "msg", "id");
     private static final Fields outputFields = new Fields("user_id", "word", "id");
