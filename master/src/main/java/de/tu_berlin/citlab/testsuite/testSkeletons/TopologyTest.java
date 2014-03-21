@@ -39,9 +39,6 @@ import java.util.List;
  */
 abstract public class TopologyTest implements TopologyTestMethods
 {
-	static {
-		System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
-	}
 
 /* Global Private Constants: */
 /* ========================= */
