@@ -1,0 +1,23 @@
+\section{Operators}
+\label{sect:operators}
+
+With the help of windows 
+
+\label{sect:operatorTypes}
+\subsection{Filter}
+
+\subsection{Map and FlatMap}
+
+\subsection{Map and FlatMap}
+
+\subsection{Joins}
+
+\subsubsection{Nested Loop Join}
+
+\subsubsection{HashJoin}
+
+\subsubsection{MergeJoin}
+
+
+
+
