@@ -30,7 +30,6 @@ public class CassandraOperator extends IOperator {
 
     private Fields keyFields;
 
-
     public CassandraOperator( CassandraConfig config ){
         this.config = config;
         
@@ -66,20 +65,24 @@ public class CassandraOperator extends IOperator {
             if( !config.isCounterBolt() ) {
 
                 for( Tuple t : tuples ){
-                    this.getUDFBolt().log_debug("operator", "store " + t);
+                    this.getUDFBolt().log_debug("cassandra-operator", "store " + t);
                 }
 
-                dao.store( tuples );
-            } else {
+                synchronized (this){
+                    dao.store( tuples );
+                }
+           } else {
 
                 for( Tuple t : tuples ){
 
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
 
-                    this.getUDFBolt().log_debug("debug: store " + t);
+                    this.getUDFBolt().log_debug("cassandra-operator", "store " + t);
 
-                    ctn.update( keyValues, (int)val.get(0) );
+                    synchronized (this){
+                        ctn.update( keyValues, (Long)val.get(0) );
+                    }
                 }//for
             }
 

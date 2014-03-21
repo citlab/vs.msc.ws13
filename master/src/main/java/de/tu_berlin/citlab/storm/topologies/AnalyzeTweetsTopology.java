@@ -9,7 +9,11 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.TupleImpl;
 import backtype.storm.tuple.Values;
+import clojure.lang.IMeta;
+import clojure.lang.Indexed;
+import clojure.lang.Seqable;
 import de.tu_berlin.citlab.db.CassandraConfig;
 import de.tu_berlin.citlab.db.CassandraDAO;
 import de.tu_berlin.citlab.db.PrimaryKey;
@@ -30,6 +34,9 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
 
 public class AnalyzeTweetsTopology implements TopologyCreation
@@ -211,18 +218,36 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
 
-    public UDFBolt delayTuplesBolt(int sec, int slide, Fields fields){
+    public UDFBolt delayTuplesBolt(final int sec, final Fields fields){
         return new UDFBolt(
                 fields,
                 new IOperator(){
+                    class DelayedTuple{
+                        private Long created=System.currentTimeMillis();
+                        private Tuple p;
+                        public DelayedTuple(Tuple p){
+                            this.p = p;
+                        }
+                        public Long getCreatedTime(){ return created; }
+                        public Tuple getTuple(){ return p; }
+                    }
+
+                    private Queue<DelayedTuple> queue = new LinkedList<DelayedTuple>();
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         for( Tuple p : tuples ){
-                            collector.emit(p.getValues());
+                            queue.add( new DelayedTuple(p));
                         }//for
-                    }//execute()
+
+                        while( !queue.isEmpty() && (System.currentTimeMillis()-queue.element().getCreatedTime()) >= sec*1000 ){
+                            collector.emit( queue.poll().getTuple().getValues() );
+                        }
+
+                        this.getUDFBolt().log_debug("operator", "delayed tuples: queue-size: "+queue.size() );
+
+                     }//execute()
                 },
-                new TimeWindow<Tuple>(sec, slide)
+                new TimeWindow<Tuple>(sec, sec)
         );
     }
 
@@ -331,7 +356,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
                 .shuffleGrouping("tweets");
 
-        builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
+        builder.setBolt("delayed_tweets", delayTuplesBolt(5, new Fields("user", "tweet_id", "tweet") ), 1 )
                 .shuffleGrouping("tweets");
 
         Fields fieldsGroupByUser = new Fields("user");
@@ -366,7 +391,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public static void main(String[] args) throws Exception {
 
         Config conf = new Config();
-        conf.setDebug(true);
+        conf.setDebug(false);
 
         conf.setMaxTaskParallelism(1);
         conf.setMaxSpoutPending(1);

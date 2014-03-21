@@ -69,7 +69,7 @@ public class Counter implements Serializable
         executeQuery( createTableQuery );
 	}
 
-	public void update ( List<Object> keyValues, int number )
+	public void update ( List<Object> keyValues, long number )
 	{
 		String keyspace_table = config.getKeyspace() + "." + assembledCounterTableName;
         String str_keyValues = StringUtils.join(keyValues, "-");

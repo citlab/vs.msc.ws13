@@ -90,7 +90,6 @@ public class CassandraDAO implements DAO, Serializable
 		{
             System.err.println("Could not connect to cassandra server, invalid config ");
 		}
-		
 	}
 
     //TODO: do we need this function any more?
@@ -110,7 +109,10 @@ public class CassandraDAO implements DAO, Serializable
 		ta.setPrimaryKey( config.getPrimaryKeys() );  //TODO: pk anderswo behandeln
 		createKeyspaceQuery = ta.createKeyspaceQuery( config.getKeyspace() );
 		createTableQueryByFields = ta.createTableQueryByFields( config.getKeyspace(), config.getTable(), ta.fieldsInTuple.toList() );
-	}
+
+        setPreparedStatement(ta.createPreparedInsertStatement(config.getKeyspace(), config.getTable()));
+
+    }
 	
 	public void createDataStructures()
 	{
@@ -140,19 +142,13 @@ public class CassandraDAO implements DAO, Serializable
 	
 	public void store( List <Tuple> tuples )
 	{
+        makeBatch();
 
-
-		setPreparedStatement(ta.createPreparedInsertStatement(config.getKeyspace(), config.getTable()));
-		
-		for ( Tuple tuple: tuples )
+        for ( Tuple tuple: tuples )
 		{
-			makeBatch();
-			
 			List <Object> values = new ArrayList <Object>();
 			for ( int i = 0; i < ta.cassandraTypesInTuple.size(); i++ )
 			{
-				//System.out.println("javaTypesinTuple: " + ta.javaTypesInTuple);
-				//System.out.println("switch: " + ta.javaTypesInTuple.get( i ));
 				String s = ta.javaTypesInTuple.get(i);
 				if (s.equals("String")) {
 					values.add(tuple.getString(i));
@@ -192,7 +188,6 @@ public class CassandraDAO implements DAO, Serializable
 
 	public void batchExecute()
 	{
-		//System.out.println( batchStatement.toFieldsString() );
 		session.execute(batchStatement);
 	}
 
