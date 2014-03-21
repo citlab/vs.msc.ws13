@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="warn" name="CIT-Storm">
-
 	<Appenders>
 		<JDBC name="databaseAppender" tableName="${sys:log4j2.databaseName}.${sys:log4j2.tableName}">
 			<ConnectionFactory class="de.tu_berlin.citlab.logging.ConnectionFactory" method="getConnectionStatic" />
@@ -26,5 +25,4 @@
 			<!-- <AppenderRef ref="databaseAppender" /> -->
 		</Root>
 	</Loggers>
-
 </Configuration>

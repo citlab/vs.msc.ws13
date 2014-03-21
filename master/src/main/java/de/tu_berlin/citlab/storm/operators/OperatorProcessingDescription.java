@@ -7,13 +7,13 @@ import java.io.Serializable;
 public class OperatorProcessingDescription implements Serializable {
 
     private IOperator operator;
-    private String source;
+    private String[] sources;
 
-    public OperatorProcessingDescription(IOperator operator, String source) {
+    public OperatorProcessingDescription(IOperator operator, String ... sources) {
         this.operator = operator;
-        this.source = source;
+        this.sources = sources;
     }
 
     public IOperator getOperator(){ return  operator; }
-    public String getSource(){ return source; }
+    public String[] getSources(){ return sources; }
 }

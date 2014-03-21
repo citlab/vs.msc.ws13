@@ -5,6 +5,11 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.BaseConfiguration;
+
 /**
  * Created by Constantin on 19.03.2014.
  */
@@ -28,8 +33,8 @@ public class TopologySubmitter
     {
         if (args == null || args.length == 0) {
         	// uncomment to enable DB logging
-        	LoggingConfigurator.activateDataBaseLogger();
-        	
+        	//LoggingConfigurator.activateDataBaseLogger();
+
         	setTopology();
             Config conf = new Config();
         	
@@ -42,7 +47,7 @@ public class TopologySubmitter
             cluster.submitTopology("analyzte-twitter-stream", conf, topology.createTopology());
 //                    new AnalyzeTweetsTopology().createTopology() );
 
-            cluster.shutdown();
+            //cluster.shutdown();
         }
         else{
         	String session = "";

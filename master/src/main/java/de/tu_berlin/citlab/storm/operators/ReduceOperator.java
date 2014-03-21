@@ -8,7 +8,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 
 @SuppressWarnings("serial")
-public class ReduceOperator implements IOperator {
+public class ReduceOperator extends IOperator {
 	
 	protected final Reducer reducer;
 	protected final List<Object> init;

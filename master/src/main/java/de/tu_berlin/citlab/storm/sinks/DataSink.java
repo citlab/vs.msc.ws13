@@ -7,7 +7,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
-public class DataSink implements IOperator {
+public class DataSink extends IOperator {
 
 	private static final long serialVersionUID = -6563062550998641926L;
 

@@ -3,6 +3,8 @@ package de.tu_berlin.citlab.db;
 import java.io.Serializable;
 import java.util.List;
 
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Host;
 import com.datastax.driver.core.Metadata;
@@ -24,9 +26,8 @@ public class Counter implements Serializable
 	public Counter( CassandraConfig config )
 	{
 		this.config = config;
-		this.config.setIP( "127.0.0.1" );
-		connect( config.getIP() );
-        createDataStructures();
+		//this.config.setIP( "127.0.0.1" );
+		//connect( config.getIP() );
 	}
 
 	public void setConfig( CassandraConfig config )
@@ -68,7 +69,7 @@ public class Counter implements Serializable
         executeQuery( createTableQuery );
 	}
 
-	public void update ( List<Object> keyValues, int number )
+	public void update ( List<Object> keyValues, long number )
 	{
 		String keyspace_table = config.getKeyspace() + "." + assembledCounterTableName;
         String str_keyValues = StringUtils.join(keyValues, "-");
@@ -89,5 +90,10 @@ public class Counter implements Serializable
 		}
 	}
 
+    public List<Values> findBy(Fields Keyfields, Values values ){
+        // check if the number of fields are equals to the number values
+        assert( Keyfields.size() == values.size() );
 
+        return null;
+    }
 }

@@ -15,7 +15,7 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 import de.tu_berlin.citlab.storm.window.WindowContainer;
 
-public class JoinOperator implements IOperator {
+public class JoinOperator extends IOperator {
 	
 	private static final long serialVersionUID = -1921795142772743781L;
 

@@ -7,7 +7,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 @SuppressWarnings("serial")
-public class MapOperator implements IOperator {
+public class MapOperator extends IOperator {
 
 	protected Mapper mapper;
 	protected boolean chaining = false;

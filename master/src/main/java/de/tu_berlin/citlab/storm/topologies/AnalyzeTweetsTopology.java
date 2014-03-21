@@ -2,14 +2,20 @@ package de.tu_berlin.citlab.storm.topologies;
 
 
 import backtype.storm.Config;
+import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.TupleImpl;
 import backtype.storm.tuple.Values;
+import clojure.lang.IMeta;
+import clojure.lang.Indexed;
+import clojure.lang.Seqable;
 import de.tu_berlin.citlab.db.CassandraConfig;
+import de.tu_berlin.citlab.db.CassandraDAO;
 import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.logging.LoggingConfigurator;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
@@ -18,7 +24,9 @@ import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.spouts.CassandraDataProviderSpout;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
+import de.tu_berlin.citlab.storm.spouts.UDFSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.*;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
@@ -27,6 +35,9 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
 
 public class AnalyzeTweetsTopology implements TopologyCreation
@@ -48,26 +59,33 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         return new TwitterSpout(config);
     }
 
-    public UDFBolt createCassandraTweetsSink(){
+    public CassandraConfig getCassandraConfig(){
         CassandraConfig cassandraCfg = new CassandraConfig();
-        cassandraCfg.setIP( "127.0.0.1" );
+        cassandraCfg.setIP("127.0.0.1");
+        //cassandraCfg.setIP(CassandraConfig.getCassandraClusterIPFromClusterManager());
+
+        return cassandraCfg;
+    }
+
+    public UDFBolt createCassandraTweetsSink(){
+        CassandraConfig cassandraCfg = getCassandraConfig();
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "tweets",
                 new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
-                new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                false // no counter
         );
 
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "tweet" ),
-                new CassandraOperator(cassandraCfg),
+                new CassandraOperator( cassandraCfg  ),
                 WINDOW
         );
     }
 
     public UDFBolt createCassandraUserSignificanceSink(){
-        CassandraConfig cassandraCfg = new CassandraConfig();
-        cassandraCfg.setIP( "127.0.0.1" );
+        CassandraConfig cassandraCfg = getCassandraConfig();
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "user_significance",
@@ -92,7 +110,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
 
                         for( Tuple p : tuples ){
-                            String[] words = p.getStringByField("tweet").split(" ");
+                            String[] words = p.getStringByField("tweet").replaceAll("[^a-zA-Z0-9 ]", "").split(" ");
                             for( String word : words ){
                                 collector.emit(new Values(p.getValueByField("user"),p.getValueByField("tweet_id"), word.trim().toLowerCase() ));
                             }//for
@@ -129,9 +147,9 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
 
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", 1)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", 1)) );
-        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", 1)) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", new Long(1) )) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", new Long(1) )) );
+        badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", new Long(1) )) );
 
         /*badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", 100)) );
         badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", 500)) );
@@ -166,46 +184,92 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         String user=tuples.get(0).getStringByField("user");
                         Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        int total_significance=0;
+                        Long total_significance = new Long(0);
+
                         for( Tuple p : tuples ){
-                            int significance = p.getIntegerByField("significance");
+                            Long significance = p.getLongByField("significance");
                             total_significance+=significance;
                         }//for
+
+                        getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
+
                         collector.emit(new Values(user,tweet_id,total_significance ));
                     }// execute()
                 },
-                WINDOW, //new TimeWindow<Tuple>(1, 1),
-                KeyConfigFactory.ByFields("user" )
+                WINDOW,
+                KeyConfigFactory.ByFields( "user" )
         );
     }
 
-    public UDFBolt delayTuplesBolt(int sec, int slide, Fields fields){
+    public UDFBolt filterUserSignificanceByThreshold( final int threshold ){
+        return new UDFBolt(
+                new Fields( "user", "tweet_id", "significance" ),
+                new FilterOperator( new Filter(){
+                    @Override
+                    public Boolean predicate(Tuple t) {
+                        if( t.getLongByField("significance") >= threshold ){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }),
+                WINDOW
+        );
+    }
+
+
+    public UDFBolt delayTuplesBolt(final int sec, final Fields fields){
         return new UDFBolt(
                 fields,
                 new IOperator(){
+                    class DelayedTuple{
+                        private Long created=System.currentTimeMillis();
+                        private Tuple p;
+                        public DelayedTuple(Tuple p){
+                            this.p = p;
+                        }
+                        public Long getCreatedTime(){ return created; }
+                        public Tuple getTuple(){ return p; }
+                    }
+
+                    private Queue<DelayedTuple> queue = new LinkedList<DelayedTuple>();
                     @Override
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         for( Tuple p : tuples ){
-                            collector.emit(p.getValues());
+                            queue.add( new DelayedTuple(p));
                         }//for
-                    }//execute()
+
+                        while( !queue.isEmpty() && (System.currentTimeMillis()-queue.element().getCreatedTime()) >= sec*1000 ){
+                            collector.emit( queue.poll().getTuple().getValues() );
+                        }
+
+                        this.getUDFBolt().log_debug("operator", "delayed tuples: queue-size: "+queue.size() );
+
+                     }//execute()
                 },
-                new TimeWindow<Tuple>(sec, slide)
+                new TimeWindow<Tuple>(sec, sec)
         );
     }
 
+    public UDFSpout persistentTupleProvider(){
+        Fields fields = new Fields("user", "significance");
+        CassandraConfig cassandraCfg = getCassandraConfig();
+        cassandraCfg.setParams("citstorm", "user_significance" );
+        return new CassandraDataProviderSpout(fields, cassandraCfg );
+    }
 
     public UDFBolt filterBadUsers(){
-
-        final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
 
         final TupleProjection projection = new TupleProjection(){
             public Values project(Tuple inMemTuple, Tuple tuple) {
                 return (Values)tuple.getValues();
-           }
+            }
         };
 
         final TupleComparator tupleComparator = KeyConfigFactory.compareByFields(new Fields("user"));
+
+        final Map<Serializable, List<Tuple>> badUsersHT = new HashMap<Serializable, List<Tuple> >();
 
         final StaticHashJoinOperator staticHashJoinBadUsers =
             new StaticHashJoinOperator(
@@ -223,29 +287,27 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                 @Override
                                 public void execute(List<Tuple> tuples, OutputCollector collector) {
                                     for( Tuple t : tuples ){
-                                        System.out.println("add new user: "+t);
+                                        getUDFBolt().log_info("operator", "add new user: " + t);
                                         String user = t.getStringByField("user");
-
-
-                                        int currSig = t.getIntegerByField("significance");
+                                        Long currSig = t.getLongByField("significance");
 
                                         // user exists?
                                         if( badUsersHT.containsKey(tupleComparator.getTupleKey(t)) ){
                                             List<Tuple> keyTuples =  badUsersHT.get(tupleComparator.getTupleKey(t));
 
                                             // lets assume we have one tuple for each detected user
-                                            int lastSig = keyTuples.get(0).getIntegerByField("significance");
-                                            int totalSig = lastSig+currSig;
+                                            Long lastSig = keyTuples.get(0).getLongByField("significance");
+                                            Long totalSig = lastSig+currSig;
 
                                             Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
                                             keyTuples.clear();
                                             keyTuples.add(newUserTuple);
 
                                             // do not output any tuples
-                                            System.out.println("debug: update user: "+t+", sig: "+totalSig);
+                                            getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
                                         } else {
-                                            int totalSig = currSig;
+                                            Long totalSig = currSig;
                                             Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
 
                                             List<Tuple> badUsers = new ArrayList<Tuple>();
@@ -253,17 +315,19 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            System.out.println("debug:  add user: "+t+", sig: "+totalSig);
+                                            System.out.println("add new user");
+
+                                            getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }
                                     }
                                 }// execute()
                             },
-                            "reduce_to_user_significance"
+                            "filter_significant_user", "persistent_tuple_provider"
                     ),
                     // process raw comping tweets
                     new OperatorProcessingDescription(
                             staticHashJoinBadUsers,
-                            "tweets"
+                            "delayed_tweets"
                         )
                 ),
             WINDOW,
@@ -278,39 +342,47 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     {
         TopologyBuilder builder = new TopologyBuilder();
 
-        // provide twitter streaminh data
+        // provide twitter streaming data
         try {
             builder.setSpout("tweets", createTwitterSpout(), 1);
+
         } catch (InvalidTwitterConfigurationException e) {
             e.printStackTrace();
         }
 
         // find bad users
+        builder.setSpout("persistent_tuple_provider", persistentTupleProvider(), 1);
+
+        // find bad users
         builder.setBolt("flatmap_tweet_words", flatMapTweetWords(), 1)
                 .shuffleGrouping("tweets");
 
-        /*builder.setBolt("delayed_tweets", delayTuplesBolt(5, 5, new Fields("user", "tweet_id", "tweet") ), 1 )
-                .shuffleGrouping("tweets");*/
+        builder.setBolt("delayed_tweets", delayTuplesBolt(5, new Fields("user", "tweet_id", "tweet") ), 1 )
+                .shuffleGrouping("tweets");
+
+        Fields fieldsGroupByUser = new Fields("user");
 
         // filter and find bad users
         builder.setBolt("filter_bad_users", filterBadUsers(), 1)
-                .shuffleGrouping("reduce_to_user_significance")
-                .shuffleGrouping("tweets");
+                .fieldsGrouping("filter_significant_user", fieldsGroupByUser)
+                .fieldsGrouping("delayed_tweets", fieldsGroupByUser)
+                .fieldsGrouping("persistent_tuple_provider", fieldsGroupByUser );
 
         builder.setBolt("store_tweets", createCassandraTweetsSink(), 1)
                 .shuffleGrouping("filter_bad_users");
-
 
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
-                .shuffleGrouping("join_with_badwords");
+                .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
-
-        builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)
+        // filter only user with a specific significance
+        builder.setBolt("filter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
                 .shuffleGrouping("reduce_to_user_significance");
 
+        builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)
+                .shuffleGrouping("filter_significant_user");
 
         return builder.createTopology();
 
