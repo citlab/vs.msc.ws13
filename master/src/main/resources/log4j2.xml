@@ -2,7 +2,7 @@
 <Configuration status="warn" name="CIT-Storm">
 
 	<Appenders>
-		<JDBC name="databaseAppender" tableName="citstorm.log4j2">
+		<JDBC name="databaseAppender" tableName="${sys:log4j2.databaseName}.${sys:log4j2.tableName}">
 			<ConnectionFactory class="de.tu_berlin.citlab.logging.ConnectionFactory" method="getConnectionStatic" />
 			<Column name="datetime" pattern="%d{yyy-MM-dd HH:mm:ss}" />
 			<Column name="milliseconds" pattern="%d{SSS}" />
@@ -12,13 +12,19 @@
 			<Column name="exception" pattern="%exception" />
 			<Column name="thread" pattern="%thread" />
 			<Column name="marker" pattern="%marker" />
+			<Column name="session" pattern="${sys:log4j2.session}" />
 		</JDBC>
+
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
 	</Appenders>
 
 	<Loggers>
 		<Root level="info">
-			<AppenderRef ref="databaseAppender" />
+			<AppenderRef ref="Console" />
+			<!-- <AppenderRef ref="databaseAppender" /> -->
 		</Root>
 	</Loggers>
-	
+
 </Configuration>

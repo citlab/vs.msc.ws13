@@ -1,10 +1,7 @@
 package de.tu_berlin.citlab.logging;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
@@ -21,17 +18,17 @@ public class ConnectionFactory {
 	}
 
 	// overridden by config file
-	private String serverName = "";
-	private String serverPort = "";
-	private String databaseName = "";
-	private String tableName = "";
-	private String user = "";
-	private String pass = "";
+	private String serverName;
+	private String serverPort;
+	private String databaseName;
+	private String tableName;
+	private String user;
+	private String pass;
 
-	private BoneCP connectionPool = null;
+	private BoneCP connectionPool;
 
 	private ConnectionFactory() {
-		if (databaseDriverLoadable()) {
+		if (databaseDriverLoadable() && propertiesLoaded()) {
 			try {
 				connectionPool = new BoneCP(getConfig());
 				// connectionPool.shutdown();
@@ -55,60 +52,35 @@ public class ConnectionFactory {
 
 	private BoneCPConfig getConfig() {
 		BoneCPConfig config = new BoneCPConfig();
-		if (loadProperties()) {
-			config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
-					serverName, serverPort, databaseName));
-			config.setUsername(user);
-			config.setPassword(pass);
-			config.setMinConnectionsPerPartition(5);
-			config.setMaxConnectionsPerPartition(10);
-			config.setPartitionCount(1);
-		}
+		config.setInitSQL("SET CHARACTER SET utf8mb4, character_set_client = utf8mb4, character_set_connection = utf8mb4, " +
+                "character_set_results = utf8mb4, NAMES utf8mb4, collation_connection = utf8mb4_general_ci, " +
+                "collation_database = utf8mb4_general_ci");
+		config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
+				serverName, serverPort, databaseName));
+		config.setUsername(user);
+		config.setPassword(pass);
+		config.setMinConnectionsPerPartition(5);
+		config.setMaxConnectionsPerPartition(10);
+		config.setPartitionCount(1);
 		return config;
 	}
 
-	private boolean loadProperties() {
-		boolean result = false;
-		Properties prop = new Properties();
-		InputStream input = null;
+	private boolean propertiesLoaded() {
+		boolean result = true;
 		try {
-			input = ConnectionFactory.class.getResourceAsStream("/log4j2_mysql.properties");
-			prop.load(input);
-			serverName = prop.getProperty("serverName");
-			if(serverName == null) {
-				throw new Exception("serverName not found in properties file");
+			serverName = System.getProperty("log4j2.serverName");
+			serverPort = System.getProperty("log4j2.serverPort");
+			databaseName = System.getProperty("log4j2.databaseName");
+			tableName = System.getProperty("log4j2.tableName");
+			user = System.getProperty("log4j2.user");
+			pass = System.getProperty("log4j2.pass");
+			if(serverName == null || serverPort == null || databaseName == null || tableName == null || user == null || pass == null) {
+				throw new Exception(String.format("Invalid db credentials: serverName='%s', serverPort='%s', databaseName='%s', tableName= '%s', user='%s', pass='%s'", serverName, serverPort, databaseName, tableName, user, pass));
 			}
-			serverPort = prop.getProperty("serverPort");
-			if(serverPort == null) {
-				throw new Exception("serverPort not found in properties file");
-			}
-			databaseName = prop.getProperty("databaseName");
-			if(databaseName == null) {
-				throw new Exception("databaseName not found in properties file");
-			}
-			tableName = prop.getProperty("tableName");
-			if(tableName == null) {
-				throw new Exception("tableName not found in properties file");
-			}
-			user = prop.getProperty("user");
-			if(user == null) {
-				throw new Exception("user not found in properties file");
-			}
-			pass = prop.getProperty("pass");
-			if(pass == null) {
-				throw new Exception("pass not found in properties file");
-			}
-			result = true;
-		} catch (Exception ex) {
+		}
+		catch(Exception ex) {
 			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			result = false;
 		}
 		return result;
 	}
@@ -125,10 +97,6 @@ public class ConnectionFactory {
 
 	public static Connection getConnectionStatic() {
 		return getInstance().getConnection();
-	}
-
-	public static void main(String[] args) {
-		getConnectionStatic();
 	}
 
 }
