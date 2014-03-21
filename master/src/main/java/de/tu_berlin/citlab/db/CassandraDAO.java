@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+
 import org.apache.commons.lang.StringUtils;
+
 import backtype.storm.tuple.Tuple;
+
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
@@ -216,7 +220,11 @@ public class CassandraDAO implements DAO, Serializable
 	public Iterator <Values> findAll()
 	{
 		Statement st = QueryBuilder.select(selectFields).from( table_inf.get( "keyspace" ), table_inf.get( "table" ) );
-		return getValuesFromStatement( st ).iterator();
+
+		st.setFetchSize(10000);
+		ResultSet rs = session.execute(st);
+
+    	return new CassandraIterator(rs);
 	}
 	
 
@@ -225,8 +233,47 @@ public class CassandraDAO implements DAO, Serializable
 		Statement st = QueryBuilder.select(selectFields).from( table_inf.get( "keyspace" ), table_inf.get( "table" ) )
 				.where( QueryBuilder.eq( rowkey, rowkey_value  ) );
 				
-		return getValuesFromStatement( st ).iterator();
+		st.setFetchSize(10000);
+		ResultSet rs = session.execute(st);
+
+    	return new CassandraIterator(rs);
 		
+	}
+	
+	public static Values getValuesFromRow(Row row){
+		Values values = new Values();
+		ColumnDefinitions cd = row.getColumnDefinitions();
+
+		int j = 0;
+		for (ColumnDefinitions.Definition def : cd)
+		{
+			if ( def.getType().getName().toString().equals( "text" ) )
+			{
+				values.add( row.getString( j ) );
+			}
+			else if ( def.getType().getName().toString().equals( "int" ) )
+			{
+				values.add( row.getInt( j ) );
+			}
+			else if ( def.getType().getName().toString().equals( "bigint" ) )
+			{
+				values.add( row.getLong( j ) );
+			}
+			else if ( def.getType().getName().toString().equals( "blob" ) )
+			{
+				values.add( row.getBytes( j ).array() );
+			}
+			else if ( def.getType().getName().toString().equals( "varchar" ) )
+			{
+				values.add( row.getString( j ) );
+			}
+            else if ( def.getType().getName().toString().equals( "counter" ) )
+            {
+                values.add( row.getLong( j ) );
+            }
+			j++;
+		}
+		return values;
 	}
 	
 	private List <Values> getValuesFromStatement( Statement st )
@@ -238,42 +285,8 @@ public class CassandraDAO implements DAO, Serializable
 		all = rs.all();
 		for ( int i = 0; i < all.size(); i++ )
 		{
-			Values values = new Values();
-			
 			Row row = all.get( i );
-
-			ColumnDefinitions cd = row.getColumnDefinitions();
-
-			int j = 0;
-			for (ColumnDefinitions.Definition def : cd)
-			{
-				if ( def.getType().getName().toString().equals( "text" ) )
-				{
-					values.add( row.getString( j ) );
-				}
-				else if ( def.getType().getName().toString().equals( "int" ) )
-				{
-					values.add( row.getInt( j ) );
-				}
-				else if ( def.getType().getName().toString().equals( "bigint" ) )
-				{
-					values.add( row.getLong( j ) );
-				}
-				else if ( def.getType().getName().toString().equals( "blob" ) )
-				{
-					values.add( row.getBytes( j ).array() );
-				}
-				else if ( def.getType().getName().toString().equals( "varchar" ) )
-				{
-					values.add( row.getString( j ) );
-				}
-                else if ( def.getType().getName().toString().equals( "counter" ) )
-                {
-                    values.add( row.getLong( j ) );
-                }
-				j++;
-			}
-			listOfValues.add( values );
+			listOfValues.add( CassandraDAO.getValuesFromRow(row) );
 		}
 		return listOfValues;
 	}
