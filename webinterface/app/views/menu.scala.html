@@ -16,7 +16,7 @@
       @if(session.get("name") != null) {
         <ul class="nav navbar-nav">
           <li><a href="/">Dashboard</a></li>
-          @if(models.User.isAdmin("name")) {
+          @if(models.User.isAdmin(session.get("name"))) {
             <li><a href="/user">User</a></li>
           }
           <li><a href="/server">Server</a></li>
