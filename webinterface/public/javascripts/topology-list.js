@@ -10,9 +10,9 @@
     topology_list.add = function(time, bolt, msg, id, hasError) {
       var list = topology_list.find("tbody");
       var style = topology_filter.tableStyle();
-      var cssClass = bolt;
+      var cssClass = "";
       if(hasError) cssClass += " danger";
-      var elem = $("<tr data-toggle='modal' data-target='#myModal' " + style + " data-value='" + cssClass + "'><td>" + id + "</td><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
+      var elem = $("<tr class="+ cssClass +" data-toggle='modal' data-target='#myModal' " + style + " data-value='" + bolt + "'><td>" + id + "</td><td>" + time + "</td><td>" + bolt + "</td><td>" + msg + "</td></tr>");
       elem.data("filter-value", bolt);
       list.prepend(elem)
 
