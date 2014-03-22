@@ -43,12 +43,13 @@ public class Log extends Controller {
     ObjectNode result = Json.newObject();
     LogEntry entry = Database.getInstance().getLog(lastId);;
 
-    result.put("id", entry.getId());
-    result.put("time", entry.getDatetime());
-    result.put("milliseconds", entry.getMilliseconds());
     result.put("logger", entry.getLogger());
     result.put("level", entry.getLevel());
     result.put("exception", entry.getException());
+    result.put("message", entry.getMessage());
+    result.put("id", entry.getId());
+    result.put("time", entry.getDatetime());
+    result.put("milliseconds", entry.getMilliseconds());
     result.put("thread", entry.getThread());
     result.put("marker", entry.getMarker());
 
