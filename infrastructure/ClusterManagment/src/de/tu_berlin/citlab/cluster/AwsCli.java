@@ -12,12 +12,13 @@ import de.tu_berlin.citlab.cluster.gson.DescribeInstancesGson;
 import de.tu_berlin.citlab.cluster.gson.InstancesGson;
 import de.tu_berlin.citlab.cluster.gson.ReservationsGson;
 import de.tu_berlin.citlab.cluster.gson.RunInstances;
+import de.tu_berlin.citlab.cluster.instances.Instance;
 
 public class AwsCli {
-	public static synchronized Instance[] runInstances(String imageId,
+	public static synchronized Instance runInstance(String imageId,
 			String instanceType, String keyName, String availabilityZone) {
 
-		return runInstances(imageId, instanceType, keyName, availabilityZone, 1);
+		return runInstances(imageId, instanceType, keyName, availabilityZone, 1)[0];
 	}
 
 	public static synchronized Instance[] runInstances(String imageId,
@@ -52,7 +53,7 @@ public class AwsCli {
 		List<Instance> instances = new ArrayList<Instance>();
 
 		for (InstancesGson i : gsonObj.getInstances()) {
-			instances.add(new Instance(i));
+			instances.add(Instance.createInstance(i));
 		}
 
 		return instances.toArray(new Instance[instances.size()]);
@@ -87,8 +88,13 @@ public class AwsCli {
 		List<Instance> instances = new ArrayList<Instance>();
 
 		for (ReservationsGson r : gsonObj.getReservations()) {
-			for (InstancesGson i : r.getInstances()) {
-				instances.add(new Instance(i));
+			for (InstancesGson ig : r.getInstances()) {
+				Instance i = Instance.createInstance(ig);
+				if (!i.getPublicIp().equals(
+						ClusterDatabase.getInstance().getProperty("public-ip"))) {
+					instances.add(i);
+				}
+
 			}
 		}
 
@@ -113,23 +119,6 @@ public class AwsCli {
 	public static synchronized void rebootInstance(String instanceId) {
 		ProcessBuilder pb = new ProcessBuilder("aws", "ec2",
 				"reboot-instances", "--instance-id", instanceId);
-
-		try {
-			Process p = pb.start();
-
-			p.waitFor();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static synchronized void associateAddress(String instanceId,
-			String publicIp) {
-		ProcessBuilder pb = new ProcessBuilder("aws", "ec2",
-				"associate-address", "--instance-id", instanceId,
-				"--public-ip", publicIp);
 
 		try {
 			Process p = pb.start();

@@ -1,102 +1,111 @@
 package de.tu_berlin.citlab.cluster;
 
-import de.tu_berlin.citlab.cluster.Instance.Role;
-import de.tu_berlin.citlab.cluster.Instance.State;
+import de.tu_berlin.citlab.cluster.instances.Instance;
 
 public class Cluster {
+	private static Cluster INSTANCE = new Cluster();
 
-	public static void startNimbus() {
-		String keyName = Config.getInstance().getProperty("cluster.key-name");
-		String availabilityZone = Config.getInstance().getProperty(
-				"cluster.zone");
-		String imageId = Config.getInstance().getProperty("nimbus.image-id");
-		String instanceType = Config.getInstance().getProperty(
-				"nimbus.instance-type");
-
-		AwsCli.runInstances(imageId, instanceType, keyName, availabilityZone);
+	private Cluster() {
 	}
 
-	public static void startSupervisor(int count) {
-		String keyName = Config.getInstance().getProperty("cluster.key-name");
-		String availabilityZone = Config.getInstance().getProperty(
+	public static Cluster getInstance() {
+		return INSTANCE;
+	}
+
+	public void startNimbus() {
+		String keyName = ClusterDatabase.getInstance().getProperty(
+				"cluster.key-name");
+		String availabilityZone = ClusterDatabase.getInstance().getProperty(
 				"cluster.zone");
-		String imageId = Config.getInstance()
-				.getProperty("supervisor.image-id");
-		String instanceType = Config.getInstance().getProperty(
+		String imageId = ClusterDatabase.getInstance().getProperty(
+				"nimbus.image-id");
+		String instanceType = ClusterDatabase.getInstance().getProperty(
+				"nimbus.instance-type");
+
+		AwsCli.runInstance(imageId, instanceType, keyName, availabilityZone);
+	}
+
+	public void startCassandra() {
+		String keyName = ClusterDatabase.getInstance().getProperty(
+				"cluster.key-name");
+		String availabilityZone = ClusterDatabase.getInstance().getProperty(
+				"cluster.zone");
+		String imageId = ClusterDatabase.getInstance().getProperty(
+				"cassandra.image-id");
+		String instanceType = ClusterDatabase.getInstance().getProperty(
+				"cassandra.instance-type");
+
+		AwsCli.runInstance(imageId, instanceType, keyName, availabilityZone);
+	}
+
+	public void startSupervisor(int count) {
+		String keyName = ClusterDatabase.getInstance().getProperty(
+				"cluster.key-name");
+		String availabilityZone = ClusterDatabase.getInstance().getProperty(
+				"cluster.zone");
+		String imageId = ClusterDatabase.getInstance().getProperty(
+				"supervisor.image-id");
+		String instanceType = ClusterDatabase.getInstance().getProperty(
 				"supervisor.instance-type");
 
 		AwsCli.runInstances(imageId, instanceType, keyName, availabilityZone,
 				count);
 	}
 
-	public static void terminateInstance(String instanceId) {
-		AwsCli.terminateInstance(instanceId);
-	}
-
-	public static void rebootInstance(String instanceId) {
-		AwsCli.rebootInstance(instanceId);
-	}
-
-	public static void updatePublicIPAddress(String instanceId) {
-		String publicIp = Config.getInstance().getProperty("nimbus.public-ip");
-
-		AwsCli.associateAddress(instanceId, publicIp);
-	}
-
-	public static void killCluster() {
+	public void killCluster() {
 		Instance[] instances = AwsCli.describeInstances();
 		for (Instance i : instances) {
-			if ((i.getState() == State.PENDING || i.getState() == State.RUNNING)
-					&& (i.getRole() == Role.CASSANDRA
-							|| i.getRole() == Role.NIMBUS
-							|| i.getRole() == Role.SUPERVISOR || i.getRole() == Role.ZOOKEEPER)) {
-				terminateInstance(i.getInstanceId());
+			if ((i.getState() == Instance.STATE_PENDING || i.getState() == Instance.STATE_RUNNING)
+					&& (i.getRole() == Instance.ROLE_CASSANDRA
+							|| i.getRole() == Instance.ROLE_NIMBUS || i
+							.getRole() == Instance.ROLE_SUPERVISOR)) {
+				i.terminate();
 			}
 		}
 	}
 
-	public static void rebootCluster() {
+	public void rebootCluster() {
 		Instance[] instances = AwsCli.describeInstances();
 		for (Instance i : instances) {
-			if ((i.getState() == State.PENDING || i.getState() == State.RUNNING)
-					&& (i.getRole() == Role.CASSANDRA
-							|| i.getRole() == Role.NIMBUS
-							|| i.getRole() == Role.SUPERVISOR || i.getRole() == Role.ZOOKEEPER)) {
-				rebootInstance(i.getInstanceId());
+			if ((i.getState() == Instance.STATE_PENDING || i.getState() == Instance.STATE_RUNNING)
+					&& (i.getRole() == Instance.ROLE_CASSANDRA
+							|| i.getRole() == Instance.ROLE_NIMBUS || i
+							.getRole() == Instance.ROLE_SUPERVISOR)) {
+				i.restart();
 			}
 		}
 	}
 
-	public static void killSupervisors() {
+	public void killSupervisors() {
 		Instance[] instances = AwsCli.describeInstances();
 		for (Instance i : instances) {
-			if ((i.getState() == State.PENDING || i.getState() == State.RUNNING)
-					&& i.getRole() == Role.SUPERVISOR) {
-				terminateInstance(i.getInstanceId());
+			if ((i.getState() == Instance.STATE_PENDING || i.getState() == Instance.STATE_RUNNING)
+					&& i.getRole() == Instance.ROLE_SUPERVISOR) {
+				i.terminate();
 			}
 		}
 	}
 
-	public static void rebootSupervisors() {
+	public void rebootSupervisors() {
 		Instance[] instances = AwsCli.describeInstances();
 		for (Instance i : instances) {
-			if ((i.getState() == State.PENDING || i.getState() == State.RUNNING)
-					&& i.getRole() == Role.SUPERVISOR) {
-				rebootInstance(i.getInstanceId());
+			if ((i.getState() == Instance.STATE_PENDING || i.getState() == Instance.STATE_RUNNING)
+					&& i.getRole() == Instance.ROLE_SUPERVISOR) {
+				i.restart();
 			}
 		}
 	}
 
-	public static boolean isNimbusUp() {
+	public boolean isNimbusUp() {
 
 		for (Instance i : AwsCli.describeInstances()) {
 
-			if (i.getRole() == Role.NIMBUS
-					&& i.getState() == State.RUNNING
+			if (i.getRole() == Instance.ROLE_NIMBUS
+					&& i.getState() == Instance.STATE_RUNNING
 					&& i.getPublicIp() != null
 					&& i.getPublicIp().equals(
-							Config.getInstance()
-									.getProperty("nimbus.public-ip"))) {
+							ClusterDatabase.getInstance().getProperty(
+									"nimbus.public-ip"))) {
 				return true;
 			}
 		}

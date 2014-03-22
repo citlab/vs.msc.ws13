@@ -14,10 +14,8 @@ import javax.servlet.http.HttpSession;
 
 import de.tu_berlin.citlab.cluster.AwsCli;
 import de.tu_berlin.citlab.cluster.Cluster;
-import de.tu_berlin.citlab.cluster.Config;
-import de.tu_berlin.citlab.cluster.Instance;
-import de.tu_berlin.citlab.cluster.Instance.Role;
-import de.tu_berlin.citlab.cluster.Instance.State;
+import de.tu_berlin.citlab.cluster.ClusterDatabase;
+import de.tu_berlin.citlab.cluster.instances.Instance;
 import de.tu_berlin.citlab.cluster.tools.HTMLBuilder;
 
 public class MainServlet extends HttpServlet {
@@ -33,7 +31,7 @@ public class MainServlet extends HttpServlet {
 		if (req.getParameterNames().hasMoreElements()) {
 			String cmd = req.getParameter("start_nimbus");
 			if (cmd != null) {
-				Cluster.startNimbus();
+				Cluster.getInstance().startNimbus();
 			}
 			cmd = req.getParameter("start_supervisor");
 			if (cmd != null) {
@@ -42,44 +40,23 @@ public class MainServlet extends HttpServlet {
 				if (cmd != null) {
 					num = Integer.parseInt(cmd);
 				}
-				Cluster.startSupervisor(num);
+				Cluster.getInstance().startSupervisor(num);
 			}
 			cmd = req.getParameter("reboot_cluster");
 			if (cmd != null) {
-				Cluster.rebootCluster();
+				Cluster.getInstance().rebootCluster();
 			}
 			cmd = req.getParameter("kill_cluster");
 			if (cmd != null) {
-				Cluster.killCluster();
+				Cluster.getInstance().killCluster();
 			}
 			cmd = req.getParameter("reboot_supervisors");
 			if (cmd != null) {
-				Cluster.rebootSupervisors();
+				Cluster.getInstance().rebootSupervisors();
 			}
 			cmd = req.getParameter("kill_supervisors");
 			if (cmd != null) {
-				Cluster.killSupervisors();
-			}
-			cmd = req.getParameter("terminate");
-			if (cmd != null) {
-				cmd = req.getParameter("instance");
-				if (cmd != null) {
-					Cluster.terminateInstance(cmd);
-				}
-			}
-			cmd = req.getParameter("reboot");
-			if (cmd != null) {
-				cmd = req.getParameter("instance");
-				if (cmd != null) {
-					Cluster.rebootInstance(cmd);
-				}
-			}
-			cmd = req.getParameter("assignIp");
-			if (cmd != null) {
-				cmd = req.getParameter("instance");
-				if (cmd != null) {
-					Cluster.updatePublicIPAddress(cmd);
-				}
+				Cluster.getInstance().killSupervisors();
 			}
 			cmd = req.getParameter("hide_terminated");
 			if (cmd != null) {
@@ -132,9 +109,10 @@ public class MainServlet extends HttpServlet {
 
 		pw.println("<p>");
 
-		if (Cluster.isNimbusUp()) {
+		if (Cluster.getInstance().isNimbusUp()) {
 			pw.println("<a href=\"http://"
-					+ Config.getInstance().getProperty("nimbus.public-ip")
+					+ ClusterDatabase.getInstance().getProperty(
+							"nimbus.public-ip")
 					+ ":8081\" target=\"_blank\">Web Deploy Page</a>");
 		} else {
 			pw.println("<br>");
@@ -161,7 +139,7 @@ public class MainServlet extends HttpServlet {
 		if (hideTerminated) {
 			List<Instance> filtered = new ArrayList<Instance>();
 			for (Instance i : instances) {
-				if (i.getState() != State.TERMINATED) {
+				if (i.getState() != Instance.STATE_TERMINATED) {
 					filtered.add(i);
 				}
 			}
@@ -215,7 +193,8 @@ public class MainServlet extends HttpServlet {
 		pw.println("<td>" + i.getInstanceType() + "</td>");
 		if (i.getPublicIp() != null
 				&& i.getPublicIp().equals(
-						Config.getInstance().getProperty("nimbus.public-ip"))) {
+						ClusterDatabase.getInstance().getProperty(
+								"nimbus.public-ip"))) {
 			pw.println("<td><font color=\"#0000FF\">" + i.getPublicIp()
 					+ "</font></td>");
 		} else {
@@ -224,22 +203,22 @@ public class MainServlet extends HttpServlet {
 		pw.println("<td>" + i.getLaunchTime() + "</td>");
 
 		switch (i.getState()) {
-		case PENDING:
+		case Instance.STATE_PENDING:
 			pw.println("<td bgcolor=\"#FFFF00\">" + i.getState() + "</td>");
 			break;
-		case RUNNING:
+		case Instance.STATE_RUNNING:
 			pw.println("<td bgcolor=\"#00FF00\">" + i.getState() + "</td>");
 			break;
-		case SHUTTING_DOWN:
+		case Instance.STATE_SHUTTING_DOWN:
 			pw.println("<td bgcolor=\"#FFFF00\">" + i.getState() + "</td>");
 			break;
-		case TERMINATED:
+		case Instance.STATE_TERMINATED:
 			pw.println("<td bgcolor=\"#FF0000\">" + i.getState() + "</td>");
 			break;
-		case STOPPING:
+		case Instance.STATE_STOPPING:
 			pw.println("<td bgcolor=\"#FF0000\">" + i.getState() + "</td>");
 			break;
-		case STOPPED:
+		case Instance.STATE_STOPPED:
 			pw.println("<td bgcolor=\"#FF0000\">" + i.getState() + "</td>");
 			break;
 		default:
@@ -253,8 +232,8 @@ public class MainServlet extends HttpServlet {
 				+ i.getInstanceId() + "\">");
 		pw.println(" <input type=\"submit\" name=\"terminate\" value=\"Terminate\">");
 		pw.println(" <input type=\"submit\" name=\"reboot\" value=\"Reboot\">");
-		if (i.getRole() == Role.NIMBUS
-				&& (i.getState() == State.RUNNING || i.getState() == State.PENDING)) {
+		if (i.getRole() == Instance.ROLE_NIMBUS
+				&& (i.getState() == Instance.STATE_RUNNING || i.getState() == Instance.STATE_PENDING)) {
 			pw.println(" <input type=\"submit\" name=\"assignIp\" value=\"Assign EIP\">");
 		}
 		pw.println("</form>");
