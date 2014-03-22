@@ -12,7 +12,6 @@ import de.tu_berlin.citlab.cluster.gson.DescribeInstancesGson;
 import de.tu_berlin.citlab.cluster.gson.InstancesGson;
 import de.tu_berlin.citlab.cluster.gson.ReservationsGson;
 import de.tu_berlin.citlab.cluster.gson.RunInstances;
-import de.tu_berlin.citlab.cluster.instances.Instance;
 
 public class AwsCli {
 	public static synchronized Instance runInstance(String imageId,

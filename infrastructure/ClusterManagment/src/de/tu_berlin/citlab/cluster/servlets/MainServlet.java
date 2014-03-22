@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import de.tu_berlin.citlab.cluster.AwsCli;
 import de.tu_berlin.citlab.cluster.Cluster;
 import de.tu_berlin.citlab.cluster.ClusterDatabase;
-import de.tu_berlin.citlab.cluster.instances.Instance;
+import de.tu_berlin.citlab.cluster.Instance;
 import de.tu_berlin.citlab.cluster.tools.HTMLBuilder;
 
 public class MainServlet extends HttpServlet {
@@ -31,7 +31,7 @@ public class MainServlet extends HttpServlet {
 		if (req.getParameterNames().hasMoreElements()) {
 			String cmd = req.getParameter("start_nimbus");
 			if (cmd != null) {
-				Cluster.getInstance().startNimbus();
+				Instance.createNimbus();
 			}
 			cmd = req.getParameter("start_supervisor");
 			if (cmd != null) {
@@ -40,7 +40,7 @@ public class MainServlet extends HttpServlet {
 				if (cmd != null) {
 					num = Integer.parseInt(cmd);
 				}
-				Cluster.getInstance().startSupervisor(num);
+				Instance.createSupervisors(num);
 			}
 			cmd = req.getParameter("reboot_cluster");
 			if (cmd != null) {

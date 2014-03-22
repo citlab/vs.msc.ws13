@@ -1,7 +1,5 @@
 package de.tu_berlin.citlab.cluster;
 
-import de.tu_berlin.citlab.cluster.instances.Instance;
-
 public class Cluster {
 	private static Cluster INSTANCE = new Cluster();
 
@@ -10,46 +8,6 @@ public class Cluster {
 
 	public static Cluster getInstance() {
 		return INSTANCE;
-	}
-
-	public void startNimbus() {
-		String keyName = ClusterDatabase.getInstance().getProperty(
-				"cluster.key-name");
-		String availabilityZone = ClusterDatabase.getInstance().getProperty(
-				"cluster.zone");
-		String imageId = ClusterDatabase.getInstance().getProperty(
-				"nimbus.image-id");
-		String instanceType = ClusterDatabase.getInstance().getProperty(
-				"nimbus.instance-type");
-
-		AwsCli.runInstance(imageId, instanceType, keyName, availabilityZone);
-	}
-
-	public void startCassandra() {
-		String keyName = ClusterDatabase.getInstance().getProperty(
-				"cluster.key-name");
-		String availabilityZone = ClusterDatabase.getInstance().getProperty(
-				"cluster.zone");
-		String imageId = ClusterDatabase.getInstance().getProperty(
-				"cassandra.image-id");
-		String instanceType = ClusterDatabase.getInstance().getProperty(
-				"cassandra.instance-type");
-
-		AwsCli.runInstance(imageId, instanceType, keyName, availabilityZone);
-	}
-
-	public void startSupervisor(int count) {
-		String keyName = ClusterDatabase.getInstance().getProperty(
-				"cluster.key-name");
-		String availabilityZone = ClusterDatabase.getInstance().getProperty(
-				"cluster.zone");
-		String imageId = ClusterDatabase.getInstance().getProperty(
-				"supervisor.image-id");
-		String instanceType = ClusterDatabase.getInstance().getProperty(
-				"supervisor.instance-type");
-
-		AwsCli.runInstances(imageId, instanceType, keyName, availabilityZone,
-				count);
 	}
 
 	public void killCluster() {

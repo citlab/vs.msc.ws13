@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import de.tu_berlin.citlab.cluster.instances.Instance;
 
 public class ClusterDatabase {
 

@@ -1,11 +1,9 @@
-package de.tu_berlin.citlab.cluster.instances;
+package de.tu_berlin.citlab.cluster;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import de.tu_berlin.citlab.cluster.AwsCli;
-import de.tu_berlin.citlab.cluster.ClusterDatabase;
 import de.tu_berlin.citlab.cluster.gson.InstancesGson;
 
 public class Instance {
