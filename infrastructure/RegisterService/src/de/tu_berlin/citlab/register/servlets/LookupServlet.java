@@ -1,4 +1,4 @@
-package de.tu_berlin.citlab.ws.servlets;
+package de.tu_berlin.citlab.register.servlets;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.tu_berlin.citlab.ws.dbase.Database;
+import de.tu_berlin.citlab.database.RegisterDatabase;
 
 public class LookupServlet extends HttpServlet {
 
@@ -21,9 +21,9 @@ public class LookupServlet extends HttpServlet {
 			String ip = null;
 
 			if (param.equals("cassandra")) {
-				ip = Database.getInstance().getIP(1);
+				ip = RegisterDatabase.getInstance().getIP(1);
 			} else if (param.equals("nimbus")) {
-				ip = Database.getInstance().getIP(0);
+				ip = RegisterDatabase.getInstance().getIP(0);
 			}
 			if (ip == null) {
 				ip = "null";

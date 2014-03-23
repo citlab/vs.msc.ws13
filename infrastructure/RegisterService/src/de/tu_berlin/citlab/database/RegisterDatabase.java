@@ -1,7 +1,5 @@
-package de.tu_berlin.citlab.ws.dbase;
+package de.tu_berlin.citlab.database;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,45 +9,27 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.Random;
 
-public class Database {
+public class RegisterDatabase {
 
-	private static final Database INSTANCE = new Database();
+	private static final RegisterDatabase INSTANCE = new RegisterDatabase();
 
-	public static Database getInstance() {
+	public static RegisterDatabase getInstance() {
 		return INSTANCE;
 	}
 
-	private final Properties prop;
-
-	private Database() {
-		prop = new Properties();
-		FileInputStream fis = null;
-
-		try {
-			fis = new FileInputStream(
-					"/home/ubuntu/StormRegisterService/db.properties");
-			prop.load(fis);
-		} catch (IOException e) {
-			System.err.println("Could not load database configuration file");
-		} finally {
-			if (fis != null) {
-				try {
-					fis.close();
-				} catch (IOException e) {
-				}
-			}
-		}
+	private RegisterDatabase() {
 	}
 
 	private String getConnectionString() {
-		return "jdbc:mysql://" + prop.getProperty("hostUrl") + ":"
-				+ prop.getProperty("hostPort") + "/"
+		DatabaseConfig prop = DatabaseConfig.getInstance();
+
+		return "jdbc:mysql://" + prop.getProperty("host_url") + ":"
+				+ prop.getProperty("host_port") + "/"
 				+ prop.getProperty("database") + "?user="
-				+ prop.getProperty("userName") + "&password="
-				+ prop.getProperty("userPW");
+				+ prop.getProperty("u_register") + "&password="
+				+ prop.getProperty("p_register");
 	}
 
 	private String generateSalt(int length) {
