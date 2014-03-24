@@ -181,11 +181,11 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     public void execute(List<Tuple> tuples, OutputCollector collector) {
                         String user=tuples.get(0).getStringByField("user");
                         Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        Long total_significance = new Long(0);
+                        Long total_significance = new Long(1);
 
                         for( Tuple p : tuples ){
                             Long significance = p.getLongByField("significance");
-                            total_significance+=significance;
+                            total_significance*=significance;
                         }//for
 
                         getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
@@ -194,7 +194,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     }// execute()
                 },
                 WINDOW,
-                KeyConfigFactory.ByFields( "user" )
+                KeyConfigFactory.ByFields( "tweet_id" )
         );
     }
 
