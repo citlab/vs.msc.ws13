@@ -20,6 +20,8 @@ public class TupleAnalyzer
 
 	Map <String, String> javaToCassandraTypes = new HashMap <String, String>()
 	{
+		private static final long serialVersionUID = 1L;
+
 		{
 			put( "String", "text" );
 			put( "Integer", "int" );
@@ -27,18 +29,13 @@ public class TupleAnalyzer
 		}
 	};
 
+	// A tuple analyzer retrieves fields and values from a tuple and maps them to Cassandra data types
 	public TupleAnalyzer( Tuple tuple )
 	{
-		// this.keyspace = keyspace;
-		// this.table = table;
 		fieldsInTuple = tuple.getFields();
 		objectsInTuple = tuple.getValues();
 		System.out.println(objectsInTuple);
 		getJavaAndCassandraTypesFromTupleObjects( objectsInTuple );
-
-		//CassandraBolt.dao.createKeyspace( createKeyspaceQuery( keyspace ) );
-		//CassandraBolt.dao.createTable( createTableQueryByFields( keyspace, table,
-		//		fieldsInTuple.toList() ) );
 	}
 	
 	public void setPrimaryKey( PrimaryKey pk )
@@ -86,26 +83,11 @@ public class TupleAnalyzer
 
 	public String createTableQueryByFields( String keyspace, String table, List <String> fields )
 	{
-		// <value1> <datatype1> ...
 		List <String> fieldsWithDataTypes = new ArrayList <String>();
 		for ( int i = 0; i < fields.size(); i++ )
 		{
-			
 			String str = fields.get( i ) + " " + cassandraTypesInTuple.get( i );
 			fieldsWithDataTypes.add( str );
-			
-/*			// testen, ob primitiver Typ oder String in javaTypesInTuple
-			if ( javaToCassandraTypes.containsKey( javaTypesInTuple.get( i ) ) )
-			{
-				String str = fields.get( i ) + " " + javaTypesInTuple.get( i );
-				fieldsWithDataTypes.add( str );
-			}
-			else // Referenztyp
-			{
-				String str = fields.get( i ) + " blob";
-				fieldsWithDataTypes.add( str );
-			}*/
-
 		}
 
 		StringBuilder pks = new StringBuilder();
@@ -115,8 +97,6 @@ public class TupleAnalyzer
 		}
 		pks.deleteCharAt( pks.length() - 1 );
 
-		// CREATE TABLE <table>(<value1> <datatype1>, <value2> <datatype2> ...,
-		// PRIMARY KEYS(<value1>, <value2> ...)
 		return "CREATE TABLE IF NOT EXISTS " + keyspace + "." + table + " ("
 				+ StringUtils.join( fieldsWithDataTypes, "," ) + "," + "PRIMARY KEY("
 				+ pks.toString() + ")) WITH COMPACT STORAGE";

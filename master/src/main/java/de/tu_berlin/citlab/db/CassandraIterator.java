@@ -1,14 +1,13 @@
 package de.tu_berlin.citlab.db;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 
 import backtype.storm.tuple.Values;
 
+// An iterator used for retrieving values from result sets with Cassandra data types
 public class CassandraIterator implements Iterator<Values> { 
 	    private Iterator<Row> rows;
 	    public CassandraIterator( ResultSet rs )

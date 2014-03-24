@@ -14,9 +14,6 @@ import com.datastax.driver.core.PreparedStatement;
 
 import de.tu_berlin.citlab.db.CassandraConfig;
 import de.tu_berlin.citlab.db.CassandraDAO;
-import de.tu_berlin.citlab.db.DAO;
-import de.tu_berlin.citlab.db.DAOFactory;
-import de.tu_berlin.citlab.db.DBConfig;
 import de.tu_berlin.citlab.db.PrimaryKey;
 import de.tu_berlin.citlab.db.TupleAnalyzer;
 import de.tu_berlin.citlab.db.TupleFields;
@@ -56,7 +53,7 @@ public class CassandraWithTwitterStream {
         String[] keywords = new String[] {"der", "die", "das"};
         String[] languages = new String[] {"de"};
         // String[] languages = new String[] { "en", "de" };
-        String[] outputFields = new String[] {"user", "id", "tweet"};
+        String[] outputFields = new String[] {"user", "user_id", "tweet"};
         //String[] outputFields = new String[] {"user", "id"};  // User name as string, Tweet-ID as long
         TwitterConfiguration config = new TwitterConfiguration(user, keywords,
                 languages, outputFields);

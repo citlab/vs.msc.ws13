@@ -17,38 +17,28 @@ public class TestSelect
 {
 	static Cluster cluster;
 	static Session session;
-	
+
 	public static void main( String[] args ) throws Exception
 	{
-		//Vorgabe:
-		//List<Values> = CassandraDAO.source("citstorm", "user_significance").findAll()
-		//List<Values> = CassandraDAO.source("citstorm", "user_significance").findBy( KeyFields, Values )
-			
-		//List<Values> listOfValues = new ArrayList<Values>();
-		
-		//listOfValues = dao.source( "myks", "tab1" ).findBy( "user", "Jules" );
-		//listOfValues = dao.source( "myks", "tab1" ).findAll();
-		
-		//System.out.println(listOfValues);
 
 		TestSelect ts = new TestSelect();
-		ts.connect("127.0.0.1");
-		Statement st = new SimpleStatement("SELECT * FROM myks.mytable1");
-		//Statement st = QueryBuilder.select(selectFields).from( table_inf.get( "keyspace" ), table_inf.get( "table" ) );
-		
-		st.setFetchSize(10);
-		ResultSet rs = session.execute(st);
+		ts.connect( "127.0.0.1" );
+		Statement st = new SimpleStatement( "SELECT * FROM myks.tab1" );
 
-    	CassandraIterator citer = new CassandraIterator(rs);
+		st.setFetchSize( 10 );
+		ResultSet rs = session.execute( st );
 
-    	for (int i = 0; citer.hasNext(); i++ )
+		int i = 0;
+		for ( Row row : rs )
 		{
-			System.out.println("Iteration: " + i + " : " +citer.next());
+			System.out.println( "Iterations : " + i );
+			i++;
 		}
 
+		CassandraIterator citer = new CassandraIterator( rs );
 		session.shutdown();
-
 	}
+
 	public void connect( String node )
 	{
 		cluster = Cluster.builder().addContactPoint( node ).build();
@@ -61,7 +51,7 @@ public class TestSelect
 		}
 		session = cluster.connect();
 	}
-	
+
 	public void shutdown()
 	{
 		session.shutdown();
