@@ -8,13 +8,13 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
 
 @SuppressWarnings("serial")
-public class ReduceOperator extends IOperator {
+public class ReduceOperator<T> extends IOperator {
 	
-	protected final Reducer reducer;
-	protected final List<Object> init;
+	protected final Reducer<T> reducer;
+	protected final T init;
 	protected boolean chaining = false;
 
-	public ReduceOperator(Reducer reducer, List<Object> init) {
+	public ReduceOperator(Reducer<T> reducer, T init) {
 		this.reducer = reducer;
 		this.init = init;
 	}
@@ -25,9 +25,9 @@ public class ReduceOperator extends IOperator {
 	}
 
 	public void execute(List<Tuple> input, OutputCollector emitter) {
-		List<Object> result = new ArrayList<Object>(init);
-		for (Tuple param : input) {
-			result = reducer.reduce(param, result);
+		T result = init;
+		for (Tuple t : input) {
+			result = reducer.reduce(result, t);
 		}
 		if (chaining) {
 			emitter.emit(input, result);

@@ -5,6 +5,6 @@ import java.util.List;
 
 import backtype.storm.tuple.Tuple;
 
-public interface Reducer extends Serializable {
-	public List<Object> reduce(Tuple tuple, List<Object> values);
+public interface Reducer<T> extends Serializable {
+	public T reduce( T value, Tuple tuple );
 }
