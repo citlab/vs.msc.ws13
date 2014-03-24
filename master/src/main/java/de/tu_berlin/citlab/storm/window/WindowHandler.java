@@ -103,7 +103,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
             if (window instanceof TimeWindow || window.isSatisfied()) {
 
                 // provide statistics
-                getUDFBolt().log_statistics( getUDFBolt().getUDFDescription() + " - process window [ key: "+key+", "+window.getClass().getSimpleName()+", size:"+window.size() );
+                getUDFBolt().log_statistics( getUDFBolt().getUDFDescription() + " - process window [key: "+key+","+window.getClass().getSimpleName()+",size:"+window.size()+"]" );
 
                 Map<Serializable, List<Tuple>> groups = new HashMap<Serializable, List<Tuple>>();
                 for(Tuple tuple : window.flush()) {

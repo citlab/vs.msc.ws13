@@ -176,22 +176,18 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt reduceUserSignificance(){
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "significance" ),
-                new IOperator(){
+                new ReduceOperator<Long>( new Reducer<Long>(){
                     @Override
-                    public void execute(List<Tuple> tuples, OutputCollector collector) {
+                    public Long reduce(Long value, Tuple tuple) {
+                        return tuple.getLongByField("significance") + value;
+                    }
+                }, new Long(0) /*reducer init value */ ) {
+                    @Override
+                    public Values envelope(List<Tuple> tuples, Long total_significance){
                         String user=tuples.get(0).getStringByField("user");
                         Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        Long total_significance = new Long(0);
-
-                        for( Tuple p : tuples ){
-                            Long significance = p.getLongByField("significance");
-                            total_significance+=significance;
-                        }//for
-
-                        getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
-
-                        collector.emit(new Values(user,tweet_id,total_significance ));
-                    }// execute()
+                        return new Values(user,tweet_id,total_significance );
+                    }
                 },
                 WINDOW,
                 KeyConfigFactory.ByFields( "user" )
@@ -278,7 +274,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                             // do not output any tuples
                                             getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
-                                            getUDFBolt().log_statistics("update user sig: " +totalSig+" "+newUserTuple );
+                                            getUDFBolt().log_statistics("update user sig: " + totalSig + " " + newUserTuple);
 
                                         } else {
                                             Long totalSig = currSig;
@@ -289,7 +285,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            getUDFBolt().log_statistics("add new user sig: " +totalSig+" "+newUserTuple );
+                                            getUDFBolt().log_statistics("add new user sig: " + totalSig + " " + newUserTuple);
 
                                             getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }

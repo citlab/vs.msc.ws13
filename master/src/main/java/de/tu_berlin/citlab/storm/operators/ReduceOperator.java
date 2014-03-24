@@ -21,6 +21,11 @@ public class ReduceOperator<T> extends IOperator {
         this.init = init;
     }
 
+    public ReduceOperator setChainingAndReturnInstance(boolean value){
+        chaining=value;
+        return this;
+    }
+
     public void execute(List<Tuple> input, OutputCollector emitter) {
         T result = init;
         for (Tuple t : input) {
