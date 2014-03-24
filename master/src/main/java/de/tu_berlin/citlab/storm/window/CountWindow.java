@@ -69,8 +69,13 @@ public class CountWindow<I> implements Window<I, List<I>> {
 	public CountWindow<I> clone() {
 		return new CountWindow<I>(size, offset);
 	}
-	
-	@Override
+
+    @Override
+    public int size() {
+        return slots.size();
+    }
+
+    @Override
 	public String toString() {
 		return slots.toString();
 	}

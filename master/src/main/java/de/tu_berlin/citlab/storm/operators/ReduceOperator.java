@@ -25,7 +25,7 @@ public class ReduceOperator extends IOperator {
 	}
 
 	public void execute(List<Tuple> input, OutputCollector emitter) {
-		List<Object> result = new ArrayList<Object>(init);
+		List<Object> result = new ArrayList<>();
 		for (Tuple param : input) {
 			result = reducer.reduce(param, result);
 		}
