@@ -45,7 +45,7 @@ public class MultipleOperators extends IOperator {
             operators.get(source).getOperator().execute( input, collector );
 
         } else {
-            System.err.print("ERROR: could not find appropriate operator in MultipleOperators for source "+source );
+            getUDFBolt().log_error("could not find appropriate operator in MultipleOperators for source "+source );
         }
     }
 }

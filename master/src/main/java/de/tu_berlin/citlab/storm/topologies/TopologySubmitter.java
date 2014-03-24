@@ -33,7 +33,7 @@ public class TopologySubmitter
     {
         if (args == null || args.length == 0) {
         	// uncomment to enable DB logging
-        	//LoggingConfigurator.activateDataBaseLogger();
+            LoggingConfigurator.activateDataBaseLogger(/* session */);
 
         	setTopology();
             Config conf = new Config();
