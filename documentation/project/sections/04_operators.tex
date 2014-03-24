@@ -1,6 +1,25 @@
 \section{Operators}
 \label{sect:operators}
+This sections lists and describes the operators that are discussed in this work.
+For each operator a common description is given about its traditional behavior plus concerns regarding how its definition changes when applied into a stream-processing context.
+\begin{description}
+  \item[map] \hfill \\
+  The \map\ operator is most often defined as a function that takes one arbitrary argument and returns an element of the same type:
+	$$map:X\rightarrow X$$
+	However, when the \map\ operator itself is applied in the \texttt{MAP} \textsl{operation} it is usually to a set of elements and results in a set of modified elements:
+	$$MAP\left(S\right)=\{s\in S : map(s)\}$$
+	This concept stays basically the same when \map\ is applied in a stream-processing context with the exception that the input of \texttt{MAP} is a stream of elements just like its output.
+  \item[filter] \hfill \\
+  The second item
+  \item[reduce] \hfill \\
+  The third etc \ldots
+	\item[join] \hfill \\
+  The third etc \ldots
+	\item[groupby] \hfill \\
+  The third etc \ldots
+	\item[update] \hfill \\
+  The third etc \ldots
+\end{description}
 
-
-\subsection{Operator Types}
-\label{sect:operatorTypes}
+%\subsection{Operator Types}
+%\label{sect:operatorTypes}
