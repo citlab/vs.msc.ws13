@@ -44,9 +44,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 {
     private static final int windowSize = 1;
     private static final int slidingOffset = 1;
-
     //public Window<Tuple, List<Tuple>> WINDOW = new CountWindow<Tuple>(windowSize, slidingOffset);
-
     public Window<Tuple, List<Tuple>> WINDOW = new TimeWindow<Tuple>(1,1);
 
     public BaseRichSpout createTwitterSpout() throws InvalidTwitterConfigurationException {
@@ -105,18 +103,17 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt flatMapTweetWords(){
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "word" ),
-                new IOperator(){
+                new FlatMapOperator( new FlatMapper() {
                     @Override
-                    public void execute(List<Tuple> tuples, OutputCollector collector) {
-
-                        for( Tuple p : tuples ){
-                            String[] words = p.getStringByField("tweet").replaceAll("[^a-zA-Z0-9 ]", "").split(" ");
-                            for( String word : words ){
-                                collector.emit(new Values(p.getValueByField("user"),p.getValueByField("tweet_id"), word.trim().toLowerCase() ));
-                            }//for
-                        }//for
-                    }// execute()
-                },
+                    public List<List<Object>> flatMap(Tuple tuple) {
+                        String[] words = tuple.getStringByField("tweet").replaceAll("[^a-zA-Z0-9 ]", "").split(" ");
+                        List<List<Object>> result = new ArrayList<>();
+                        for( String word : words ){
+                            result.add(new Values(tuple.getValueByField("user"), tuple.getValueByField("tweet_id"), word.trim().toLowerCase()));
+                        }
+                        return result;
+                    }
+                }),
                 WINDOW
                 );
     }
@@ -222,32 +219,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt delayTuplesBolt(final int sec, final Fields fields){
         return new UDFBolt(
                 fields,
-                new IOperator(){
-                    class DelayedTuple{
-                        private Long created=System.currentTimeMillis();
-                        private Tuple p;
-                        public DelayedTuple(Tuple p){
-                            this.p = p;
-                        }
-                        public Long getCreatedTime(){ return created; }
-                        public Tuple getTuple(){ return p; }
-                    }
-
-                    private Queue<DelayedTuple> queue = new LinkedList<DelayedTuple>();
-                    @Override
-                    public void execute(List<Tuple> tuples, OutputCollector collector) {
-                        for( Tuple p : tuples ){
-                            queue.add( new DelayedTuple(p));
-                        }//for
-
-                        while( !queue.isEmpty() && (System.currentTimeMillis()-queue.element().getCreatedTime()) >= sec*1000 ){
-                            collector.emit( queue.poll().getTuple().getValues() );
-                        }
-
-                        this.getUDFBolt().log_debug("operator", "delayed tuples: queue-size: "+queue.size() );
-
-                     }//execute()
-                },
+                new DelayTuplesOperator(sec),
                 new TimeWindow<Tuple>(sec, sec)
         );
     }
@@ -306,6 +278,8 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                             // do not output any tuples
                                             getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
+                                            getUDFBolt().log_statistics("update user sig: " +totalSig+" "+newUserTuple );
+
                                         } else {
                                             Long totalSig = currSig;
                                             Tuple newUserTuple = TupleHelper.createStaticTuple(new Fields("user", "significance"), new Values(user, totalSig) );
@@ -315,7 +289,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            System.out.println("add new user");
+                                            getUDFBolt().log_statistics("add new user sig: " +totalSig+" "+newUserTuple );
 
                                             getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import backtype.storm.tuple.Tuple;
 
@@ -31,6 +32,16 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
      */
     final protected IKeyConfig groupByKey;
 
+    /**
+     * reference to parent UDF bolt, important to enable logging
+     */
+    private UDFBolt bolt;
+
+    public void setUDFBolt(UDFBolt bolt){
+        this.bolt=bolt;
+    }
+
+    public UDFBolt getUDFBolt(){ return this.bolt; }
 
 	/* Constructors: */
 	/* ============= */
@@ -90,6 +101,10 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         for (Object key : windows.keySet()) {
             Window<Tuple, List<Tuple>> window = windows.get(key);
             if (window instanceof TimeWindow || window.isSatisfied()) {
+
+                // provide statistics
+                getUDFBolt().log_statistics( getUDFBolt().getUDFDescription() + " - process window [ key: "+key+", "+window.getClass().getSimpleName()+", size:"+window.size() );
+
                 Map<Serializable, List<Tuple>> groups = new HashMap<Serializable, List<Tuple>>();
                 for(Tuple tuple : window.flush()) {
                     Serializable groupKey = groupByKey.getKeyOf(tuple);
@@ -101,6 +116,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
                 for(List<Tuple> group : groups.values()) {
                     result.add(group);
                 }
+
             }
         }
         return result;
@@ -114,7 +130,17 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         return null;
     }
 
-	public List<List<Tuple>> addSafely(Tuple input) {
+    @Override
+    public int size() {
+        int size=0;
+        for (Object key : windows.keySet()) {
+            Window<Tuple, List<Tuple>> window = windows.get(key);
+            size = size + window.size();
+        }
+        return size;
+    }
+
+    public List<List<Tuple>> addSafely(Tuple input) {
 		List<List<Tuple>> result = null;
 		if (isSatisfied()) {
 			result = flush();

@@ -40,7 +40,7 @@ public class UDFBolt extends BaseRichBolt {
 
     // SCOPE describes the location of log messages created (e.g. operator)
 
-    public void log_debug(String msg){ log_info("UDF", msg); };
+    public void log_debug(String msg){ log_debug("UDF", msg); };
     public void log_debug(String scope, Object ... msgs){
         LOGGER.debug(marker, stormComponentId+LOG_DLIMITER+stormTaskId+LOG_DLIMITER+scope+LOG_DLIMITER+ StringUtils.join(msgs, ' '));
     }
@@ -49,11 +49,11 @@ public class UDFBolt extends BaseRichBolt {
     public void log_info(String scope, Object ... msgs){
         LOGGER.info(marker, stormComponentId+LOG_DLIMITER+stormTaskId+LOG_DLIMITER+scope+LOG_DLIMITER+ StringUtils.join(msgs, ' '));
     }
-    public void log_error(String msg){ log_info("UDF", msg); };
+    public void log_error(String msg){ log_error("UDF", msg); };
     public void log_error(String scope, Object ... msgs){
         LOGGER.error(marker, stormComponentId + LOG_DLIMITER + stormTaskId + LOG_DLIMITER + scope + LOG_DLIMITER + StringUtils.join(msgs, ' '));
     }
-    public void log_statistics(String msg){ log_info("UDF", msg); };
+    public void log_statistics(String msg){ log_statistics("UDF", msg); };
     public void log_statistics(String scope, Object ... msgs){
         LOGGER.info(statistics, stormComponentId + LOG_DLIMITER + stormTaskId + LOG_DLIMITER+ scope + LOG_DLIMITER + StringUtils.join(msgs, ' '  ));
     }
@@ -100,6 +100,7 @@ public class UDFBolt extends BaseRichBolt {
         this.operator = operator;
         this.operator.setUDFBolt(this);
         windowHandler = new WindowHandler(window, windowKey, groupByKey);
+        windowHandler.setUDFBolt(this);
     }
 
 
@@ -156,6 +157,10 @@ public class UDFBolt extends BaseRichBolt {
         }
     }
 
+
+    public String getUDFDescription(){
+        return "Bolt<"+stormComponentId+">::UDF<"+operator.getClass().getSimpleName()+"> -> (" +StringUtils.join(outputFields.toList().toArray(), ",")+")";
+    }
 
 
 /* Private Methods: */
