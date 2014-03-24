@@ -9,18 +9,21 @@
 \usepackage{balance}  % for  \balance command ON LAST PAGE  (only there!)
 
 \usepackage[printonlyused]{acronym}
- 
+
+\usepackage[backend=biber]{biblatex}
+\bibliography{bibliography}
+
 \newacro{TUB}{Berlin Institute of Technology}
 \newacro{CIT}{Complex and Distributed IT-Systems}
 
 \newcommand{\BigData}{\textsl{Big Data}}
 \newcommand{\Stratosphere}{\textsl{Stratosphere}}
 \newcommand{\map}{\texttt{map}}
-\newcommand{\filter}{\texttt{map}}
-\newcommand{\reduce}{\texttt{map}}
-\newcommand{\join}{\texttt{map}}
-\newcommand{\groupby}{\texttt{map}}
-\newcommand{\update}{\texttt{map}}
+\newcommand{\filter}{\texttt{filter}}
+\newcommand{\reduce}{\texttt{reduce}}
+\newcommand{\join}{\texttt{join}}
+\newcommand{\groupby}{\texttt{groupby}}
+\newcommand{\update}{\texttt{update}}
 
 \begin{document}
 
@@ -36,4 +39,7 @@
 	\input{sections/07_frontend}
 	\input{sections/08_testing}
 	\input{sections/09_conclusion}
+	
+	%\thebibliography{References}
+	\printbibliography
 \end{document}
