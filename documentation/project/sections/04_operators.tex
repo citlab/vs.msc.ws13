@@ -4,13 +4,13 @@ This sections lists and describes the operators that are discussed in this work.
 For each operator a common description is given about its traditional behavior plus concerns regarding how its definition changes when applied into a stream-processing context.
 \begin{description}
   \item[map] \hfill \\
-  The \map\ operator is most often defined as a function that takes one arbitrary argument and returns an element of the same type:
-	$$map:X\rightarrow X$$
-	However, when the \map\ operator itself is applied in the \texttt{MAP} \textsl{operation} it is usually to a set of elements and results in a set of modified elements:
-	$$MAP\left(S\right)=\{s\in S : map(s)\}$$
-	This concept stays basically the same when \map\ is applied in a stream-processing context with the exception that the input of \texttt{MAP} is a stream of elements just like its output.
+  The \map\ operator is most often defined as a function that converts a data set by applying a higher-order function \textsl{\_map} against each element of the set, resulting in a new data set of modified elements \cite{Wiki:Map}:
+	$$map\left(S, \_map\right)=\{s\in S : \_map(s)\}$$
+	This concept stays basically the same when \map\ is applied in a stream-processing context except that its inputs and outputs are streams of elements not sets.
   \item[filter] \hfill \\
-  The second item
+  The \filter\ operator is commonly understood as a function that converts a data set to a subset by removing all elements from the original data set that do not match a higher-order predicate \textsl{\_filter}\cite{Wiki:Filter}:
+	$$filter\left(S, \_filter\right)=\{s\in S\ | \_filter\left(s\right)\}$$
+	This concept stays basically the same when \filter\ is applied in a stream-processing context except that its inputs and outputs are streams of elements not sets.
   \item[reduce] \hfill \\
   The third etc \ldots
 	\item[join] \hfill \\
