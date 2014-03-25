@@ -49,23 +49,23 @@ public class StreamNode implements Serializable {
         return udf;
     }
 
-    public StreamCaseMerge case_merge( Fields outputFields, StreamNode ... nodes){
-        MultipleOperators multiOperatos =  new MultipleOperators();
-        StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperatos );
+    public StreamCaseMerge case_merge( Fields groupBy, Fields outputFields, StreamNode ... nodes){
+        MultipleOperators multiOperators =  new MultipleOperators();
+        StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperators );
 
         BoltDeclarer boldDeclarer =
                 getStreamBuilder().getTopologyBuilder().setBolt(case_merge.getNodeId(),
                         assignUDF(new UDFBolt(
                                 outputFields,
-                                new IdentityOperator(),
+                                multiOperators,
                                 getStreamBuilder().getDefaultWindowType(),
                                 KeyConfigFactory.BySource()
                         ))
                 )
-                .shuffleGrouping(this.getNodeId());
+                .fieldsGrouping(this.getNodeId(), groupBy);
 
         for(StreamNode node : nodes ){
-            boldDeclarer.shuffleGrouping(node.getNodeId());
+            boldDeclarer.fieldsGrouping(node.getNodeId(),groupBy);
         }
 
         return case_merge;

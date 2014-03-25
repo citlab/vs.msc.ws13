@@ -18,9 +18,8 @@ import java.util.Map;
 
 public class StreamCaseMergeSource extends StreamCaseMerge {
 
-    private MultipleOperators multipleOperators;
-    private StreamNode[] sources;
-    private StreamCaseMerge casemerge;
+    protected StreamNode[] sources;
+    protected StreamCaseMerge casemerge;
 
     public StreamCaseMergeSource(StreamBuilder builder,StreamCaseMerge casemerge, MultipleOperators multipleOperators, StreamNode ... sources) {
         super(builder,multipleOperators);

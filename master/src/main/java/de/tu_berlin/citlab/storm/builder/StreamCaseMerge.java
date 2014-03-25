@@ -6,7 +6,7 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 
 public class StreamCaseMerge extends StreamNode {
 
-    private MultipleOperators multipleOperators;
+    protected MultipleOperators multipleOperators;
 
     public StreamCaseMerge(StreamBuilder builder, MultipleOperators multipleOperators ) {
         super(builder);

@@ -169,7 +169,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             final TupleComparator compareUser = KeyConfigFactory.compareByFields(new Fields("user"));
 
-            delayedTweets.case_merge( new Fields(tweets_outputfields) )
+            delayedTweets.case_merge( new Fields("user") /*group by*/, new Fields(tweets_outputfields) )
                          .source(detectedUsers , userCassandraPersistentSignificanceSource )
                          .join( badUsersHashTable,
                                 TupleProjection.projectLeft(),
