@@ -3,23 +3,29 @@ package de.tu_berlin.citlab.storm.builder;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.operators.Filter;
-import de.tu_berlin.citlab.storm.operators.FlatMapper;
-import de.tu_berlin.citlab.storm.operators.Mapper;
-import de.tu_berlin.citlab.storm.operators.Reducer;
+import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
+import de.tu_berlin.citlab.storm.operators.*;
+import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
+import de.tu_berlin.citlab.storm.window.TupleComparator;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-abstract public class StreamNode {
+public class StreamNode {
+    public static int StreamNodeCounter = 1;
     public List<StreamNode> sources;
     private UDFBolt bolt;
     private StreamBuilder builder;
+    private String nodeId;
 
     public StreamNode(StreamBuilder builder){
+        StreamNodeCounter++;
+        nodeId = this.getClass().getSimpleName()+"-"+this.getClass().hashCode()+"-"+StreamNodeCounter;
         this.builder = builder;
     }
 
@@ -30,36 +36,85 @@ abstract public class StreamNode {
         return builder;
     }
 
-    public StreamNode join( IKeyConfig groupKey,
+    public StreamJoin join( /*Fields groupKey,*/
                             Iterator<Tuple> tuples,
                             TupleProjection projection,
+                            TupleComparator comparator,
                             Fields outputFields ){
-        return this;
+
+        StreamJoin node = new StreamJoin( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt(node.getNodeId(),
+            new UDFBolt(
+                    outputFields,
+                new StaticHashJoinOperator(
+                        comparator,
+                        projection,
+                        tuples ),
+                    getStreamBuilder().getDefaultWindowType(),
+                KeyConfigFactory.BySource()
+        ) )
+        .shuffleGrouping(this.getNodeId());
+         return node;
     }
+
+    /*
     public StreamNode join( StreamNode ... nodes ){
         return this;
+    }*/
+    public StreamFilter filter( Filter filter, Fields outputFields  ){
+        StreamFilter node = new StreamFilter( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt(node.getNodeId(),
+                new UDFBolt(
+                        outputFields,
+                        new FilterOperator(filter),
+                        getStreamBuilder().getDefaultWindowType()
+                ))
+        .shuffleGrouping( this.getNodeId());
+        
+        return node;
     }
-    public StreamNode filter( Filter filter, Fields outputFields  ){
-        return this;
+    public StreamMapper map( Mapper mapper, Fields outputFields  ){
+        StreamMapper node = new StreamMapper( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt( node.getNodeId(),
+           new UDFBolt(
+                   outputFields,
+                new MapOperator(mapper),
+                getStreamBuilder().getDefaultWindowType()
+            ) )
+            .shuffleGrouping(this.getNodeId());
+
+        return node;
     }
-    public StreamNode map( Mapper mapper, Fields outputFields  ){
-        return this;
+    public StreamFlatMapper flapMap( FlatMapper flatmapper, Fields outputFields ){
+        StreamFlatMapper node = new StreamFlatMapper( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt( node.getNodeId(),
+                new UDFBolt(
+                        outputFields,
+                        new FlatMapOperator(flatmapper),
+                        getStreamBuilder().getDefaultWindowType()
+                ) )
+                .shuffleGrouping( this.getNodeId() );
+        return node;
     }
-    public StreamNode flapMap( FlatMapper flatmapper, Fields outputFields ){
-        return this;
+    public void save( StreamSink sink ){
+
     }
-    public StreamNode cassnadraSink(){
-        return this;
-    }
-    public StreamNode reduce( Fields groupKey, Reducer reducer ){
-        return this;
+
+    public StreamReducer reduce( Fields reduceKey, Reducer reducer, Object init ){
+        StreamReducer node = new StreamReducer( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt( node.getNodeId(),
+            new UDFBolt(
+                new Fields( "user", "tweet_id", "significance" ),
+                new ReduceOperator( reduceKey, reducer, init /*reducer init value */ ),
+                getStreamBuilder().getDefaultWindowType(),
+                KeyConfigFactory.ByFields( reduceKey )
+        ) ).fieldsGrouping( this.getNodeId(), reduceKey );
+        return node;
     }
     public StreamNode caseInput( Reducer reducer ){
         return this;
     }
-
     public String getNodeId(){
-        return this.getClass().getSimpleName()+"_"+this.getClass().hashCode();
-
+        return nodeId;
     }
 }
