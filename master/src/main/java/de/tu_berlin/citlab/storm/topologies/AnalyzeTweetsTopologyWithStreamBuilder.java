@@ -101,13 +101,12 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             SinkOperator userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
             SinkOperator badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
 
-
             StreamSource userCassandraPersistentSignificanceSource = new CassandraStreamSource(stream,
                                                         cassandraUserSignificanceCfg,
                                                         new Fields("user", "significance") );
 
 
-            // delay tweets for 5 seconds, to make sure that the tweets are analyzed
+            // delay each tweets for 5 seconds, to make sure that the tweets are analyzed
             StreamNode delayedTweets = tweets.delay(5);
 
             StreamNode badWords =
@@ -142,8 +141,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                  return new Values(tuple.getValueByField("word"), new Long(1));
                              }
                          },
-                            new Fields("word", "count")
-                    )
+                        new Fields("word", "count"))
                     .save(badWordsStatisticsSink);
 
             StreamNode detectedUsers =
@@ -174,13 +172,13 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             delayedTweets.case_merge( new Fields("user") /*group by*/, new Fields(tweets_outputfields) )
 
-                         .source(delayedTweets )
-                         .join( badUsersHashTable,
+                            .source(delayedTweets )
+                            .join( badUsersHashTable,
                                 TupleProjection.projectLeft(),
                                 KeyConfigFactory.compareByFields(new Fields("user")) )
 
-                         .source(detectedUsers, userCassandraPersistentSignificanceSource )
-                         .execute( new IOperator(){
+                            .source(detectedUsers, userCassandraPersistentSignificanceSource )
+                            .execute( new IOperator(){
                                            @Override
                                            public void execute(List<Tuple> tuples, OutputCollector collector) {
                                                for( Tuple t : tuples ){
@@ -221,7 +219,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                                }
                                            }// execute()
                                        } )
-                        .save(tweetsSink);
+                            .save(tweetsSink);
 
         }catch(Exception e ){
             e.printStackTrace();
