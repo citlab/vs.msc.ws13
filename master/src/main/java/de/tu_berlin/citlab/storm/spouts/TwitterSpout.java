@@ -27,7 +27,7 @@ import de.tu_berlin.citlab.twitter.ConfiguredTwitterStreamBuilder;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 
-public class TwitterSpout extends BaseRichSpout {
+public class TwitterSpout extends UDFSpout {
 
 	private static final long serialVersionUID = 8650869752517101545L;
 	private static final Logger LOGGER = LogManager.getLogger("Spout");
@@ -43,9 +43,10 @@ public class TwitterSpout extends BaseRichSpout {
 
 	private final TwitterConfiguration config;
 
-	public TwitterSpout(TwitterConfiguration config)
+	public TwitterSpout(TwitterConfiguration config, Fields outputFields)
 					throws InvalidTwitterConfigurationException {
-			if (!config.isValid()) {
+        super(outputFields);
+        if (!config.isValid()) {
 					throw new InvalidTwitterConfigurationException(
 									"The passed configuration is not valid");
 			}

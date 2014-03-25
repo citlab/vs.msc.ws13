@@ -54,7 +54,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
-        return new TwitterSpout(config);
+        return new TwitterSpout(config,  new Fields(outputFields) );
     }
 
     public CassandraConfig getCassandraConfig(){
@@ -148,13 +148,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFBolt createStaticHashJoin(){
-
-        IKeyConfig groupKey = new IKeyConfig(){
-            public Serializable getKeyOf( Tuple tuple) {
-                Serializable key = tuple.getSourceComponent();
-                return key;
-            }
-        };
+        IKeyConfig groupKey = KeyConfigFactory.BySource();
 
 
         TupleProjection projection = new TupleProjection(){
