@@ -98,6 +98,35 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                 WINDOW
         );
     }
+    public UDFBolt mapToBadWordsWithCounter(){
+        return new UDFBolt(
+                new Fields( "word", "count" ),
+                new MapOperator( new Mapper() {
+                    @Override
+                    public List<Object> map(Tuple tuple) {
+                        return new Values(tuple.getValueByField("word"), new Long(1) );
+                    }
+                }),
+                WINDOW
+        );
+    }
+
+    public UDFBolt createCountWordStatisticsCassandraSink(){
+        CassandraConfig cassandraCfg = getCassandraConfig();
+        cassandraCfg.setParams(  //optional, but defaults not always sensable
+                "citstorm",
+                "badword_occurences",
+                new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
+                new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                true // enable counter-mode
+        );
+
+        return new UDFBolt(
+                new Fields(),
+                new CassandraOperator(cassandraCfg),
+                WINDOW
+        );
+    }
 
 
     public UDFBolt flatMapTweetWords(){
@@ -343,6 +372,13 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");
+
+        // store bad words into database
+        builder.setBolt("badwords_with_counter", this.mapToBadWordsWithCounter(), 1)
+                .shuffleGrouping("join_with_badwords");
+
+        builder.setBolt("badwords_with_counter_sink", createCountWordStatisticsCassandraSink(), 1)
+                .shuffleGrouping("badwords_with_counter");
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
