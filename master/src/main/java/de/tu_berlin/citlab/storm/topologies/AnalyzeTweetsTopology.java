@@ -249,7 +249,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt filterBadUsers(){
 
         final TupleProjection projection = new TupleProjection(){
-            public Values project(Tuple inMemTuple, Tuple tuple) {
+            public Values project(Tuple tuple, Tuple inMemTuple) {
                 return (Values)tuple.getValues();
             }
         };
