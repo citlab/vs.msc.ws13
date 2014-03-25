@@ -163,19 +163,20 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                 return false;
                             }
                         }},
-                        new Fields( "user", "tweet_id", "significance" ))
-                    .save(tweetsSink);
+                        new Fields( "user", "tweet_id", "significance" ));
 
+            // update user significance
+            detectedUsers.save(userSignificanceSink);
 
             final TupleComparator compareUser = KeyConfigFactory.compareByFields(new Fields("user"));
 
             delayedTweets.case_merge( new Fields("user") /*group by*/, new Fields(tweets_outputfields) )
-                         .source(detectedUsers , userCassandraPersistentSignificanceSource )
+                         .source(userCassandraPersistentSignificanceSource )
                          .join( badUsersHashTable,
                                 TupleProjection.projectLeft(),
                                 KeyConfigFactory.compareByFields(new Fields("user")) )
 
-                         .source()
+                         .source(detectedUsers)
                          .execute( new IOperator(){
                                            @Override
                                            public void execute(List<Tuple> tuples, OutputCollector collector) {

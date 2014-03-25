@@ -2,6 +2,7 @@ package de.tu_berlin.citlab.storm.operators;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import com.sun.script.util.BindingsEntrySet;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 public class MultipleOperators extends IOperator {
 
-    private Map<String,OperatorProcessingDescription> operators = new HashMap<String, OperatorProcessingDescription>();
+    protected Map<String,OperatorProcessingDescription> operators = new HashMap<String, OperatorProcessingDescription>();
 
     public MultipleOperators( OperatorProcessingDescription... descs ) {
 
@@ -38,6 +39,7 @@ public class MultipleOperators extends IOperator {
 
             operators.get(pairs.getKey()).getOperator().setUDFBolt(bolt);
         }//while
+        this.bolt = bolt;
     }
 
 
@@ -51,7 +53,7 @@ public class MultipleOperators extends IOperator {
             operators.get(source).getOperator().execute( input, collector );
 
         } else {
-            getUDFBolt().log_error("could not find appropriate operator in MultipleOperators for source "+source );
+            getUDFBolt().log_error("could not find appropriate operator in MultipleOperators for source " + source);
         }
     }
 }

@@ -11,7 +11,7 @@ import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 public abstract class IOperator implements Serializable {
 	public void execute(List<Tuple> input, OutputCollector collector) throws OperatorException {
     }
-    private UDFBolt bolt;
+    protected UDFBolt bolt;
     public void setUDFBolt(UDFBolt bolt){
         this.bolt=bolt;
     }
