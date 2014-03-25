@@ -140,9 +140,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                          },
                             new Fields("word", "count")
                     )
-                    .save(userSignificanceSink);
-
-
+                    .save(badWordsStatisticsSink);
 
             StreamNode detectedUsers =
                 joinedBadWords

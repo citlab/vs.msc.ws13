@@ -21,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 public class CassandraOperator extends SinkOperator {
 
     private boolean initialized = false;
-    private boolean isCounterBolt = false;
 
     private CassandraDAO dao = new CassandraDAO();
 
@@ -91,6 +90,8 @@ public class CassandraOperator extends SinkOperator {
 
         } catch (Exception e ){
             this.getUDFBolt().log_error("Storing of tuples into Cassandra DB failed!", e );
+
+            e.printStackTrace();
 
 			throw new OperatorException("Storing of tuples into Cassandra DB failed!");
         }
