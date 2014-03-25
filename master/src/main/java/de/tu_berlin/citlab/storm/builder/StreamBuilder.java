@@ -6,9 +6,10 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class StreamBuilder {
+public class StreamBuilder implements Serializable {
     private TopologyBuilder topology;
     private Window<Tuple, List<Tuple>> windowType;
 

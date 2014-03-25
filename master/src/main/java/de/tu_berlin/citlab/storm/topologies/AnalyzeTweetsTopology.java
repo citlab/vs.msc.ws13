@@ -54,7 +54,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
-        return new TwitterSpout(config,  new Fields(outputFields) );
+        return new TwitterSpout(config );
     }
 
     public CassandraConfig getCassandraConfig(){
@@ -374,7 +374,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
         // filter only user with a specific significance
-        builder.setBolt("filter_significant_userfilter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
+        builder.setBolt("filter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
                 .shuffleGrouping("reduce_to_user_significance");
 
         builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)

@@ -12,10 +12,7 @@ import de.tu_berlin.citlab.storm.builder.StreamSource;
 import de.tu_berlin.citlab.storm.builder.TwitterStreamSource;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
-import de.tu_berlin.citlab.storm.operators.Filter;
-import de.tu_berlin.citlab.storm.operators.FlatMapper;
-import de.tu_berlin.citlab.storm.operators.Mapper;
-import de.tu_berlin.citlab.storm.operators.Reducer;
+import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.sinks.CassandraSink;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
@@ -84,9 +81,9 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             StreamSource tweets = new TwitterStreamSource(stream).subscribe(keywords, languages, outputfields);
 
-            CassandraSink tweetsSink = new CassandraSink(cassandraTweetsCfg);
-            CassandraSink userSignificanceSink = new CassandraSink(cassandraUserSignificanceCfg);
-            CassandraSink badWordsStatisticsSink = new CassandraSink(cassandraBadWordsStatisticsCfg);
+            SinkOperator tweetsSink = new CassandraOperator(cassandraTweetsCfg);
+            SinkOperator userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
+            SinkOperator badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
 
             StreamNode badWords =
                 tweets.flapMap(new FlatMapper() {

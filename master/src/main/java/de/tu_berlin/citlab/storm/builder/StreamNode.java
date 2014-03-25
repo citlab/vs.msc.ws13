@@ -1,10 +1,13 @@
 package de.tu_berlin.citlab.storm.builder;
 
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
+import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
@@ -13,11 +16,12 @@ import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class StreamNode {
+public class StreamNode implements Serializable {
     public static int StreamNodeCounter = 1;
     public List<StreamNode> sources;
     private UDFBolt bolt;
@@ -29,14 +33,35 @@ public class StreamNode {
         nodeId = this.getClass().getSimpleName()+"-"+this.getClass().hashCode()+"-"+StreamNodeCounter;
         this.builder = builder;
     }
-
-    public StreamNode merge( StreamNode ... nodes ){
-        return this;
-    }
     public StreamBuilder getStreamBuilder(){
         return builder;
     }
 
+
+    /*public StreamNode merge( OperatorProcessingDescription ... desc ){
+        return this;
+    }*/
+
+
+
+    public StreamMerged merge( Fields outputFields, StreamNode ... nodes ){
+        StreamMerged merged = new StreamMerged( getStreamBuilder());
+
+        BoltDeclarer boldDeclarer =
+        getStreamBuilder().getTopologyBuilder().setBolt(merged.getNodeId(),
+                new UDFBolt(
+                        outputFields,
+                        new IdentityOperator(),
+                        getStreamBuilder().getDefaultWindowType(),
+                        KeyConfigFactory.BySource()
+                ))
+                .shuffleGrouping(this.getNodeId());
+
+        for(StreamNode node : nodes ){
+            boldDeclarer.shuffleGrouping(node.getNodeId());
+        }
+        return merged;
+    }
     public StreamJoin join( /*Fields groupKey,*/
                             Iterator<Tuple> tuples,
                             TupleProjection projection,
@@ -119,10 +144,6 @@ public class StreamNode {
         ) ).fieldsGrouping( this.getNodeId(), reduceKey );
         return node;
     }
-    public StreamNode caseInput( Reducer reducer ){
-        return this;
-    }
-    
     public String getNodeId(){
         return nodeId;
     }

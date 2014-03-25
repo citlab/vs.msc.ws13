@@ -43,9 +43,9 @@ public class TwitterSpout extends UDFSpout {
 
 	private final TwitterConfiguration config;
 
-	public TwitterSpout(TwitterConfiguration config, Fields outputFields)
+	public TwitterSpout(TwitterConfiguration config )
 					throws InvalidTwitterConfigurationException {
-        super(outputFields);
+        super(new Fields(config.getOutputFields()));
         if (!config.isValid()) {
 					throw new InvalidTwitterConfigurationException(
 									"The passed configuration is not valid");

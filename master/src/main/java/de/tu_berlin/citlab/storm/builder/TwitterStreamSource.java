@@ -22,7 +22,7 @@ public class TwitterStreamSource extends StreamSource {
 
     public StreamSource subscribe ( String[] keywords, String[] languages, String[] outputfields ) throws InvalidTwitterConfigurationException {
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputfields);
-        spout = new TwitterSpout(config, new Fields(outputfields));
+        spout = new TwitterSpout(config);
         getStreamBuilder().getTopologyBuilder().setSpout(getNodeId(), spout );
         return this;
     }
