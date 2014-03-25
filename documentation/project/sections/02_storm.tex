@@ -1,9 +1,14 @@
 \section{Storm Framework}
 \label{sect:architecture}
 
+	Storm characterizes itself as a \textit{distributed and fault-tolerant realtime computation engine} that is hosted under the Apache Foundation and thus free and open to use.
+	The architecture of Apache Storm is, unlike Hadoop, designed to cope with a continuous stream of input data, which gives it a flexibility towards scenarios where batch processing would fail, due to the fact that an input stream has - per definition - no determined start and end point. As our goal was to design streaming operators via \textit{User Defined Functions} (UDFs), Storm was an appropriate framework for our needs.
+
 
 \subsection{Storm Topology}
 \label{sect:stormTopology}
+	A topology in Storm is, on an abstract level, divided in two different elements: Sources and sinks. A source is an element which is providing input data to the topology, whereas a
+	sink is executing the input from one or more sources.
 
 \subsubsection{Bolts}
 
