@@ -140,7 +140,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                          },
                             new Fields("word", "count")
                     )
-                    .save(badWordsStatisticsSink);
+                    .save(userSignificanceSink);
 
 
 
@@ -163,8 +163,8 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                 return false;
                             }
                         }},
-                        new Fields( "user", "tweet_id", "significance" ));
-
+                        new Fields( "user", "tweet_id", "significance" ))
+                    .save(tweetsSink);
 
 
             final TupleComparator compareUser = KeyConfigFactory.compareByFields(new Fields("user"));
@@ -216,7 +216,8 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                                    }
                                                }
                                            }// execute()
-                                       } );
+                                       } )
+                        .save(tweetsSink);
 
 
         }catch(Exception e ){
