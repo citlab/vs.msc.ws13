@@ -22,12 +22,16 @@ public class CassandraDataProviderSpout extends UDFSpout {
 
     @Override
     public void open(){
-        // load data from cassandra
-        dao.setConfig(this.Cassandracfg);
-        dao.init();
-        stored_data = dao.source( Cassandracfg.getKeyspace(), Cassandracfg.getTable(), outputFields ).findAll();
+        try {
+            // load data from cassandra
+            dao.setConfig(this.Cassandracfg);
+            dao.init();
+            stored_data = dao.source(Cassandracfg.getKeyspace(), Cassandracfg.getTable(), outputFields).findAll();
 
-        ready=true;
+            ready = true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     @Override
     public void nextTuple(){
@@ -42,5 +46,10 @@ public class CassandraDataProviderSpout extends UDFSpout {
 
     @Override
     public void close(){
+    }
+
+    @Override
+    public Fields getOutputFields() {
+        return null;
     }
 }

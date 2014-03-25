@@ -3,6 +3,7 @@ package de.tu_berlin.citlab.storm.bolts;
 import java.util.List;
 import java.util.Map;
 
+import de.tu_berlin.citlab.storm.udf.UDFOutput;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 
-public class UDFBolt extends BaseRichBolt {
+public class UDFBolt extends BaseRichBolt implements UDFOutput {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LogManager.getLogger("Bolt");

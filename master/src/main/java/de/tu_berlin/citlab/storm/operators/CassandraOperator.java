@@ -18,10 +18,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-public class CassandraOperator extends IOperator {
+public class CassandraOperator extends SinkOperator {
 
     private boolean initialized = false;
-    private boolean isCounterBolt = false;
 
     private CassandraDAO dao = new CassandraDAO();
 
@@ -48,6 +47,7 @@ public class CassandraOperator extends IOperator {
                 dao.init();
                 dao.analyzeTuple( tuples.get(0) );
                 dao.createDataStructures();
+                dao.prepare();
 
             }
             else {
@@ -74,7 +74,6 @@ public class CassandraOperator extends IOperator {
            } else {
 
                 for( Tuple t : tuples ){
-
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
 
@@ -89,6 +88,8 @@ public class CassandraOperator extends IOperator {
 
         } catch (Exception e ){
             this.getUDFBolt().log_error("Storing of tuples into Cassandra DB failed!", e );
+
+            e.printStackTrace();
 
 			throw new OperatorException("Storing of tuples into Cassandra DB failed!");
         }

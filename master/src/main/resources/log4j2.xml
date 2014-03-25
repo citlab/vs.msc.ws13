@@ -17,10 +17,6 @@
 
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-<<<<<<< HEAD
-=======
-
->>>>>>> 5862b2203ef0f2965efcdbe1e86c530b1cf1442a
 		</Console>
 	</Appenders>
 

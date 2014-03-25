@@ -101,6 +101,7 @@ public class UDFTestTopology {
 			new UDFBolt(
 				new Fields("value"),
 				new ReduceOperator<> (
+                    new Fields(),
 					new Reducer<Integer>() {
 						public Integer reduce(Integer result, Tuple tuple ) {
 							return result + tuple.getIntegerByField("value");

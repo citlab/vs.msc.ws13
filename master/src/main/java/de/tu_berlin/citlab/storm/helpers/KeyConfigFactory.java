@@ -22,7 +22,7 @@ public class KeyConfigFactory implements Serializable {
 			return input.getSourceComponent();
 		}
 	};
-	
+
 	public static IKeyConfig ByFields(final String... fields) {
 		return ByFields(new Fields(fields));
 	}

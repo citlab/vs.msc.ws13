@@ -109,9 +109,10 @@ public class CassandraDAO implements DAO, Serializable
 		ta.setPrimaryKey( config.getPrimaryKeys() );  //TODO: pk anderswo behandeln
 		createKeyspaceQuery = ta.createKeyspaceQuery( config.getKeyspace() );
 		createTableQueryByFields = ta.createTableQueryByFields( config.getKeyspace(), config.getTable(), ta.fieldsInTuple.toList() );
+    }
 
+    public void prepare(){
         setPreparedStatement(ta.createPreparedInsertStatement(config.getKeyspace(), config.getTable()));
-
     }
 	
 	public void createDataStructures()

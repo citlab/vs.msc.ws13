@@ -24,7 +24,7 @@ public class TopologySubmitter
     }
     
     private static void setTopology() {
-    	topology = new AnalyzeTweetsTopology();
+    	topology = new AnalyzeTweetsTopologyWithStreamBuilder();
     }
 
 

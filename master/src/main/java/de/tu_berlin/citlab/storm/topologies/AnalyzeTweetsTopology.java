@@ -55,7 +55,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
         String[] languages = new String[] {"de"};
         String[] outputFields = new String[] {"user", "tweet_id", "tweet"};
         TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputFields);
-        return new TwitterSpout(config);
+        return new TwitterSpout(config );
     }
 
     public CassandraConfig getCassandraConfig(){
@@ -149,13 +149,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFBolt createStaticHashJoin(){
-
-        IKeyConfig groupKey = new IKeyConfig(){
-            public Serializable getKeyOf( Tuple tuple) {
-                Serializable key = tuple.getSourceComponent();
-                return key;
-            }
-        };
+        IKeyConfig groupKey = KeyConfigFactory.BySource();
 
 
         TupleProjection projection = new TupleProjection(){
@@ -196,23 +190,19 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFBolt reduceUserSignificance(){
+        final Fields groupFields = new Fields("user", "tweet_id");
+
+        IKeyConfig reduceKey =KeyConfigFactory.ByFields( groupFields );
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "significance" ),
-                new ReduceOperator<Long>( new Reducer<Long>(){
+                new ReduceOperator<Long>( groupFields, new Reducer<Long>(){
                     @Override
                     public Long reduce(Long value, Tuple tuple) {
                         return tuple.getLongByField("significance") + value;
                     }
-                }, new Long(0) /*reducer init value */ ) {
-                    @Override
-                    public Values envelope(List<Tuple> tuples, Long total_significance){
-                        String user=tuples.get(0).getStringByField("user");
-                        Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        return new Values(user,tweet_id,total_significance );
-                    }
-                },
+                }, new Long(0) /*reducer init value */ ),
                 WINDOW,
-                KeyConfigFactory.ByFields( "tweet_id" )
+                reduceKey
         );
     }
 
@@ -252,7 +242,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt filterBadUsers(){
 
         final TupleProjection projection = new TupleProjection(){
-            public Values project(Tuple inMemTuple, Tuple tuple) {
+            public Values project(Tuple tuple, Tuple inMemTuple) {
                 return (Values)tuple.getValues();
             }
         };
