@@ -26,8 +26,11 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
     @Override
     public StormTopology createTopology() {
+        String cassandraServerIP = "127.0.0.1";
+
+        StreamBuilder stream = new StreamBuilder();
+
         try{
-            String cassandraServerIP = "127.0.0.1";
 
             CassandraConfig cassandraTweetsCfg = new CassandraConfig();
             CassandraConfig cassandraUserSignificanceCfg = new CassandraConfig();
@@ -76,7 +79,6 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             String[] languages = new String[] {"de"};
             String[] outputfields = new String[] {"user", "tweet_id", "tweet"};
 
-            StreamBuilder stream = new StreamBuilder();
             stream.setDefaultWindowType(new TimeWindow<Tuple>(1,1));
 
             StreamSource tweets = new TwitterStreamSource(stream).subscribe(keywords, languages, outputfields);
@@ -136,8 +138,10 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                         }},
                         new Fields( "user", "tweet_id", "significance" ));
 
-        }catch(Exception e ){}
+        }catch(Exception e ){
+            e.printStackTrace();
+        }
 
-        return null;
+        return stream.getTopologyBuilder().createTopology();
     }
 }

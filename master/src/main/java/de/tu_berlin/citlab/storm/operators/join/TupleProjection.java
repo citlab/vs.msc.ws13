@@ -5,6 +5,7 @@ import java.io.Serializable;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import org.apache.commons.lang.ArrayUtils;
 
 public class TupleProjection implements Serializable {
 	public Values project(Tuple outer, Tuple inner ) { return null; };
@@ -12,7 +13,7 @@ public class TupleProjection implements Serializable {
         return
         new TupleProjection() {
             public Values project(Tuple inMemTuple, Tuple tuple) {
-                return new Values( tuple.select(inner), inMemTuple.select(outer) );
+                return new Values( ArrayUtils.addAll(tuple.select(outer).toArray(), inMemTuple.select(inner).toArray() ) );
             }
         };
     }
