@@ -7,10 +7,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.CassandraConfig;
 import de.tu_berlin.citlab.db.PrimaryKey;
-import de.tu_berlin.citlab.storm.builder.StreamBuilder;
-import de.tu_berlin.citlab.storm.builder.StreamNode;
-import de.tu_berlin.citlab.storm.builder.StreamSource;
-import de.tu_berlin.citlab.storm.builder.TwitterStreamSource;
+import de.tu_berlin.citlab.storm.builder.*;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.operators.*;
@@ -99,6 +96,12 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             SinkOperator userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
             SinkOperator badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
 
+
+            StreamSource userCassandraPersistentSignificanceSource = new CassandraStreamSource(stream,
+                                                        cassandraUserSignificanceCfg,
+                                                        new Fields("user", "significance") );
+
+
             // delay tweets for 5 seconds, to make sure that the tweets are analyzed
             StreamNode delayedTweets = tweets.delay(5);
 
@@ -163,10 +166,11 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                         new Fields( "user", "tweet_id", "significance" ));
 
 
+
             final TupleComparator compareUser = KeyConfigFactory.compareByFields(new Fields("user"));
 
             delayedTweets.case_merge( new Fields(tweets_outputfields) )
-                         .source(detectedUsers /*, "persistent_tuple_provider"*/)
+                         .source(detectedUsers , userCassandraPersistentSignificanceSource )
                          .join( badUsersHashTable,
                                 TupleProjection.projectLeft(),
                                 KeyConfigFactory.compareByFields(new Fields("user")) )
