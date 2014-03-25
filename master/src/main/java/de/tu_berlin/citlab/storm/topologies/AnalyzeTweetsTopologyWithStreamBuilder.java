@@ -47,7 +47,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             cassandraBadWordsStatisticsCfg.setIP(cassandraServerIP);
 
             cassandraTweetsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm2",
+                    "citstorm3",
                     "tweets",
                     new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -55,7 +55,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraUserSignificanceCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm2",
+                    "citstorm3",
                     "user_significance",
                     new PrimaryKey("user"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields("significance"), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -63,7 +63,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraBadWordsStatisticsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm2",
+                    "citstorm3",
                     "badword_occurences",
                     new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -71,21 +71,26 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
 
-            Window<Tuple, List<Tuple>> STREAM_WINDOW = new TimeWindow<Tuple>(1,1);
-
-
             List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
 
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("google", new Long(1))) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("microsoft", new Long(1) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("facebook", new Long(1) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", new Long(100))) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", new Long(500) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", new Long(1000))) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", new Long(10) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", new Long(100) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("religion", new Long(200) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("gott", new Long(50) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", new Long(1000) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("heilig", new Long(500) )) );
 
 
             // HashTable
             final Map<Serializable, List<Tuple>> badUsersHashTable = new HashMap<Serializable, List<Tuple> >();
 
-            String[] keywords = new String[] {"der", "die","das","wir","ihr","sie", "dein", "mein", "facebook", "google", "twitter" };
+            String[] keywords = new String[] { "der", "die","das","wir","ihr","sie", "dein", "mein", "es", "in", "einem", "von", "zu", "hat", "nicht",
+                    "bombe", "nuklear", "anschlag", "berin", "macht", "religion", "gott", "allah", "heilig" };
             String[] languages = new String[] {"de"};
+
             String[] tweets_outputfields = new String[] {"user", "tweet_id", "tweet"};
 
             stream.setDefaultWindowType(new TimeWindow<Tuple>(1,1));
@@ -113,7 +118,6 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                     .replaceAll("[^\\p{L}\\p{Nd} ]", "").trim().split(" +");
                             List<List<Object>> result = new ArrayList<>();
                             for (String word : words) {
-                                System.out.println("extract word: "+word+"("+word.length()+") -> "+tuple.getStringByField("tweet"));
                                 result.add(new Values(tuple.getValueByField("user"),
                                         tuple.getValueByField("tweet_id"),
                                         word.trim().toLowerCase()));
@@ -148,9 +152,9 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                            new Reducer<Long>() {
                                @Override
                                public Long reduce(Long value, Tuple tuple) {
-                                   return tuple.getLongByField("significance") + value;
+                                   return tuple.getLongByField("significance") * value;
                                }
-                           }, new Long(0),
+                           }, new Long(1),
                            new Fields( "user", "tweet_id", "significance" ))
                     .filter( new Filter(){
                         @Override

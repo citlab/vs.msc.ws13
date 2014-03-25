@@ -77,8 +77,6 @@ public class CassandraOperator extends SinkOperator {
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
 
-                    System.out.println("key: "+keyFields+"keyvalues: "+keyValues+", values: "+val);
-
                     this.getUDFBolt().log_debug("cassandra-operator", "store " + t);
 
                     synchronized (this){

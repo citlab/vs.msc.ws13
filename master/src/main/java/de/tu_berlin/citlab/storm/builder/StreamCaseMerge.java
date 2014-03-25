@@ -1,6 +1,5 @@
 package de.tu_berlin.citlab.storm.builder;
 
-import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.InputDeclarer;
 import backtype.storm.tuple.Fields;
 import de.tu_berlin.citlab.storm.operators.MultipleOperators;
@@ -37,10 +36,8 @@ public class StreamCaseMerge extends StreamNode {
     public StreamCaseMergeSource source(StreamNode ... sources){
         StreamCaseMergeSource casemergeSource = new StreamCaseMergeSource(getStreamBuilder(), this, multipleOperators, sources );
         for( StreamNode source : sources ) {
-            System.out.println("case_source: "+source.getNodeId());
             declarer.fieldsGrouping( source.getNodeId(), getGroupByFields());
         }
-
         return casemergeSource;
     }
 
