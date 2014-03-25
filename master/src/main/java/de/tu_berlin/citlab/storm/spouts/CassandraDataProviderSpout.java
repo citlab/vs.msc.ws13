@@ -47,4 +47,9 @@ public class CassandraDataProviderSpout extends UDFSpout {
     @Override
     public void close(){
     }
+
+    @Override
+    public Fields getOutputFields() {
+        return null;
+    }
 }

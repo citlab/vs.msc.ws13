@@ -81,11 +81,14 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             stream.setDefaultWindowType(new TimeWindow<Tuple>(1,1));
 
-            StreamSource tweets = new TwitterStreamSource(stream).subscribe(keywords, languages, outputfields);
+            StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, outputfields);
 
             SinkOperator tweetsSink = new CassandraOperator(cassandraTweetsCfg);
             SinkOperator userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
             SinkOperator badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
+
+            // delay tweets for 5 seconds, to make sure that the tweets are analyzed
+            StreamNode delayedTweets = tweets.delay(5);
 
             StreamNode badWords =
                 tweets.flapMap(new FlatMapper() {

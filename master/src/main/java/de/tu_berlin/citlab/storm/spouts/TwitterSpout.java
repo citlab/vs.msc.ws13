@@ -161,4 +161,9 @@ public class TwitterSpout extends UDFSpout {
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
                 declarer.declare(new Fields(config.getOutputFields()));
         }
+
+    @Override
+    public Fields getOutputFields() {
+        return new Fields(config.getOutputFields());
+    }
 }

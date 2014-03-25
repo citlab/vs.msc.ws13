@@ -3,8 +3,7 @@ package de.tu_berlin.citlab.storm.spouts;
 
 import java.util.Map;
 
-import backtype.storm.task.OutputCollector;
-import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
+import de.tu_berlin.citlab.storm.udf.UDFOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import backtype.storm.Config;
@@ -14,7 +13,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 
-abstract public class UDFSpout extends BaseRichSpout {
+abstract public class UDFSpout extends BaseRichSpout implements UDFOutput {
 
     protected static final Logger LOGGER = LogManager.getLogger("Spout");
 
