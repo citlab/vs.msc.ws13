@@ -92,9 +92,10 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                         @Override
                         public List<List<Object>> flatMap(Tuple tuple) {
                             String[] words = tuple.getStringByField("tweet")
-                                    .replaceAll("[^a-zA-Z0-9 ]", "").split(" ");
+                                    .replaceAll("[^\\p{L}\\p{Nd}]", "").trim().split(" +");
                             List<List<Object>> result = new ArrayList<>();
                             for (String word : words) {
+                                System.out.println("extract word: "+word+"("+word.length()+") -> "+tuple.getStringByField("tweet"));
                                 result.add(new Values(tuple.getValueByField("user"),
                                         tuple.getValueByField("tweet_id"),
                                         word.trim().toLowerCase()));
