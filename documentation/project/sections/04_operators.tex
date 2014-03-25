@@ -1,6 +1,52 @@
 \section{Operators}
 \label{sect:operators}
+This sections lists and describes the operators that are discussed in this work.
+For each operator a common description is given about its traditional behavior plus concerns regarding how its definition changes when applied into a stream-processing context.
 
+The following definitions have no claim to be universally valid and are only intended to clarify the perspective of this work.
+\begin{description}
+  \item[map] \hfill \\
+  The \map\ operator is most often defined as a function that converts a data set by applying a unary higher-order function \texttt{\_map} against each element of the set, resulting in a new data set of modified elements \cite{Wiki:Map}:
+	$$map\left(S, \_map\right)=\{s\in S : \_map(s)\}$$
+	A stream-\map\ is trivial, because \map\ is stateless: to each element of a stream, the the higher-order \texttt{\_map} is applied and the result is added to the resulting stream.
+  \item[filter] \hfill \\
+  The \filter\ operator is commonly understood as a function that converts a data set to a subset by removing all elements from the original data set that do not match a unary higher-order predicate \texttt{\_filter}\cite{Wiki:Filter}:
+	$$filter\left(S, \_filter\right)=\{s\in S\ | \_filter\left(s\right)\}$$
+	Again, a stream-\filter\ is trivial because of its statelessness: the higher-order predicate \texttt{\_filter} decides if an element is attached to a resulting stream or not.
+  \item[reduce] \hfill \\
+  The \reduce\ or \texttt{fold} operator is usually\cite{Wiki:Fold} defined as an function, that \textsl{reduces} all elements of a data set to a single one by applying a binary higher-order function
+	$\_reduce: X \times X \rightarrow Y $
+	recursively to all elements of a data set
+	$S={s_0, s_1, ..., s_n}$
+	$$ reduce(S, \_reduce)=\_reduce(s_0, \_reduce(s_1, ...))) $$
+	When eventually the recursion tree is completely expanded an element is missing, which is substituted by a \texttt{seed}:
+	$$ \_reduce(s_n, \texttt{seed}) $$
+	%Whether the tree is expanded from the beginning or the ending of a data set decides what kind of \reduce\ operator it is: \texttt{left-} or \texttt{right-reduce}.
+	
+	%In the case of stream-processing there can not be different kinds of \reduce\ operators that refer to the order of how elements get processed because there is only one order in that elements arrive from a data stream.
+	A stream-\reduce\ has to process multiple elements of a stream and is therefore stateful.	Consequently, it calculates intermediate result as data elements arrive, by calling \texttt{\_reduce} with the element that just arrived and the intermediate result from the previous element. Therefore, on start-up, a \texttt{seed} is still required, because no previous intermediate result exists. The key difference of a stream-processing \reduce\ to a traditional one is, that it needs a definition of when a \reduce\ is considered \textsl{done}, because a stream goes on forever unlike a discrete data set. These termination-definitions can be, for example, depended of time- or count-constraints.
+	\item[join] \hfill \\
+  Common definitions of \join\ operators \cite{Wiki:JoinSQL, Wiki:JoinRA} can be broken down, to a function that combines two sets of data into a single one, by testing each pair of elements from both sets against a binary predicate $ \_pred : X \times Y \rightarrow \mathbb{B}$, and on match, adding the result of a binary projection function $ \_proj : X \times Y \rightarrow Z $ into the resulting set:
+\begin{equation*}
+	\begin{split}
+	join(S,T,\_pred,\_proj)= \\
+	\{\forall (s,t) \in S\times T : \_proj(s,t) | \_pred(s,t)\}
+	\end{split}
+\end{equation*}
+The most common predicate is the equality of values of certain elements' sub-fields. The projection decides if the join is inner or outer, left or right. Common implementations that differ in what order elements are tested against each other, are \textsl{nested-loop}, \textsl{sort-merge} and \textsl{hash-join}.
 
-\subsection{Operator Types}
-\label{sect:operatorTypes}
+In a stream-processing \join\ the semantics of predicates and projections stay the same. But in order to perform tests, if elements satisfy a \join 's predicate, a stream-\join\ has to gather elements from both input streams first. What leads to the \textsl{gathering phase} being considered done, is depended on domain-specific definitions that are, for example, depended on time- or count-constraints. After the \textsl{gathering phase} the typical implementations can be applied to the data sets. In the case of a \textsl{hash-join} it may be sufficient to hold state from only one stream, and continuously probe arriving elements from the other stream against it.
+
+In the context of stream-processing there is another type of \join\ that consumes only on data streams and holds a static set of data to be joined with. But that functionality (when using hash-join) can be implemented using \map, because no state of the stream itself has to be held.
+	\item[groupby] \hfill \\
+	\groupby\ splits a data set into subsets, where each element of one subset has the same value when applied to a unary \texttt{\_groupby} function. \groupby\ is commonly\cite{w3cs:groupby} not considered an independent operator, but is rather used in conjunction with an aggregating operator like \reduce to build subsets that are all in turn applied to it.
+	
+	In this work \groupby\ is interpreted just so. Another valid interpretation in the stream-processing context would be to split a stream into several other streams.
+	\item[update] \hfill \\
+  TBD \ldots
+	\item[sink] \hfill \\
+  TBD \ldots
+\end{description}
+
+%\subsection{Operator Types}
+%\label{sect:operatorTypes}

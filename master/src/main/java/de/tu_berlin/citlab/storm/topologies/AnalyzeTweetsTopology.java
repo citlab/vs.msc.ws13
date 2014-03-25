@@ -99,6 +99,35 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                 WINDOW
         );
     }
+    public UDFBolt mapToBadWordsWithCounter(){
+        return new UDFBolt(
+                new Fields( "word", "count" ),
+                new MapOperator( new Mapper() {
+                    @Override
+                    public List<Object> map(Tuple tuple) {
+                        return new Values(tuple.getValueByField("word"), new Long(1) );
+                    }
+                }),
+                WINDOW
+        );
+    }
+
+    public UDFBolt createCountWordStatisticsCassandraSink(){
+        CassandraConfig cassandraCfg = getCassandraConfig();
+        cassandraCfg.setParams(  //optional, but defaults not always sensable
+                "citstorm",
+                "badword_occurences",
+                new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
+                new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
+                true // enable counter-mode
+        );
+
+        return new UDFBolt(
+                new Fields(),
+                new CassandraOperator(cassandraCfg),
+                WINDOW
+        );
+    }
 
 
     public UDFBolt flatMapTweetWords(){
@@ -169,25 +198,21 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     public UDFBolt reduceUserSignificance(){
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "significance" ),
-                new IOperator(){
+                new ReduceOperator<Long>( new Reducer<Long>(){
                     @Override
-                    public void execute(List<Tuple> tuples, OutputCollector collector) {
+                    public Long reduce(Long value, Tuple tuple) {
+                        return tuple.getLongByField("significance") + value;
+                    }
+                }, new Long(0) /*reducer init value */ ) {
+                    @Override
+                    public Values envelope(List<Tuple> tuples, Long total_significance){
                         String user=tuples.get(0).getStringByField("user");
                         Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        Long total_significance = new Long(0);
-
-                        for( Tuple p : tuples ){
-                            Long significance = p.getLongByField("significance");
-                            total_significance+=significance;
-                        }//for
-
-                        getUDFBolt().log_info("operator", user+" "+tweet_id+" "+total_significance);
-
-                        collector.emit(new Values(user,tweet_id,total_significance ));
-                    }// execute()
+                        return new Values(user,tweet_id,total_significance );
+                    }
                 },
                 WINDOW,
-                KeyConfigFactory.ByFields( "user" )
+                KeyConfigFactory.ByFields( "tweet_id" )
         );
     }
 
@@ -271,7 +296,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                                             // do not output any tuples
                                             getUDFBolt().log_info("operator", "update user: " + t + ", sig: " + totalSig);
 
-                                            getUDFBolt().log_statistics("update user sig: " +totalSig+" "+newUserTuple );
+                                            getUDFBolt().log_statistics("update user sig: " + totalSig + " " + newUserTuple);
 
                                         } else {
                                             Long totalSig = currSig;
@@ -282,7 +307,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
                                             badUsersHT.put(tupleComparator.getTupleKey(t), badUsers );
 
-                                            getUDFBolt().log_statistics("add new user sig: " +totalSig+" "+newUserTuple );
+                                            getUDFBolt().log_statistics("add new user sig: " + totalSig + " " + newUserTuple);
 
                                             getUDFBolt().log_info("operator","add new user: "+t+", sig: "+totalSig);
                                         }
@@ -340,6 +365,13 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
         builder.setBolt("join_with_badwords", createStaticHashJoin(), 1)
                 .shuffleGrouping("flatmap_tweet_words");
+
+        // store bad words into database
+        builder.setBolt("badwords_with_counter", this.mapToBadWordsWithCounter(), 1)
+                .shuffleGrouping("join_with_badwords");
+
+        builder.setBolt("badwords_with_counter_sink", createCountWordStatisticsCassandraSink(), 1)
+                .shuffleGrouping("badwords_with_counter");
 
         builder.setBolt("reduce_to_user_significance", reduceUserSignificance(), 1)
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);

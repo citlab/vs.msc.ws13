@@ -100,13 +100,13 @@ public class UDFTestTopology {
 			"reducer",
 			new UDFBolt(
 				new Fields("value"),
-				new ReduceOperator(
-					new Reducer() {
-						public List<Object> reduce(Tuple tuple, List<Object> values) {
-							return new Values((Integer) values.get(0) + + tuple.getIntegerByField("value"));
+				new ReduceOperator<> (
+					new Reducer<Integer>() {
+						public Integer reduce(Integer result, Tuple tuple ) {
+							return result + tuple.getIntegerByField("value");
 						}
 					},
-					new Values(0)
+					new Integer(0)
 				).setChainingAndReturnInstance(true),
 				new CountWindow<Tuple>(2)
 			),
