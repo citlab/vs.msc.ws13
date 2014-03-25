@@ -17,6 +17,7 @@ public class StreamCaseMerge extends StreamNode {
         this.multipleOperators = multipleOperators;
         this.groupBy = groupBy;
     }
+
     public StreamCaseMerge case_source(IOperator operator, StreamNode ... sources){
         String[] sourceList = new String[sources.length];
         for( int i=0; i < sources.length; i++ )

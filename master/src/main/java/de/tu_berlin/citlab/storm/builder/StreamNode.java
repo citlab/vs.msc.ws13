@@ -63,11 +63,8 @@ public class StreamNode implements Serializable {
         multiOperators.setUDFBolt(this.bolt);
         StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperators, groupBy );
 
-        System.out.println("case_source: "+this.getNodeId());
-
         InputDeclarer inputDeclarer =
                 getStreamBuilder().getTopologyBuilder().setBolt(case_merge.getNodeId(), getUDFBolt() );
-                //.fieldsGrouping( this.getNodeId(), groupBy);
         case_merge.setDeclarer(inputDeclarer);
 
         return case_merge;
