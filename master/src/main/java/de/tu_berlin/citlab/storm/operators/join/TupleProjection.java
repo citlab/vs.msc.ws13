@@ -14,10 +14,23 @@ public class TupleProjection implements Serializable {
         return
         new TupleProjection() {
             public Values project(Tuple tuple, Tuple inMemTuple) {
-                System.out.println("mem:"+inMemTuple+", fields:"+memFields);
-                System.out.println("tuple:"+tuple+", tuple:"+tupleFields);
                 return new Values( ArrayUtils.addAll( tuple.select(tupleFields).toArray(), inMemTuple.select(memFields).toArray()) );
             }
         };
     }
+
+    public static TupleProjection projectLeft(){
+        return new TupleProjection(){
+            public Values project(Tuple left, Tuple right) {
+                return (Values)left.getValues();
+            }
+        };
+    };
+    public static TupleProjection projectRight(){
+        return new TupleProjection(){
+            public Values project(Tuple left, Tuple right) {
+                return (Values)right.getValues();
+            }
+        };
+    };
 }

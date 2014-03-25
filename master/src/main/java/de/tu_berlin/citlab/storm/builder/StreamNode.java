@@ -40,14 +40,37 @@ public class StreamNode implements Serializable {
     }
     public UDFOutput getUDFOutput(){return bolt; }
 
-    /*public StreamNode merge( OperatorProcessingDescription ... desc ){
-        return this;
-    }*/
+    public String getNodeId(){
+        return nodeId;
+    }
 
     private UDFBolt assignUDF(UDFBolt udf){
         bolt = udf;
         return udf;
     }
+
+    public StreamCaseMerge case_merge( Fields outputFields, StreamNode ... nodes){
+        MultipleOperators multiOperatos =  new MultipleOperators();
+        StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperatos );
+
+        BoltDeclarer boldDeclarer =
+                getStreamBuilder().getTopologyBuilder().setBolt(case_merge.getNodeId(),
+                        assignUDF(new UDFBolt(
+                                outputFields,
+                                new IdentityOperator(),
+                                getStreamBuilder().getDefaultWindowType(),
+                                KeyConfigFactory.BySource()
+                        ))
+                )
+                .shuffleGrouping(this.getNodeId());
+
+        for(StreamNode node : nodes ){
+            boldDeclarer.shuffleGrouping(node.getNodeId());
+        }
+
+        return case_merge;
+    }
+
 
     public StreamMerged merge( Fields outputFields, StreamNode ... nodes ){
         StreamMerged merged = new StreamMerged( getStreamBuilder());
@@ -61,7 +84,7 @@ public class StreamNode implements Serializable {
                         KeyConfigFactory.BySource()
                 ))
         )
-                .shuffleGrouping(this.getNodeId());
+        .shuffleGrouping(this.getNodeId());
 
         for(StreamNode node : nodes ){
             boldDeclarer.shuffleGrouping(node.getNodeId());
@@ -168,9 +191,5 @@ public class StreamNode implements Serializable {
                         )
             )).shuffleGrouping(this.getNodeId());
         return node;
-    }
-
-    public String getNodeId(){
-        return nodeId;
     }
 }

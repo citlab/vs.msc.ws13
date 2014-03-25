@@ -24,6 +24,12 @@ public class MultipleOperators extends IOperator {
         }
     }
 
+    public void addOperatorProcessingDescription(OperatorProcessingDescription desc ){
+        for( String source : desc.getSources() ){
+            operators.put( source, desc );
+        }
+    }
+
     @Override
     public void setUDFBolt(UDFBolt bolt){
         Iterator it =  operators.entrySet().iterator();
