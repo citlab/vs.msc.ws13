@@ -8,6 +8,7 @@ import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
+import org.apache.commons.lang.ArrayUtils;
 
 
 @SuppressWarnings("serial")
@@ -42,6 +43,6 @@ public class ReduceOperator<T> extends IOperator {
     }
 
     public Values envelope(List<Tuple> input, T result){
-        return new Values( input.get(0).select(groupKey), result );
+        return new Values( ArrayUtils.add( input.get(0).select(groupKey).toArray(), (Object)result ) );
     }
 }
