@@ -9,6 +9,7 @@ import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
@@ -93,11 +94,18 @@ public class StreamNode {
                         new FlatMapOperator(flatmapper),
                         getStreamBuilder().getDefaultWindowType()
                 ) )
-                .shuffleGrouping( this.getNodeId() );
+                .shuffleGrouping(this.getNodeId());
         return node;
     }
-    public void save( StreamSink sink ){
-
+    public StreamSink save( SinkOperator sinkOperator ){
+        StreamSink node = new StreamSink( getStreamBuilder());
+        getStreamBuilder().getTopologyBuilder().setBolt( node.getNodeId(),
+            new UDFBolt(
+                new Fields(),
+                    sinkOperator,
+                    getStreamBuilder().getDefaultWindowType()
+        )).shuffleGrouping( this.getNodeId() );
+        return node;
     }
 
     public StreamReducer reduce( Fields reduceKey, Reducer reducer, Object init, Fields outputFields ){
@@ -114,6 +122,7 @@ public class StreamNode {
     public StreamNode caseInput( Reducer reducer ){
         return this;
     }
+    
     public String getNodeId(){
         return nodeId;
     }
