@@ -48,6 +48,7 @@ public class CassandraOperator extends SinkOperator {
                 dao.init();
                 dao.analyzeTuple( tuples.get(0) );
                 dao.createDataStructures();
+                dao.prepare();
 
             }
             else {
