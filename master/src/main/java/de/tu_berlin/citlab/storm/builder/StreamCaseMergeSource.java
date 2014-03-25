@@ -22,7 +22,7 @@ public class StreamCaseMergeSource extends StreamCaseMerge {
     protected StreamCaseMerge casemerge;
 
     public StreamCaseMergeSource(StreamBuilder builder,StreamCaseMerge casemerge, MultipleOperators multipleOperators, StreamNode ... sources) {
-        super(builder,multipleOperators);
+        super(builder,multipleOperators, casemerge.getGroupByFields() );
         this.sources = sources;
         this.casemerge = casemerge;
     }
@@ -36,6 +36,7 @@ public class StreamCaseMergeSource extends StreamCaseMerge {
                         tupleComparator,
                         projection,
                         hashTable );
+        staticHashJoin.setUDFBolt(getUDFBolt());
 
         String[] sourceList = new String[sources.length];
         for( int i=0; i < sources.length; i++ )
@@ -47,9 +48,11 @@ public class StreamCaseMergeSource extends StreamCaseMerge {
     }
 
     public StreamCaseMerge execute( IOperator operator ) {
+        operator.setUDFBolt(this.getUDFBolt());
         String[] sourceList = new String[sources.length];
-        for( int i=0; i < sources.length; i++ )
+        for( int i=0; i < sources.length; i++ ) {
             sourceList[i] = sources[i].getNodeId();
+        }
 
         this.multipleOperators.addOperatorProcessingDescription( new OperatorProcessingDescription( operator, sourceList ));
 

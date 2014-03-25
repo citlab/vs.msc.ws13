@@ -47,7 +47,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             cassandraBadWordsStatisticsCfg.setIP(cassandraServerIP);
 
             cassandraTweetsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm2",
                     "tweets",
                     new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -55,7 +55,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraUserSignificanceCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm2",
                     "user_significance",
                     new PrimaryKey("user"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields("significance"), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -63,7 +63,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraBadWordsStatisticsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm2",
                     "badword_occurences",
                     new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -171,12 +171,13 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             final TupleComparator compareUser = KeyConfigFactory.compareByFields(new Fields("user"));
 
             delayedTweets.case_merge( new Fields("user") /*group by*/, new Fields(tweets_outputfields) )
-                         .source(userCassandraPersistentSignificanceSource )
+
+                         .source(delayedTweets )
                          .join( badUsersHashTable,
                                 TupleProjection.projectLeft(),
                                 KeyConfigFactory.compareByFields(new Fields("user")) )
 
-                         .source(detectedUsers)
+                         .source(detectedUsers, userCassandraPersistentSignificanceSource )
                          .execute( new IOperator(){
                                            @Override
                                            public void execute(List<Tuple> tuples, OutputCollector collector) {
@@ -219,7 +220,6 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                            }// execute()
                                        } )
                         .save(tweetsSink);
-
 
         }catch(Exception e ){
             e.printStackTrace();

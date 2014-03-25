@@ -27,6 +27,7 @@ public class MultipleOperators extends IOperator {
 
     public void addOperatorProcessingDescription(OperatorProcessingDescription desc ){
         for( String source : desc.getSources() ){
+            desc.getOperator().setUDFBolt(getUDFBolt());
             operators.put( source, desc );
         }
     }

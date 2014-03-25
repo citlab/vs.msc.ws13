@@ -3,6 +3,7 @@ package de.tu_berlin.citlab.storm.builder;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.BoltDeclarer;
+import backtype.storm.topology.InputDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -26,9 +27,9 @@ import java.util.List;
 public class StreamNode implements Serializable {
     public static int StreamNodeCounter = 1;
 
-    private UDFBolt bolt;
-    private StreamBuilder builder;
-    private String nodeId;
+    protected UDFBolt bolt;
+    protected StreamBuilder builder;
+    protected String nodeId;
 
     public StreamNode(StreamBuilder builder){
         StreamNodeCounter++;
@@ -39,34 +40,35 @@ public class StreamNode implements Serializable {
         return builder;
     }
     public UDFOutput getUDFOutput(){return bolt; }
+    public UDFBolt getUDFBolt(){return bolt; }
 
     public String getNodeId(){
         return nodeId;
     }
 
     private UDFBolt assignUDF(UDFBolt udf){
-        bolt = udf;
+        this.bolt = udf;
         return udf;
     }
 
-    public StreamCaseMerge case_merge( Fields groupBy, Fields outputFields, StreamNode ... nodes){
+    public StreamCaseMerge case_merge( Fields groupBy, Fields outputFields ){
         MultipleOperators multiOperators =  new MultipleOperators();
-        StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperators );
 
-        BoltDeclarer boldDeclarer =
-                getStreamBuilder().getTopologyBuilder().setBolt(case_merge.getNodeId(),
-                        assignUDF(new UDFBolt(
-                                outputFields,
-                                multiOperators,
-                                getStreamBuilder().getDefaultWindowType(),
-                                KeyConfigFactory.BySource()
-                        ))
-                )
-                .fieldsGrouping(this.getNodeId(), groupBy);
+        this.bolt = new UDFBolt(
+                outputFields,
+                multiOperators,
+                getStreamBuilder().getDefaultWindowType(),
+                KeyConfigFactory.BySource()
+        );
+        multiOperators.setUDFBolt(this.bolt);
+        StreamCaseMerge case_merge = new StreamCaseMerge(getStreamBuilder(), multiOperators, groupBy );
 
-        for(StreamNode node : nodes ){
-            boldDeclarer.fieldsGrouping(node.getNodeId(),groupBy);
-        }
+        System.out.println("case_source: "+this.getNodeId());
+
+        InputDeclarer inputDeclarer =
+                getStreamBuilder().getTopologyBuilder().setBolt(case_merge.getNodeId(), getUDFBolt() );
+                //.fieldsGrouping( this.getNodeId(), groupBy);
+        case_merge.setDeclarer(inputDeclarer);
 
         return case_merge;
     }
@@ -180,8 +182,8 @@ public class StreamNode implements Serializable {
         return node;
     }
 
-    public StreamReducer delay( int sec ){
-        StreamReducer node = new StreamReducer( getStreamBuilder());
+    public StreamDelay delay( int sec ){
+        StreamDelay node = new StreamDelay( getStreamBuilder());
         getStreamBuilder().getTopologyBuilder().setBolt(node.getNodeId(),
                 assignUDF(
                         new UDFBolt(
