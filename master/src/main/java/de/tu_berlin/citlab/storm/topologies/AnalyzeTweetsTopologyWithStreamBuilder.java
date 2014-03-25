@@ -126,7 +126,8 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                public Long reduce(Long value, Tuple tuple) {
                                    return tuple.getLongByField("significance") + value;
                                }
-                           }, new Long(0) )
+                           }, new Long(0),
+                           new Fields( "user", "tweet_id", "significance" ))
                     .filter( new Filter(){
                         @Override
                         public Boolean predicate(Tuple t) {

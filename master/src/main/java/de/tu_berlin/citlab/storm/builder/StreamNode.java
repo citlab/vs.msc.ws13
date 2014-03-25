@@ -100,11 +100,11 @@ public class StreamNode {
 
     }
 
-    public StreamReducer reduce( Fields reduceKey, Reducer reducer, Object init ){
+    public StreamReducer reduce( Fields reduceKey, Reducer reducer, Object init, Fields outputFields ){
         StreamReducer node = new StreamReducer( getStreamBuilder());
         getStreamBuilder().getTopologyBuilder().setBolt( node.getNodeId(),
             new UDFBolt(
-                new Fields( "user", "tweet_id", "significance" ),
+                outputFields,
                 new ReduceOperator( reduceKey, reducer, init /*reducer init value */ ),
                 getStreamBuilder().getDefaultWindowType(),
                 KeyConfigFactory.ByFields( reduceKey )
