@@ -197,23 +197,19 @@ public class AnalyzeTweetsTopology implements TopologyCreation
     }
 
     public UDFBolt reduceUserSignificance(){
+        final Fields groupFields = new Fields("user", "tweet_id");
+
+        IKeyConfig reduceKey =KeyConfigFactory.ByFields( groupFields );
         return new UDFBolt(
                 new Fields( "user", "tweet_id", "significance" ),
-                new ReduceOperator<Long>( new Reducer<Long>(){
+                new ReduceOperator<Long>( groupFields, new Reducer<Long>(){
                     @Override
                     public Long reduce(Long value, Tuple tuple) {
                         return tuple.getLongByField("significance") + value;
                     }
-                }, new Long(0) /*reducer init value */ ) {
-                    @Override
-                    public Values envelope(List<Tuple> tuples, Long total_significance){
-                        String user=tuples.get(0).getStringByField("user");
-                        Long tweet_id=tuples.get(0).getLongByField("tweet_id");
-                        return new Values(user,tweet_id,total_significance );
-                    }
-                },
+                }, new Long(0) /*reducer init value */ ),
                 WINDOW,
-                KeyConfigFactory.ByFields( "user" )
+                reduceKey
         );
     }
 
@@ -378,7 +374,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                 .fieldsGrouping("join_with_badwords", fieldsGroupByUser);
 
         // filter only user with a specific significance
-        builder.setBolt("filter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
+        builder.setBolt("filter_significant_userfilter_significant_user", filterUserSignificanceByThreshold(ConspicuousUserDatabase.SIGNIFICANCE_THRESHOLD), 1)
                 .shuffleGrouping("reduce_to_user_significance");
 
         builder.setBolt("store_user_significance", createCassandraUserSignificanceSink(), 1)

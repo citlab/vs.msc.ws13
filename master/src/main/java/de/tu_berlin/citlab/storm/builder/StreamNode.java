@@ -39,10 +39,10 @@ abstract public class StreamNode {
     public StreamNode join( StreamNode ... nodes ){
         return this;
     }
-    public StreamNode filter( Filter filter ){
+    public StreamNode filter( Filter filter, Fields outputFields  ){
         return this;
     }
-    public StreamNode map( Mapper mapper ){
+    public StreamNode map( Mapper mapper, Fields outputFields  ){
         return this;
     }
     public StreamNode flapMap( FlatMapper flatmapper, Fields outputFields ){
@@ -51,7 +51,7 @@ abstract public class StreamNode {
     public StreamNode cassnadraSink(){
         return this;
     }
-    public StreamNode reduce( Reducer reducer ){
+    public StreamNode reduce( Fields groupKey, Reducer reducer ){
         return this;
     }
     public StreamNode caseInput( Reducer reducer ){
