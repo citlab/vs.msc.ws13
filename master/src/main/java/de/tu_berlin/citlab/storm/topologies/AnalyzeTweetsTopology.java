@@ -219,7 +219,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
                     }
                 },
                 WINDOW,
-                KeyConfigFactory.ByFields( "user" )
+                KeyConfigFactory.ByFields( "tweet_id" )
         );
     }
 
