@@ -9,11 +9,14 @@ import org.apache.commons.lang.ArrayUtils;
 
 public class TupleProjection implements Serializable {
 	public Values project(Tuple outer, Tuple inner ) { return null; };
-    public static TupleProjection project(final Fields outer, final Fields inner){
+
+    public static TupleProjection project(final Fields tupleFields, final Fields memFields){
         return
         new TupleProjection() {
-            public Values project(Tuple inMemTuple, Tuple tuple) {
-                return new Values( ArrayUtils.addAll(tuple.select(outer).toArray(), inMemTuple.select(inner).toArray() ) );
+            public Values project(Tuple tuple, Tuple inMemTuple) {
+                System.out.println("mem:"+inMemTuple+", fields:"+memFields);
+                System.out.println("tuple:"+tuple+", tuple:"+tupleFields);
+                return new Values( ArrayUtils.addAll( tuple.select(tupleFields).toArray(), inMemTuple.select(memFields).toArray()) );
             }
         };
     }

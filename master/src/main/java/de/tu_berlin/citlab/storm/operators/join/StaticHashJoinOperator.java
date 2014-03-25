@@ -107,7 +107,7 @@ public class StaticHashJoinOperator extends IOperator {
 				
 				List<Tuple> memoryTuples = hashTable.get( joinComparator.getTupleKey(tuple) );
 				for( Tuple memoryTuple : memoryTuples ){
-					collector.emit(projection.project(memoryTuple,tuple));
+					collector.emit(projection.project(tuple, memoryTuple));
 				}
 
                 getUDFBolt().log_debug("static join (" + joinComparator.getTupleKey(tuple) + ") YES " + tuple);

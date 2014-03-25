@@ -92,7 +92,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                         @Override
                         public List<List<Object>> flatMap(Tuple tuple) {
                             String[] words = tuple.getStringByField("tweet")
-                                    .replaceAll("[^\\p{L}\\p{Nd}]", "").trim().split(" +");
+                                    .replaceAll("[^\\p{L}\\p{Nd} ]", "").trim().split(" +");
                             List<List<Object>> result = new ArrayList<>();
                             for (String word : words) {
                                 System.out.println("extract word: "+word+"("+word.length()+") -> "+tuple.getStringByField("tweet"));
@@ -105,22 +105,28 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                     },
                     new Fields("user", "tweet_id", "word"));
 
+            StreamNode joinedBadWords =
+                badWords.join( badWordJoinSide.iterator(),
+                                TupleProjection.project( new Fields("user", "tweet_id", "word"), new Fields("significance")),
+                                KeyConfigFactory.compareByFields(new Fields("word")),
+                                new Fields("user", "tweet_id", "word", "significance"));
+
             // prepare data to save in cassandra
-            badWords.map( new Mapper() {
-                            @Override
-                            public List<Object> map(Tuple tuple) {
-                                return new Values(tuple.getValueByField("word"), new Long(1) );
-                            }
-                        },
-                        new Fields( "word", "count" ))
+            // store join words
+            joinedBadWords
+                    .map( new Mapper() {
+                                        @Override
+                                        public List<Object> map(Tuple tuple) {
+                                            return new Values(tuple.getValueByField("word"), new Long(1) );
+                                        }
+                                    },
+                                    new Fields( "word", "count" ))
                     .save( badWordsStatisticsSink );
 
 
-            badWords.join( badWordJoinSide.iterator(),
-                        TupleProjection.project(new Fields("user", "tweet_id", "word"), new Fields("significance")),
-                        KeyConfigFactory.compareByFields(new Fields("word")),
-                        new Fields("user", "tweet_id", "word", "significance"))
-                   .reduce(new Fields("user", "tweet_id"),
+
+            joinedBadWords
+                    .reduce(new Fields("user", "tweet_id"),
                            new Reducer<Long>() {
                                @Override
                                public Long reduce(Long value, Tuple tuple) {
