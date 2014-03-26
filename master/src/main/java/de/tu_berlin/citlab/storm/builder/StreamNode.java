@@ -148,16 +148,15 @@ public class StreamNode implements Serializable {
                 .shuffleGrouping(this.getNodeId());
         return node;
     }
-    public StreamSink save( de.tu_berlin.citlab.storm.operators.StreamSink streamSink){
-        StreamSink node = new StreamSink( getStreamBuilder());
-        getStreamBuilder().getTopologyBuilder().setBolt(node.getNodeId(),
+    public StreamSink save( StreamSink streamSink ){
+        getStreamBuilder().getTopologyBuilder().setBolt( streamSink.getNodeId(),
                 assignUDF(new UDFBolt(
                                 new Fields(),
-                                streamSink,
+                                streamSink.getOperator(),
                                 getStreamBuilder().getDefaultWindowType())
                 )
         ).shuffleGrouping(this.getNodeId());
-        return node;
+        return streamSink;
     }
 
     public StreamReducer reduce( Fields reduceKey, Reducer reducer, Object init, Fields outputFields ){

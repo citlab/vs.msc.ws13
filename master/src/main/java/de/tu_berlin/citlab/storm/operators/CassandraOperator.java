@@ -5,10 +5,11 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
+import de.tu_berlin.citlab.storm.udf.IOperator;
 
 import java.util.List;
 
-public class CassandraOperator extends StreamSink {
+public class CassandraOperator extends IOperator {
 
     private boolean initialized = false;
 
