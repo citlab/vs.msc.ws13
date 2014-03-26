@@ -11,8 +11,8 @@ import de.tu_berlin.citlab.storm.builder.*;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.operators.*;
-import de.tu_berlin.citlab.storm.operators.StreamSink;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
+import de.tu_berlin.citlab.storm.sinks.CassandraSink;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
@@ -93,9 +93,9 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
 
-            StreamSink tweetsSink = new CassandraOperator(cassandraTweetsCfg);
-            StreamSink userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
-            StreamSink badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
+            StreamSink tweetsSink = new CassandraSink(stream, cassandraTweetsCfg);
+            StreamSink userSignificanceSink = new CassandraSink(stream, cassandraUserSignificanceCfg);
+            StreamSink badWordsStatisticsSink = new CassandraSink(stream, cassandraBadWordsStatisticsCfg);
 
 
             StreamSource userCassandraPersistentSignificanceSource = new CassandraStreamSource(stream,
