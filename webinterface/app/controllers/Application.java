@@ -50,7 +50,7 @@ public class Application extends Controller {
             String nimbusIp = Nimbus.getIp();
             String msg = sendFile(file, nimbusIp, fileName);
 
-            Database.getInstance().addFile(msg, fileName, session("name"));
+            FileDatabase.getInstance().addFile(msg, fileName, session("name"));
 
             flash("notice", "File uploaded");
             return ok(String.format("{ip: %s, msg: %s}", nimbusIp, msg));
@@ -68,8 +68,7 @@ public class Application extends Controller {
 
     public static Result deleteFile(String title) {
         String request = HttpRequest.get("http://"+ Nimbus.getIp() +":8081/delete", true, "file", title).body();
-        String s = Database.getInstance().deleteFile(title);
-        Logger.info(s);
+        String s = FileDatabase.getInstance().deleteFile(title);
         return redirect(routes.Application.deploy());
     }
 }
