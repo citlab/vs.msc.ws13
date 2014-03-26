@@ -2,7 +2,6 @@ package de.tu_berlin.citlab.storm.operators;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Tuple;
-import com.sun.script.util.BindingsEntrySet;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
