@@ -7,8 +7,12 @@
       Blah
     </div>
     <div class="panel-footer">
-      @server_control.number_of_supervisor_input()
-      @server_control.buttons.render("Supervisor", "supervisor", false)
+      <div class="row">
+        @server_control.number_of_supervisor_input()
+        <div class="col-md-8"> 
+          @server_control.buttons.render("Supervisor", "supervisor", false)
+        </div>
+      </div>
     </div>
   </div>
 </div>
