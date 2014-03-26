@@ -1,15 +1,38 @@
 \section{Storm Framework}
 \label{sect:architecture}
 
-	Storm characterizes itself as a \textit{distributed and fault-tolerant realtime computation engine} that is hosted under the Apache Foundation and thus free and open to use.
+	Storm characterizes itself as a \textit{distributed and fault-tolerant realtime computation engine} that is, at the time of writing, an incubator belonging to the Apache Foundation and thus free and open to use (\cite{Website:Storm}).
 	The architecture of Apache Storm is, unlike Hadoop, designed to cope with a continuous stream of input data, which gives it a flexibility towards scenarios where batch processing would fail, due to the fact that an input stream has - per definition - no determined start and end point. As our goal was to design streaming operators via \textit{User Defined Functions} (UDFs), Storm was an appropriate framework for our needs.
 
 
 \subsection{Storm Topology}
 \label{sect:stormTopology}
-	A topology in Storm is, on an abstract level, divided in two different elements: Sources and sinks. A source is an element which is providing input data to the topology, whereas a
-	sink is executing the input from one or more sources.
-
-\subsubsection{Bolts}
+	A topology in Storm is including the logic of a distributed big-data scenario and is, in contrary to a MapReduce job which finishes its batch process most likely at some time in the future, running forever on the assigned machines or as long as it is getting killed (for more details see \cite{Wiki:StormConcepts}). \\
+	The Storm topology is, on an abstract level, divided in two different elements: Sources and sinks. A source is an element which is providing input data to the topology, whereas a sink is executing the input from one or more sources. However, Storms naming convention defines a source as a \textit{Spout} and a sink as a \textit{Bolt}.\\
+	In order to create a topology in Storm, you need a \textit{TopologyBuilder}. Once the topology is created, it may be handed over to a \textit{LocalCluster} for testing purposes, or via a \textit{StormSubmitter} to a remote cluster (in our case it is an AWS-hosted pool of instances).\\
+	This basic concept makes Storm easy to learn and likewise suited for complex scenarios, as you are able to chain Bolts and Spouts together to form very dynamic topologies for a wide variety of different application areas.
 
 \subsubsection{Spouts}
+\label{sect:Spouts}
+	Each topology's input data has its origin at one or more Spouts. Spouts are emitting tuples into the topology, which are defined by a Spout-Instance before. There are two types of Spouts available: A Spout may be \textit{\textbf{reliable}} or \textit{\textbf{unreliable}}. Reliable Spouts are archiving the currently emitted tuples, giving this kind of Spout the ability to \textit{replay} its input, if the topology failed to process one or more tuples of it. The Storm topology allows to call \texttt{ack} and \texttt{fail} on a tuple, emitted by a reliable Spout, so that this tuple can be resend by it. An unreliable Spout on the other hand is forgetting about the emitted tuples as soon as they were sended. This type of Spout is a lightweight implementation, however it is not possible to solve failed input tuples with it.
+	
+\subsubsection{Bolts}
+\label{sect:Bolts}
+	In a Storm topology, the whole \textit{processing} is done in Bolts. Depending on its implementation, a Bolt could map some transformations on the input tuples and emits them into the next layer of the topology, may define window-based merge operations or could even be used as a database sink without any further output emission.\\
+	Bolts are subscribing to specific streams, which are having its origin at a Spout or at other Bolts (the subscribing aspect is further described in section \ref{sect:StreamGroupings}). After a Bolt received its input, the internal \texttt{execute(input)}-method is called, causing the input to be processed as defined in this method. At last, a Bolt is using an \texttt{OutputCollector} to emit the processed output into the topology, if this behaviour is wanted. Otherwise, this Bolt would simply have no output.
+	
+	
+\subsubsection{Stream Groupings}
+\label{sect:StreamGroupings}
+	As stated before, Bolts are subscribing at streams to receive their input. A \textit{Stream Grouping} defines on top of that, how a stream should be partitioned between the subscribing Bolts. There are numerous kinds of grouping mechanisms in Storm (like \textit{\textbf{Global Grouping}}, \textit{\textbf{Direct Grouping}} or \textit{\textbf{Local Grouping}} - see \cite{webAnchor:streamGrouping}) but as we only used the two following grouping mechanisms, those are described in detail here:
+	
+	\begin{description}
+		\descriptor{Shuffle Grouping}
+			Each Bolt is guaranteed to get an equal number of tuples, as this grouping mechanism is random, but fairly distributing the input tuples to their tasks.
+		
+		\descriptor{Fields Grouping}
+			Storm defines \texttt{Fields}on each \texttt{Tuple} where each Field is mapping a value inside a tuple relative to its index inside the tuple. \\
+			In that Grouping method, the Fields are not only specifying the value index, but also the grouping. So, if a Stream is grouped by a Field A, tuples with the same Field-value will always go to the same task.
+	\end{description}
+
+	
