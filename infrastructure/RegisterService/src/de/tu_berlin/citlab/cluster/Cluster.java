@@ -1,5 +1,7 @@
 package de.tu_berlin.citlab.cluster;
 
+import de.tu_berlin.citlab.database.ClusterDatabase;
+
 public class Cluster {
 
 	public static void killCluster() {

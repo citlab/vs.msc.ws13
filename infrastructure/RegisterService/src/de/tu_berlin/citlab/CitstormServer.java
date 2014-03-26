@@ -1,16 +1,23 @@
-package de.tu_berlin.citlab.ws;
+package de.tu_berlin.citlab;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-import de.tu_berlin.citlab.ws.servlets.LookupServlet;
-import de.tu_berlin.citlab.ws.servlets.RegisterServlet;
+import de.tu_berlin.citlab.register.servlets.LookupServlet;
+import de.tu_berlin.citlab.register.servlets.RegisterServlet;
 
-public class RegisterServer extends Thread {
+public class CitstormServer {
 
-	public static void main(String args[]) throws java.lang.Exception {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		startRegisterService();
+		startClusterManager();
+	}
 
+	private static void startRegisterService() {
 		Server server = new Server(9000);
 
 		ContextHandlerCollection handlers = new ContextHandlerCollection();
@@ -24,7 +31,16 @@ public class RegisterServer extends Thread {
 
 		server.setHandler(handlers);
 
-		server.start();
-		server.join();
+		try {
+			server.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Register Server started");
+	}
+
+	private static void startClusterManager() {
+
 	}
 }

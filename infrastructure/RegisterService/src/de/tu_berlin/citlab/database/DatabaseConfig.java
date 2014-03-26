@@ -1,32 +1,28 @@
-/**
- * A simple utility class to load twitter login credentials from a file.
- */
-
-package de.tu_berlin.citlab.cluster;
+package de.tu_berlin.citlab.database;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Config {
+public class DatabaseConfig {
+	private static final DatabaseConfig INSTANCE = new DatabaseConfig();
 
-	private static final Config INSTANCE = new Config();
-
-	public static Config getInstance() {
+	public static DatabaseConfig getInstance() {
 		return INSTANCE;
 	}
 
 	private final Properties prop;
 
-	private Config() {
+	private DatabaseConfig() {
 		prop = new Properties();
 		FileInputStream fis = null;
 
 		try {
-			fis = new FileInputStream("manager.properties");
+			fis = new FileInputStream(
+					"/home/ubuntu/StormRegisterService/db.properties");
 			prop.load(fis);
 		} catch (IOException e) {
-			System.err.println("Could not load manager configuration file");
+			System.err.println("Could not load database configuration file");
 		} finally {
 			if (fis != null) {
 				try {

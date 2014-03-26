@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.tu_berlin.citlab.cluster.gson.InstancesGson;
+import de.tu_berlin.citlab.database.ClusterDatabase;
 
 public class Instance {
 	private static final SimpleDateFormat SDF = new SimpleDateFormat(
