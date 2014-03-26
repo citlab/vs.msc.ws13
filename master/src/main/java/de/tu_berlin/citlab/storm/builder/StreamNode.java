@@ -1,28 +1,21 @@
 package de.tu_berlin.citlab.storm.builder;
 
 
-import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.InputDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
-import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.operators.*;
 import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
-import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.udf.UDFOutput;
-import de.tu_berlin.citlab.storm.window.IKeyConfig;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class StreamNode implements Serializable {
     public static int StreamNodeCounter = 1;
@@ -33,7 +26,7 @@ public class StreamNode implements Serializable {
 
     public StreamNode(StreamBuilder builder){
         StreamNodeCounter++;
-        nodeId = this.getClass().getSimpleName()+"-"+this.getClass().hashCode()+"-"+StreamNodeCounter;
+        nodeId = this.getClass().getSimpleName()+"-"+StreamNodeCounter;
         this.builder = builder;
     }
     public StreamBuilder getStreamBuilder(){
@@ -155,12 +148,12 @@ public class StreamNode implements Serializable {
                 .shuffleGrouping(this.getNodeId());
         return node;
     }
-    public StreamSink save( SinkOperator sinkOperator ){
+    public StreamSink save( de.tu_berlin.citlab.storm.operators.StreamSink streamSink){
         StreamSink node = new StreamSink( getStreamBuilder());
         getStreamBuilder().getTopologyBuilder().setBolt(node.getNodeId(),
                 assignUDF(new UDFBolt(
                                 new Fields(),
-                                sinkOperator,
+                                streamSink,
                                 getStreamBuilder().getDefaultWindowType())
                 )
         ).shuffleGrouping(this.getNodeId());
