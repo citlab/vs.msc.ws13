@@ -652,4 +652,49 @@ public class Database {
 
     return entry;
   }
+
+  public ArrayList<User> getUsers() {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+
+    ArrayList<User> list = new ArrayList<User>();
+
+    try {
+      // Register JDBC driver
+      Class.forName("com.mysql.jdbc.Driver");
+
+      // Open a connection
+      conn = DriverManager.getConnection(getConnectionString());
+
+      // Execute SQL query
+      stmt = conn.prepareStatement("SELECT * FROM users");
+
+      ResultSet rs = stmt.executeQuery();
+
+      while(rs.next()) {
+        list.add(new User(
+          rs.getString("name"),
+          rs.getInt("id"),
+          rs.getString("session")));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException e) {
+      }
+      try {
+        if (conn != null)
+          conn.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return list;
+  }
 }

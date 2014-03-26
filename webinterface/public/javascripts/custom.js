@@ -18,6 +18,8 @@
       }
     });
 
+    $(".fancybox").fancybox();
+
     $(".start-form").ajaxForm({
       dataType: 'json',
       success: function(response, status, xhr, form) {

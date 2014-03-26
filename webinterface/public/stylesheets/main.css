@@ -56,6 +56,23 @@
   color: #fff;
 }
 
+.login-form {
+  margin-top: 50px;
+}
+
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+body.test {
+  background: url('/assets/images/topology.png') no-repeat center center fixed;;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 .rotating {
   -webkit-animation:spin 4s linear infinite;
   -moz-animation:spin 4s linear infinite;
