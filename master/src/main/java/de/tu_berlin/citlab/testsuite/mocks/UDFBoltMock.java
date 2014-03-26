@@ -51,27 +51,19 @@ public class UDFBoltMock extends UDFBolt
 			Window<Tuple, List<Tuple>> window, IKeyConfig windowKey)
 	{
 		super(outputFields, operator, window, windowKey, KeyConfigFactory.DefaultKey());
-		this.prepare(null, null, null); //TODO: maybe adjust this?
+        this.collector = OutputCollectorMock.mockOutputCollector();
 	}
 
     public UDFBoltMock(Fields outputFields, IOperator operator,
                        Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey)
     {
         super(outputFields, operator, window, windowKey, groupByKey);
-        this.prepare(null, null, null); //TODO: maybe adjust this?
+        this.collector = OutputCollectorMock.mockOutputCollector();
     }
 	
 	
 /* Public Methods: */
 /* =============== */
-	
-	@Override
-	public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
-			TopologyContext context, OutputCollector collector) 
-	{
-		super.prepare(stormConf, context, collector);
-		this.collector = OutputCollectorMock.mockOutputCollector();
-	}
 
     @Override
     public void execute(Tuple input) {
