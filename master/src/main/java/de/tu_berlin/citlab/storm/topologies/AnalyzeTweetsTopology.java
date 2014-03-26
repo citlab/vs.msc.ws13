@@ -320,7 +320,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
 
     @Override
-    public StormTopology createTopology()
+    public StormTopology createTopology(boolean isCluster)
     {
         TopologyBuilder builder = new TopologyBuilder();
 

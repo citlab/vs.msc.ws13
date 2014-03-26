@@ -10,5 +10,5 @@ import java.io.Serializable;
  */
 public interface TopologyCreation extends Serializable
 {
-   public StormTopology createTopology();
+   public StormTopology createTopology(boolean isCluster);
 }
