@@ -3,22 +3,13 @@ package de.tu_berlin.citlab.storm.operators;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import de.tu_berlin.citlab.db.*;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-public class CassandraOperator extends SinkOperator {
+public class CassandraOperator extends IOperator {
 
     private boolean initialized = false;
 

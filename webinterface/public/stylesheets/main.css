@@ -56,6 +56,33 @@
   color: #fff;
 }
 
+.login-form {
+  margin-top: 50px;
+}
+
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+.online {
+  font-weight: bold;
+  color: #008800;
+}
+
+.offline {
+  font-weight: bold;
+  color: #cc0000;
+}
+
+body.test {
+  background: url('/assets/images/topology.png') no-repeat center center fixed;;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 .rotating {
   -webkit-animation:spin 4s linear infinite;
   -moz-animation:spin 4s linear infinite;

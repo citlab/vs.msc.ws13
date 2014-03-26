@@ -1,10 +1,27 @@
-@helper.form(action = routes.User.create, 'id -> "create-user-form", 'class -> "ajax-form") {
-  <div class="form-group">
-    <label for="name">Name</label>
-    <input type="text" name="name">
+<div class="col-md-6">
+  <div class="login-form panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Neuen user anlegen</h3>
+    </div>
+    @helper.form(action = routes.User.create, 'id -> "create-user-form", 'class -> "ajax-form form-horizontal", 'role -> "form") {
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="name" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" name="name">
+          </div>
+        </div>
 
-    <label for="password">Password</label>
-    <input type="password" name="password">
+        <div class="form-group">
+          <label for="password" class="col-sm-2 control-label">Password</label>
+          <div class="col-sm-10">
+            <input type="password" class="form-control" name="password">
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <input type="submit" class="btn btn-primary" value="Anmelden">
+      </div>
+    }
   </div>
-  <input type="submit" class="btn btn-primary">
-}
+</div>

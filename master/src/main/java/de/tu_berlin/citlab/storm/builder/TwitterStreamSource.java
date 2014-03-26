@@ -11,7 +11,7 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 import java.util.Properties;
 
 public class TwitterStreamSource extends StreamSource {
-    private final Properties user = TwitterUserLoader.loadUser("twitter.config");
+    private final Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
     private UDFSpout spout;
 
     public TwitterStreamSource(StreamBuilder builder, String[] keywords, String[] languages, String[] outputfields )

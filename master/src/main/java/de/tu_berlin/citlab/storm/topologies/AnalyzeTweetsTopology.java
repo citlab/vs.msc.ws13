@@ -49,7 +49,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
     public BaseRichSpout createTwitterSpout() throws InvalidTwitterConfigurationException {
         // Setup up Twitter configuration
-        Properties user = TwitterUserLoader.loadUser("twitter.config");
+        Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
         String[] keywords = new String[] { "der", "die","das","wir","ihr","sie", "dein", "mein", "es", "in", "einem", "von", "zu", "hat", "nicht",
                 "bombe", "nuklear", "anschlag", "berin", "macht", "religion", "gott", "allah", "heilig" };
         String[] languages = new String[] {"de"};
@@ -320,7 +320,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
 
     @Override
-    public StormTopology createTopology()
+    public StormTopology createTopology(boolean isCluster)
     {
         TopologyBuilder builder = new TopologyBuilder();
 

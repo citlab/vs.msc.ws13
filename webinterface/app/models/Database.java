@@ -1,5 +1,8 @@
 package models;
 
+import play.*;
+import play.mvc.*;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,34 +26,14 @@ public class Database {
     return INSTANCE;
   }
 
-  private final Properties prop;
-
-  private Database() {
-    prop = new Properties();
-    FileInputStream fis = null;
-
-    try {
-      fis = new FileInputStream(
-          "conf/db.properties");
-      prop.load(fis);
-    } catch (IOException e) {
-      System.err.println("Could not load database configuration file");
-    } finally {
-      if (fis != null) {
-        try {
-          fis.close();
-        } catch (IOException e) {
-        }
-      }
-    }
-  }
-
   private String getConnectionString() {
-    return "jdbc:mysql://" + prop.getProperty("hostUrl") + ":"
-        + prop.getProperty("hostPort") + "/"
+    DatabaseConfig prop = DatabaseConfig.getInstance();
+
+    return "jdbc:mysql://" + prop.getProperty("host_url") + ":"
+        + prop.getProperty("host_port") + "/"
         + prop.getProperty("database") + "?user="
-        + prop.getProperty("userName") + "&password="
-        + prop.getProperty("userPW");
+        + prop.getProperty("u_web") + "&password="
+        + prop.getProperty("p_web");
   }
 
   private String generateSalt(int length) {
@@ -427,10 +410,11 @@ public class Database {
     return "0";
   }
 
-  public String addFile(String title, String name, String user) {
+  public ArrayList<User> getUsers() {
     Connection conn = null;
     PreparedStatement stmt = null;
-    boolean result = false;
+
+    ArrayList<User> list = new ArrayList<User>();
 
     try {
       // Register JDBC driver
@@ -440,57 +424,15 @@ public class Database {
       conn = DriverManager.getConnection(getConnectionString());
 
       // Execute SQL query
-      stmt = conn.prepareStatement("INSERT INTO files(title,name,user) VALUES(?,?,?)");
-
-      stmt.setString(1, title);
-      stmt.setString(2, name);
-      stmt.setString(3, user);
-
-      stmt.executeUpdate();
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (stmt != null)
-          stmt.close();
-      } catch (SQLException e) {
-      }
-      try {
-        if (conn != null)
-          conn.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return "0";
-  }
-
-  public ArrayList<Topology> getFilesForUser(String user) {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    ArrayList<Topology> list = new ArrayList<Topology>();
-
-    try {
-      // Register JDBC driver
-      Class.forName("com.mysql.jdbc.Driver");
-
-      // Open a connection
-      conn = DriverManager.getConnection(getConnectionString());
-
-      // Execute SQL query
-      stmt = conn.prepareStatement("SELECT * FROM files WHERE user=?");
-
-      stmt.setString(1, user);
+      stmt = conn.prepareStatement("SELECT * FROM users");
 
       ResultSet rs = stmt.executeQuery();
 
       while(rs.next()) {
-        list.add(new Topology(rs.getString("title"), user, rs.getTimestamp("date").toString(), rs.getString("name")));
+        list.add(new User(
+          rs.getString("name"),
+          rs.getInt("uid"),
+          rs.getString("session")));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -511,145 +453,5 @@ public class Database {
     }
 
     return list;
-  }
-
-  public ArrayList<LogEntry> getLogs(long lastId) {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    ArrayList<LogEntry> list = new ArrayList<LogEntry>();
-
-    try {
-      // Register JDBC driver
-      Class.forName("com.mysql.jdbc.Driver");
-
-      // Open a connection
-      conn = DriverManager.getConnection(getConnectionString());
-
-      // Execute SQL query
-      stmt = conn.prepareStatement("SELECT * FROM log4j2 WHERE id>?");
-      stmt.setLong(1, lastId);
-
-      ResultSet rs = stmt.executeQuery();
-
-      while(rs.next()) {
-        list.add(new LogEntry(rs.getInt("id"))
-          .datetime(rs.getTimestamp("datetime").toString())
-          .milliseconds(new Integer(rs.getInt("milliseconds")).toString())
-          .logger(rs.getString("logger"))
-          .level(rs.getString("level"))
-          .message(rs.getString("message"))
-          .exception(rs.getString("exception"))
-          .thread(rs.getString("thread"))
-          .marker(rs.getString("marker"))
-        );
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (stmt != null)
-          stmt.close();
-      } catch (SQLException e) {
-      }
-      try {
-        if (conn != null)
-          conn.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return list;
-  }
-
-  public String deleteFile(String title) {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    boolean result = false;
-
-    try {
-      // Register JDBC driver
-      Class.forName("com.mysql.jdbc.Driver");
-
-      // Open a connection
-      conn = DriverManager.getConnection(getConnectionString());
-
-      // Execute SQL query
-      stmt = conn.prepareStatement("DELETE FROM files WHERE title=?");
-
-      stmt.setString(1, title);
-
-      stmt.executeUpdate();
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (stmt != null)
-          stmt.close();
-      } catch (SQLException e) {
-      }
-      try {
-        if (conn != null)
-          conn.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return title;
-  }
-
-  public LogEntry getLog(long id) {
-    Connection conn = null;
-    PreparedStatement stmt = null;
-
-    LogEntry entry = null;
-    try {
-      // Register JDBC driver
-      Class.forName("com.mysql.jdbc.Driver");
-
-      // Open a connection
-      conn = DriverManager.getConnection(getConnectionString());
-
-      // Execute SQL query
-      stmt = conn.prepareStatement("SELECT * FROM log4j2 WHERE id=?");
-      stmt.setLong(1, id);
-
-      ResultSet rs = stmt.executeQuery();
-      rs.first();
-      entry = new LogEntry(rs.getInt("id"))
-        .datetime(rs.getTimestamp("datetime").toString())
-        .milliseconds(new Integer(rs.getInt("milliseconds")).toString())
-        .logger(rs.getString("logger"))
-        .level(rs.getString("level"))
-        .message(rs.getString("message"))
-        .exception(rs.getString("exception"))
-        .thread(rs.getString("thread"))
-        .marker(rs.getString("marker"));
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (stmt != null)
-          stmt.close();
-      } catch (SQLException e) {
-      }
-      try {
-        if (conn != null)
-          conn.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return entry;
   }
 }

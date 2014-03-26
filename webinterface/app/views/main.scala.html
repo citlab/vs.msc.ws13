@@ -11,16 +11,19 @@
         
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
 
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.fancybox.css")">
+
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.at("javascripts/jquery.form.min.js")" type="text/javascript"></script>
 
+        <script src="@routes.Assets.at("javascripts/jquery.fancybox.js")" type="text/javascript"></script>
+
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.at("javascripts/custom.js")" type="text/javascript"></script>
-
 
         <script src="@routes.Assets.at("javascripts/modal.js")" type="text/javascript"></script>
 
@@ -32,9 +35,9 @@
         @menu.render
         <div class="container">
             @(if(models.User.loggedIn(onlyLoggedIn, session.get("name"), session.get("session"))) {
-                content
+              content
             } else {
-                user_control.login.render
+              user_control.login.render
             })
         </div>
     </body>

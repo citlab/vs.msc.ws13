@@ -11,15 +11,11 @@ import de.tu_berlin.citlab.storm.builder.*;
 import de.tu_berlin.citlab.storm.helpers.KeyConfigFactory;
 import de.tu_berlin.citlab.storm.helpers.TupleHelper;
 import de.tu_berlin.citlab.storm.operators.*;
-import de.tu_berlin.citlab.storm.operators.join.StaticHashJoinOperator;
 import de.tu_berlin.citlab.storm.operators.join.TupleProjection;
 import de.tu_berlin.citlab.storm.sinks.CassandraSink;
-import de.tu_berlin.citlab.storm.spouts.CassandraDataProviderSpout;
-import de.tu_berlin.citlab.storm.spouts.UDFSpout;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
-import de.tu_berlin.citlab.storm.window.Window;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,9 +27,12 @@ import java.util.Map;
 public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation {
 
     @Override
-    public StormTopology createTopology() {
+    public StormTopology createTopology(boolean isCluster) {
         String cassandraServerIP = "127.0.0.1";
 
+        if(isCluster) {
+            cassandraServerIP = CassandraConfig.getCassandraClusterIPFromClusterManager();
+        }
         StreamBuilder stream = new StreamBuilder();
 
         try{
@@ -47,7 +46,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             cassandraBadWordsStatisticsCfg.setIP(cassandraServerIP);
 
             cassandraTweetsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm3",
+                    "citstorm",
                     "tweets",
                     new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -55,7 +54,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraUserSignificanceCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm3",
+                    "citstorm",
                     "user_significance",
                     new PrimaryKey("user"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields("significance"), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -63,7 +62,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraBadWordsStatisticsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm3",
+                    "citstorm",
                     "badword_occurences",
                     new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -97,9 +96,9 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
 
-            SinkOperator tweetsSink = new CassandraOperator(cassandraTweetsCfg);
-            SinkOperator userSignificanceSink = new CassandraOperator(cassandraUserSignificanceCfg);
-            SinkOperator badWordsStatisticsSink = new CassandraOperator(cassandraBadWordsStatisticsCfg);
+            StreamSink tweetsSink = new CassandraSink(stream, cassandraTweetsCfg);
+            StreamSink userSignificanceSink = new CassandraSink(stream, cassandraUserSignificanceCfg);
+            StreamSink badWordsStatisticsSink = new CassandraSink(stream, cassandraBadWordsStatisticsCfg);
 
 
             StreamSource userCassandraPersistentSignificanceSource = new CassandraStreamSource(stream,

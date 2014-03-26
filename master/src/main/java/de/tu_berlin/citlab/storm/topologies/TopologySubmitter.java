@@ -44,7 +44,7 @@ public class TopologySubmitter
             conf.setMaxSpoutPending(1);
 
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("analyzte-twitter-stream", conf, topology.createTopology());
+            cluster.submitTopology("analyzte-twitter-stream", conf, topology.createTopology(false));
 //                    new AnalyzeTweetsTopology().createTopology() );
 
             //cluster.shutdown();
@@ -57,7 +57,7 @@ public class TopologySubmitter
         	setTopology();
             Config conf = new Config();
             conf.setNumWorkers(3);
-            StormSubmitter.submitTopology(args[0], conf, topology.createTopology());
+            StormSubmitter.submitTopology(args[0], conf, topology.createTopology(true));
         }
 
     }
