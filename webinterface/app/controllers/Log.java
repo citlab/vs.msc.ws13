@@ -5,7 +5,7 @@ import play.mvc.*;
 
 import views.html.*;
 import models.LogEntry;
-import models.Database;
+import models.LogDatabase;
 
 import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,7 +20,7 @@ public class Log extends Controller {
     ObjectNode result = Json.newObject();
 
     //int lastId = Integer.parseInt(request().getQueryString("lastId"));
-    ArrayList<LogEntry> list = Database.getInstance().getLogs(lastId);
+    ArrayList<LogEntry> list = LogDatabase.getInstance().getLogs(lastId);
 
     for(LogEntry entry : list) {
       ObjectNode message = Json.newObject();
@@ -41,7 +41,7 @@ public class Log extends Controller {
   @BodyParser.Of(BodyParser.Json.class)
   public static Result getLog(long lastId) {
     ObjectNode result = Json.newObject();
-    LogEntry entry = Database.getInstance().getLog(lastId);;
+    LogEntry entry = LogDatabase.getInstance().getLog(lastId);;
 
     result.put("logger", entry.getLogger());
     result.put("level", entry.getLevel());
