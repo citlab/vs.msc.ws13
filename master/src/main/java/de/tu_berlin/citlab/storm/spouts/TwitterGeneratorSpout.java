@@ -94,6 +94,7 @@ public class TwitterGeneratorSpout extends UDFSpout
                         LogPrinter.toValString(tweetVal));
             }
         }
+        tupleCount ++;
 
     }
 
