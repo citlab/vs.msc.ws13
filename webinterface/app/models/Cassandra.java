@@ -13,7 +13,7 @@ public class Cassandra implements Server {
   }
 
   public Boolean isUp() {
-    return this.getIp() != null;
+    return !this.getIp().equals("null");
   }
 
   public String getStatus() {
