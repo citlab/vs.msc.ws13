@@ -1,6 +1,6 @@
 package de.tu_berlin.citlab.storm.builder;
 
-import backtype.storm.tuple.Fields;
+import de.tu_berlin.citlab.storm.spouts.TwitterGeneratorSpout;
 import de.tu_berlin.citlab.storm.spouts.TwitterSpout;
 import de.tu_berlin.citlab.storm.spouts.UDFSpout;
 import de.tu_berlin.citlab.storm.udf.UDFOutput;
@@ -10,15 +10,15 @@ import de.tu_berlin.citlab.twitter.TwitterUserLoader;
 
 import java.util.Properties;
 
-public class TwitterStreamSource extends StreamSource {
+public class TwitterTestStreamSource extends StreamSource {
     private final Properties user = TwitterUserLoader.loadUserFromJar("twitter.config");
+    private UDFSpout spout;
 
-    public TwitterStreamSource(StreamBuilder builder, String[] keywords, String[] languages, String[] outputfields )
-            throws InvalidTwitterConfigurationException{
+    public TwitterTestStreamSource(StreamBuilder builder, String[] users, String[] dict,
+                                   int wordsPerTweet, int tweetsPerSecond)
+    {
         super(builder);
-        TwitterConfiguration config = new TwitterConfiguration(user, keywords, languages, outputfields);
-        spout = new TwitterSpout(config);
-
+        spout = new TwitterGeneratorSpout(users, dict, wordsPerTweet, tweetsPerSecond);
         getStreamBuilder().getTopologyBuilder().setSpout(getNodeId(), spout );
     }
 

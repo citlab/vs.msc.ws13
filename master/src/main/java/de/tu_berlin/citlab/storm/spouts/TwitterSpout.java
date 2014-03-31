@@ -33,8 +33,6 @@ public class TwitterSpout extends UDFSpout {
 	private static final Logger LOGGER = LogManager.getLogger("Spout");
 
 
-	private SpoutOutputCollector collector;
-
 	// The linked blocking queue is needed, as the offering in the list by the
 	// twitter stream and the polling from the list by the spout is asynchronous
 	private LinkedBlockingQueue<Status> queue = null;
@@ -54,10 +52,8 @@ public class TwitterSpout extends UDFSpout {
 	}
 
 	@Override
-	public void open(Map conf, TopologyContext context,
-					SpoutOutputCollector collector) {
+	public void open() {
 			queue = new LinkedBlockingQueue<Status>(1000);
-			this.collector = collector;
 			StatusListener listener = new StatusListener() {
 
 					@Override
@@ -99,7 +95,8 @@ public class TwitterSpout extends UDFSpout {
 			LOGGER.info("Opened Twitter Stream!");
 	}
 
-	@Override
+
+    @Override
 	public void nextTuple() {
 			Status ret = queue.poll();
 			if (ret == null) {
