@@ -19,7 +19,7 @@ public class DatabaseConfig {
 
 		try {
 			fis = new FileInputStream(
-					"/home/ubuntu/StormRegisterService/db.properties");
+					"/home/ubuntu/CitstormService/db.properties");
 			prop.load(fis);
 		} catch (IOException e) {
 			System.err.println("Could not load database configuration file");

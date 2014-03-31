@@ -13,6 +13,9 @@ import java.util.Random;
 
 public class RegisterDatabase {
 
+	public static final int TYPE_NIMBUS = 0;
+	public static final int TYPE_CASSANDRA = 1;
+
 	private static final RegisterDatabase INSTANCE = new RegisterDatabase();
 
 	public static RegisterDatabase getInstance() {

@@ -21,7 +21,7 @@ public class NodeStartupService {
 			}
 		}
 		System.out.println("Nimbus address is: " + nimbus);
-		writeCfgFile(nimbus, "/home/ubuntu/storm-0.8.1/conf/storm.yaml");
+		writeCfgFile(nimbus, "/home/ubuntu/storm-0.8.2/conf/storm.yaml");
 	}
 
 	private static void writeCfgFile(String nimbus, String path) {

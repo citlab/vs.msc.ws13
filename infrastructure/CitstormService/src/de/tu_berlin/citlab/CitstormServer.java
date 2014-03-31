@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
+import de.tu_berlin.citlab.cluster.ClusterManager;
 import de.tu_berlin.citlab.register.servlets.LookupServlet;
 import de.tu_berlin.citlab.register.servlets.RegisterServlet;
 
@@ -41,6 +42,9 @@ public class CitstormServer {
 	}
 
 	private static void startClusterManager() {
+		ClusterManager cMan = new ClusterManager();
+		cMan.start();
 
+		System.out.println("Cluster Manager started");
 	}
 }
