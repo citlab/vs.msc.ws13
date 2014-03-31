@@ -94,8 +94,6 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             stream.setDefaultWindowType(new TimeWindow<Tuple>(1,1));
 
-//            StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
-
 
             String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
             String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
@@ -106,7 +104,9 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                                     "Pilates", "Politik", "Kapital", "Twitter",
                                                     "der", "die", "das", "google", "microsoft", "facebook"};
 
+            //StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
             StreamSource tweets = new TwitterTestStreamSource(stream, twitterUsers, dictionary, 10, 30);
+
 
             StreamSink tweetsSink = new CassandraSink(stream, cassandraTweetsCfg);
             StreamSink userSignificanceSink = new CassandraSink(stream, cassandraUserSignificanceCfg);
