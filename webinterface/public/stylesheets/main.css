@@ -42,6 +42,7 @@
   cursor: pointer;
   font-weight: bold;
   max-width: 150px;
+  height: 27px;
   white-space: nowrap;
   overflow: hidden;
   -webkit-transition: all 0.1s ease-in-out;
@@ -49,6 +50,24 @@
   -o-transition: all 0.1s ease-in-out;
   -ms-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
+}
+
+#topology-list ul li.input-filter {
+  margin: 3px 5px 5px;
+  padding: 0 3px;
+  float: left;
+  height: 27px;
+  max-width: none;
+  box-shadow: none;
+  cursor: default;
+  height: 27px;
+  box-shadow: 0 0 2px #ccc;
+}
+
+#topology-list ul li.input-filter input {
+  padding: 3px;
+  border: none;
+  background: transparent none;
 }
 
 #topology-list ul li:hover {
