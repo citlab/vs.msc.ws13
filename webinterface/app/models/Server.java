@@ -2,6 +2,8 @@ package models;
 
 import java.util.*;
 
-public class Server {
-  
+public interface Server {
+  public String getStatus();
+  public Boolean isUp();
+  public String getIp();
 }
