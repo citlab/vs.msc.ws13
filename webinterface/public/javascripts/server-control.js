@@ -8,19 +8,6 @@
     global.server_control.panel.cassandra = $("#cassandra");
     global.server_control.panel.supervisor = $("#supervisor");
 
-    global.server_control.panel.nimbus.started = function() {
-      return $(global.server_control).find("[value=start_nimbus]").is(':disabled');
-    }
-
-    global.server_control.panel.nimbus.updateIp = function(value) {
-      $("#server-nimbus-ip").html(value);
-      $("#server-nimbus-ip").attr('href', 'http://' + value + ':8080');
-    }
-
-    global.server_control.panel.nimbus.updateStatus = function(value) {
-      $("#server-nimbus-status").html(value);
-    }
-
     global.server_control.panel.cassandra.started = function() {
       return $(global.server_control).find("[value=start_cassandra]").is(':disabled');
     }
@@ -51,6 +38,9 @@
 
       global.server_control.panel.cassandra.updateIp(data.Cassandra.ip);
       global.server_control.panel.cassandra.updateStatus(data.Cassandra.status);
+
+      global.server_control.panel.supervisor.updateIp(data.Supervisor.ip);
+      global.server_control.panel.supervisor.updateStatus(data.Supervisor.status);
 
       window.setTimeout(function() {global.server_control.update();}, 10000);
     }

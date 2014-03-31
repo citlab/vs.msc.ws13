@@ -29,5 +29,22 @@
         
       }
     });
+
+    global.server_request = function(action, server, success, count) {
+      var url = "server/" + server + "/" + action;
+      if(count != undefined)
+         url += "/" + count;
+
+      $.ajax({
+        url: url,
+        data: {count: count},
+        dataType: 'text',
+        type: 'POST',
+        success: success,
+        error: function() {
+          alert('Error at server action ' + server + ' - ' + action);
+        }
+      });
+    }
   });
 }(jQuery, this))

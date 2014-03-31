@@ -31,4 +31,8 @@ public class Cassandra implements Server {
       return "Local";
     }
   }
+
+  public String getInstanceData() {
+    return "{blah: test}";
+  }
 }
