@@ -1,72 +1,156 @@
 package models.aws;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import gson.InstancesGson;
+import models.Database;
+import models.ClusterDatabase;
 
 public class Instance {
-  public static final int PENDING = 0;
-  public static final int RUNNING = 16;
-  public static final int SHUTTING_DOWN = 32;
-  public static final int TERMINATED = 48;
-  public static final int STOPPING = 64;
-  public static final int STOPPED = 80;
+  private static final SimpleDateFormat SDF = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+  public static final int STATE_PENDING = 0;
+  public static final int STATE_RUNNING = 16;
+  public static final int STATE_SHUTTING_DOWN = 32;
+  public static final int STATE_TERMINATED = 48;
+  public static final int STATE_STOPPING = 64;
+  public static final int STATE_STOPPED = 80;
+  public static final int STATE_UNKNOWN = -1;
+
+  public static final int ROLE_NIMBUS = 100;
+  public static final int ROLE_CASSANDRA = 101;
+  public static final int ROLE_SUPERVISOR = 102;
+  public static final int ROLE_OTHER = 103;
 
   private final String instanceId;
   private final String imageId;
   private final String instanceType;
-  private final String launchTime;
-  private String publicIp;
-  private State state;
+  private final Date launchTime;
+  private final int role;
+  private final String publicIp;
+  private final int state;
 
-  public enum State {
-    PENDING, RUNNING, SHUTTING_DOWN, TERMINATED, STOPPING, STOPPED
+  public static Instance createNimbus() {
+    String keyName = ClusterDatabase.getInstance().getProperty(
+        "cluster.key-name");
+    String availabilityZone = ClusterDatabase.getInstance().getProperty(
+        "cluster.zone");
+    String imageId = ClusterDatabase.getInstance().getProperty(
+        "nimbus.image-id");
+    String instanceType = ClusterDatabase.getInstance().getProperty(
+        "nimbus.instance-type");
+
+    return AwsCli.runInstance(imageId, instanceType, keyName,
+        availabilityZone);
   }
 
-  public enum Role {
-    NIMBUS, CASSANDRA, ZOOKEEPER, SUPERVISOR, MANAGER, OTHER
+  public static Instance createCassandra() {
+    String keyName = ClusterDatabase.getInstance().getProperty(
+        "cluster.key-name");
+    String availabilityZone = ClusterDatabase.getInstance().getProperty(
+        "cluster.zone");
+    String imageId = ClusterDatabase.getInstance().getProperty(
+        "cassandra.image-id");
+    String instanceType = ClusterDatabase.getInstance().getProperty(
+        "cassandra.instance-type");
+
+    return AwsCli.runInstance(imageId, instanceType, keyName,
+        availabilityZone);
   }
 
-  public Instance(InstancesGson instance) {
+  public static Instance[] createSupervisors(int count) {
+    String keyName = ClusterDatabase.getInstance().getProperty(
+        "cluster.key-name");
+    String availabilityZone = ClusterDatabase.getInstance().getProperty(
+        "cluster.zone");
+    String imageId = ClusterDatabase.getInstance().getProperty(
+        "supervisor.image-id");
+    String instanceType = ClusterDatabase.getInstance().getProperty(
+        "supervisor.instance-type");
+
+    return AwsCli.runInstances(imageId, instanceType, keyName,
+        availabilityZone, count);
+  }
+
+  public static Instance createInstance(InstancesGson instance) {
+    return new Instance(instance);
+  }
+
+  private Instance(InstancesGson instance) {
     this(instance.getInstanceId(), instance.getImageId(), instance
         .getInstanceType(), instance.getState().getName(), instance
         .getPublicIpAddress(), instance.getLaunchTime());
   }
 
-  public Instance(String instanceId, String imageId, String instanceType,
+  private Instance(String instanceId, String imageId, String instanceType,
       String state, String publicIp, String launchTime) {
     this.instanceId = instanceId;
     this.imageId = imageId;
     this.instanceType = instanceType;
-    this.launchTime = launchTime;
+
+    Date date = null;
+    try {
+      date = SDF.parse(launchTime);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    this.launchTime = date;
+
     this.publicIp = publicIp;
+
+    if (imageId.equals(ClusterDatabase.getInstance().getProperty(
+        "nimbus.image-id"))) {
+      this.role = ROLE_NIMBUS;
+    } else if (imageId.equals(ClusterDatabase.getInstance().getProperty(
+        "supervisor.image-id"))) {
+      this.role = ROLE_SUPERVISOR;
+    } else if (imageId.equals(ClusterDatabase.getInstance().getProperty(
+        "cassandra.image-id"))) {
+      this.role = ROLE_CASSANDRA;
+    } else {
+      this.role = ROLE_OTHER;
+    }
 
     switch (state) {
     case "pending":
-      this.state = State.PENDING;
+      this.state = STATE_PENDING;
       break;
 
     case "running":
-      this.state = State.RUNNING;
+      this.state = STATE_RUNNING;
       break;
 
     case "shutting-down":
-      this.state = State.SHUTTING_DOWN;
+      this.state = STATE_SHUTTING_DOWN;
       break;
 
     case "terminated":
-      this.state = State.TERMINATED;
+      this.state = STATE_TERMINATED;
       break;
 
     case "stopping":
-      this.state = State.STOPPING;
+      this.state = STATE_STOPPING;
       break;
 
     case "stopped":
-      this.state = State.STOPPED;
+      this.state = STATE_STOPPED;
       break;
 
     default:
+      this.state = STATE_UNKNOWN;
       break;
     }
+  }
+
+  public void terminate() {
+    AwsCli.terminateInstance(instanceId);
+  }
+
+  public void restart() {
+    AwsCli.rebootInstance(instanceId);
   }
 
   public String getInstanceId() {
@@ -85,37 +169,16 @@ public class Instance {
     return publicIp;
   }
 
-  public void setPublicIp(String publicIp) {
-    this.publicIp = publicIp;
-  }
-
-  public String getLaunchTime() {
+  public Date getLaunchTime() {
     return launchTime;
   }
 
-  public State getState() {
+  public int getState() {
     return state;
   }
 
-  public void setState(State state) {
-    this.state = state;
-  }
-
-  public Role getRole() {
-    if (imageId.equals(Config.getInstance().getProperty("nimbus.image-id"))) {
-      return Role.NIMBUS;
-    } else if (imageId.equals(Config.getInstance().getProperty(
-        "supervisor.image-id"))) {
-      return Role.SUPERVISOR;
-    } else if (imageId.equals(Config.getInstance().getProperty(
-        "zookeeper.image-id"))) {
-      return Role.ZOOKEEPER;
-    } else if (imageId.equals(Config.getInstance().getProperty(
-        "cassandra.image-id"))) {
-      return Role.CASSANDRA;
-    } else {
-      return Role.OTHER;
-    }
+  public int getRole() {
+    return this.role;
   }
 
   @Override

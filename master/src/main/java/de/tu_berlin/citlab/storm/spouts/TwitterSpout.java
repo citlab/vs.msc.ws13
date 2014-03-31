@@ -3,9 +3,12 @@ package de.tu_berlin.citlab.storm.spouts;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import de.tu_berlin.citlab.storm.helpers.StringHelper;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import twitter4j.FilterQuery;
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -24,7 +27,7 @@ import de.tu_berlin.citlab.twitter.ConfiguredTwitterStreamBuilder;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 
-public class TwitterSpout extends BaseRichSpout {
+public class TwitterSpout extends UDFSpout {
 
 	private static final long serialVersionUID = 8650869752517101545L;
 	private static final Logger LOGGER = LogManager.getLogger("Spout");
@@ -40,9 +43,10 @@ public class TwitterSpout extends BaseRichSpout {
 
 	private final TwitterConfiguration config;
 
-	public TwitterSpout(TwitterConfiguration config)
+	public TwitterSpout(TwitterConfiguration config )
 					throws InvalidTwitterConfigurationException {
-			if (!config.isValid()) {
+        super(new Fields(config.getOutputFields()));
+        if (!config.isValid()) {
 					throw new InvalidTwitterConfigurationException(
 									"The passed configuration is not valid");
 			}
@@ -113,13 +117,13 @@ public class TwitterSpout extends BaseRichSpout {
 		
                 for (int i = 0; i < outputFields.length; i++) {
                         if( outputFields[i].compareTo("user") == 0)
-                            values[i] = ret.getUser().getName();
+                            values[i] = StringHelper.removeAllNonBMPCharacters(ret.getUser().getName());
                         if( outputFields[i].compareTo("tweet") == 0)
-                            values[i] = ret.getText();
+                            values[i] = StringHelper.removeAllNonBMPCharacters(ret.getText());
                         if( outputFields[i].compareTo("date") == 0)
                             values[i] = ret.getCreatedAt().getTime();
                         if( outputFields[i].compareTo("lang") == 0)
-                            values[i] = ret.getIsoLanguageCode();
+                            values[i] = StringHelper.removeAllNonBMPCharacters(ret.getIsoLanguageCode());
                         if( outputFields[i].compareTo("geolocation") == 0)
                             values[i] = ret.getGeoLocation();
                         if( outputFields[i].compareTo("id") == 0)
@@ -157,4 +161,9 @@ public class TwitterSpout extends BaseRichSpout {
         public void declareOutputFields(OutputFieldsDeclarer declarer) {
                 declarer.declare(new Fields(config.getOutputFields()));
         }
+
+    @Override
+    public Fields getOutputFields() {
+        return new Fields(config.getOutputFields());
+    }
 }

@@ -1,0 +1,133 @@
+-- MySQL dump 10.13  Distrib 5.6.15, for osx10.9 (x86_64)
+--
+-- Host: localhost    Database: citstorm
+-- ------------------------------------------------------
+-- Server version	5.6.15
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `clustercfg`
+--
+
+DROP TABLE IF EXISTS `clustercfg`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `clustercfg` (
+  `uid` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clustercfg`
+--
+
+LOCK TABLES `clustercfg` WRITE;
+/*!40000 ALTER TABLE `clustercfg` DISABLE KEYS */;
+INSERT INTO `clustercfg` VALUES (1,'nimbus.instance-type','m1.small'),(2,'nimbus.image-id','ami-9516eae2'),(3,'supervisor.instance-type','m1.large'),(4,'supervisor.image-id','ami-516c9126'),(5,'cassandra.instance-type','m1.small'),(6,'cassandra.image-id','ami-876995f0'),(7,'cluster.zone','eu-west-1a'),(8,'cluster.key-name','citstorm');
+/*!40000 ALTER TABLE `clustercfg` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `files`
+--
+
+DROP TABLE IF EXISTS `files`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `files` (
+  `name` varchar(255) DEFAULT NULL,
+  `user` varchar(255) DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `title` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `files`
+--
+
+LOCK TABLES `files` WRITE;
+/*!40000 ALTER TABLE `files` DISABLE KEYS */;
+/*!40000 ALTER TABLE `files` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `log4j2`
+--
+
+DROP TABLE IF EXISTS `log4j2`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `log4j2` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `datetime` datetime NOT NULL,
+  `milliseconds` int(11) NOT NULL,
+  `logger` varchar(255) NOT NULL,
+  `level` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `exception` text NOT NULL,
+  `thread` varchar(255) NOT NULL,
+  `marker` varchar(255) NOT NULL,
+  `session` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `log4j2`
+--
+
+LOCK TABLES `log4j2` WRITE;
+/*!40000 ALTER TABLE `log4j2` DISABLE KEYS */;
+INSERT INTO `log4j2` VALUES (1,'2014-03-19 17:24:15',778,'class \nde.tu_berlin.citlab.logging.LoggingTest->slf4j','INFO','info','','main','','logsessionXY'),(2,'2014-03-19 17:24:16',228,'class \nde.tu_berlin.citlab.logging.LoggingTest->slf4j','WARN','warn','','main','','logsessionXY'),(3,'2014-03-19 17:24:16',241,'class \nde.tu_berlin.citlab.logging.LoggingTest->slf4j','ERROR','error','','main','','logsessionXY'),(4,'2014-03-19 17:24:16',252,'class \nde.tu_berlin.citlab.logging.LoggingTest->slf4j','ERROR','kaputt','java.lang.RuntimeException: panic!!!\r\n at \nde.tu_berlin.citlab.logging.LoggingTest.SLF4JLoggerTest(LoggingTest.java:24)\r\n\nat \nde.tu_berlin.citlab.logging.LoggingTest.main(LoggingTest.java:10)\r\n','main','','logsessionXY'),(5,'2014-03-19 17:24:16',264,'class \nde.tu_berlin.citlab.logging.LoggingTest->slf4j','INFO','this is a \nmarked message','','main','marker1','logsessionXY'),(6,'2014-03-19 17:24:16',282,'de.tu_berlin.citlab.logging.LoggingTest->log4j1.2','INFO','info','','main','','logsessionXY'),(7,'2014-03-19 17:24:16',287,'de.tu_berlin.citlab.logging.LoggingTest->log4j1.2','WARN','warn','','main','','logsessionXY'),(8,'2014-03-19 17:24:16',292,'de.tu_berlin.citlab.logging.LoggingTest->log4j1.2','ERROR','error','','main','','logsessionXY'),(9,'2014-03-19 17:24:16',296,'de.tu_berlin.citlab.logging.LoggingTest->log4j1.2','ERROR','kaputt','java.lang.RuntimeException: panic!!!\r\n at \nde.tu_berlin.citlab.logging.LoggingTest.Log4J12LoggerTest(LoggingTest.java:39)\r\n\nat \nde.tu_berlin.citlab.logging.LoggingTest.main(LoggingTest.java:11)\r\n','main','','logsessionXY'),(10,'2014-03-19 17:24:16',303,'de.tu_berlin.citlab.logging.LoggingTest->log4j2','INFO','info','','main','','logsessionXY'),(11,'2014-03-19 17:24:16',307,'de.tu_berlin.citlab.logging.LoggingTest->log4j2','WARN','warn','','main','','logsessionXY'),(12,'2014-03-19 17:24:16',313,'de.tu_berlin.citlab.logging.LoggingTest->log4j2','ERROR','error','','main','','logsessionXY'),(13,'2014-03-19 17:24:16',317,'de.tu_berlin.citlab.logging.LoggingTest->log4j2','ERROR','kaputt','java.lang.RuntimeException: panic!!!\r\n at \nde.tu_berlin.citlab.logging.LoggingTest.Log4J2LoggerTest(LoggingTest.java:53)\r\n\nat \nde.tu_berlin.citlab.logging.LoggingTest.main(LoggingTest.java:12)\r\n','main','','logsessionXY'),(14,'2014-03-19 17:24:16',322,'de.tu_berlin.citlab.logging.LoggingTest->log4j2','INFO','this is a \nmarked message','','main','marker1','logsessionXY');
+/*!40000 ALTER TABLE `log4j2` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `name` varchar(20) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `salt` varchar(255) DEFAULT NULL,
+  `session` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('gertimon','a325ac72bdd2d92055025c8f5560750c','57130309b53bf39be2a773cecd6e0934',NULL),('michi','bf07c73c67c73983cfe89159aad74bfd','2dbe00452678597518905b151a540cc0','1395236031'),('admin','86e7b3023caa1e2dcde1d2632fc8b68c','7995f68b5d5c05f24de2bcb16db80022','1395495101');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2014-03-22 16:34:23

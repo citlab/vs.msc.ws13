@@ -3,6 +3,8 @@ package de.tu_berlin.citlab.storm.bolts;
 import java.util.List;
 import java.util.Map;
 
+import de.tu_berlin.citlab.storm.udf.UDFOutput;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,14 +26,40 @@ import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
 import de.tu_berlin.citlab.storm.exceptions.OperatorException;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 
-public class UDFBolt extends BaseRichBolt {
+public class UDFBolt extends BaseRichBolt implements UDFOutput {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LogManager.getLogger("Bolt");
+    private static final Marker marker = MarkerManager.getMarker("Topology");
+    private static final Marker statistics = MarkerManager.getMarker("Statistics");
+    private static final Marker debugger = MarkerManager.getMarker("Debug");
+    private static final String LOG_DLIMITER=",";
 
+    // SCOPE describes the location of log messages created (e.g. operator)
 
+    public void log_debug(String msg){ log_debug("UDF", msg); };
+    public void log_debug(String scope, Object ... msgs){
+        LOGGER.debug(marker, stormComponentId+LOG_DLIMITER+stormTaskId+LOG_DLIMITER+scope+LOG_DLIMITER+ StringUtils.join(msgs, ' '));
+    }
+
+    public void log_info(String msg){ log_info("UDF", msg); };
+    public void log_info(String scope, Object ... msgs){
+        LOGGER.info(marker, stormComponentId+LOG_DLIMITER+stormTaskId+LOG_DLIMITER+scope+LOG_DLIMITER+ StringUtils.join(msgs, ' '));
+    }
+    public void log_error(String msg){ log_error("UDF", msg); };
+    public void log_error(String scope, Object ... msgs){
+        LOGGER.error(marker, stormComponentId + LOG_DLIMITER + stormTaskId + LOG_DLIMITER + scope + LOG_DLIMITER + StringUtils.join(msgs, ' '));
+    }
+    public void log_statistics(String msg){ log_statistics("UDF", msg); };
+    public void log_statistics(String scope, Object ... msgs){
+        LOGGER.info(statistics, stormComponentId + LOG_DLIMITER + stormTaskId + LOG_DLIMITER+ scope + LOG_DLIMITER + StringUtils.join(msgs, ' '  ));
+    }
+
+    
 /* Global Variables: */
 /* ================= */
 
@@ -43,6 +71,10 @@ public class UDFBolt extends BaseRichBolt {
     final protected Fields outputFields;
     final protected IOperator operator;
     final protected WindowHandler windowHandler;
+
+    // important for logging
+    private String stormComponentId     = "default";
+    private int stormTaskId             = -1;
 
 
 
@@ -67,7 +99,9 @@ public class UDFBolt extends BaseRichBolt {
                    Window<Tuple, List<Tuple>> window, IKeyConfig windowKey, IKeyConfig groupByKey) {
         this.outputFields = outputFields;
         this.operator = operator;
+        this.operator.setUDFBolt(this);
         windowHandler = new WindowHandler(window, windowKey, groupByKey);
+        windowHandler.setUDFBolt(this);
     }
 
 
@@ -99,6 +133,8 @@ public class UDFBolt extends BaseRichBolt {
     public void prepare(@SuppressWarnings("rawtypes") Map stormConf,
                         TopologyContext context, OutputCollector collector) {
         this.collector = collector;
+        this.stormComponentId = context.getThisComponentId();
+        this.stormTaskId = context.getThisTaskIndex();
     }
 
     public Map<String, Object> getComponentConfiguration() {
@@ -120,9 +156,12 @@ public class UDFBolt extends BaseRichBolt {
                 executeBatches(windows);
             }
         }
-
     }
 
+
+    public String getUDFDescription(){
+        return "Bolt<"+stormComponentId+">::UDF<"+operator.getClass().getSimpleName()+"> -> (" +StringUtils.join(outputFields.toList().toArray(), ",")+")";
+    }
 
 
 /* Private Methods: */
@@ -130,18 +169,19 @@ public class UDFBolt extends BaseRichBolt {
 
     protected void executeBatches(List<List<Tuple>> windows) {
         for (List<Tuple> window : windows) {
-			LOGGER.info("Executing Operator with window {}", LogPrinter.toTupleListString(window));
+            log_debug("Executing Operator with window {}", LogPrinter.toTupleListString(window));
 			try {
 				operator.execute(window, collector );
 
+                log_debug("executeBatch:size "+window.size());
 				for (Tuple tuple : window) {
-					collector.ack(tuple);
+                    log_info("executeBatch:tuple:" +tuple );
+                    collector.ack(tuple);
 				}
 			}
 			catch (OperatorException e) {
-				LOGGER.error("Operator Execution resulted in an error!", e);
+				log_error("Operator Execution resulted in an error!", e);
 			}
-
         }//for
     }
 

@@ -7,7 +7,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 @SuppressWarnings("serial")
-public class FilterOperator implements IOperator {
+public class FilterOperator extends IOperator {
 
 	protected Filter filter;
 	protected boolean chaining = false;

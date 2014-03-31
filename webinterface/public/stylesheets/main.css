@@ -1,14 +1,86 @@
-.topology-list {
-  margin-top: 30px;
+#upload-topology-form {
+  margin-bottom: 0px;
 }
 
-.topology {
-  margin-bottom: 20px;
-  display: block;
+#topology-list {
+  margin-bottom: 30px;
 }
 
-.topology strong {
-  display: block;
+#topology-list table {
+  margin: 0;
+}
+
+#topology-list .log-list {
+  font-size: 10px;
+  height: 300px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: 0 0 2px #ddd;
+}
+
+#topology-list .time {
+  width: 150px;
+}
+
+#topology-list .bolt {
+  width: 200px;
+}
+
+#topology-list ul {
+  font-size: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#topology-list ul li {
+  margin: 3px 5px 5px;
+  padding: 3px 15px;
+  float: left;
+  box-shadow: 0 0 2px #ccc;
+  cursor: pointer;
+  font-weight: bold;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+#topology-list ul li:hover {
+  background: #428bca;
+  color: #fff;
+}
+
+.login-form {
+  margin-top: 50px;
+}
+
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+.online {
+  font-weight: bold;
+  color: #008800;
+}
+
+.offline {
+  font-weight: bold;
+  color: #cc0000;
+}
+
+body.test {
+  background: url('/assets/images/topology.png') no-repeat center center fixed;;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 .rotating {

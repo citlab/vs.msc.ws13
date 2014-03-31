@@ -5,7 +5,10 @@
 # Home page
 GET     /                           controllers.Application.index()
 
-POST    /login                      controllers.Application.login()
+POST    /login                      controllers.User.login()
+GET     /logout                     controllers.User.logout()
+GET     /user                       controllers.User.user()
+POST    /create                     controllers.User.create()
 
 GET    /kontakt                     controllers.Application.kontakt()
 GET    /impressum                   controllers.Application.impressum()
@@ -13,10 +16,12 @@ GET    /impressum                   controllers.Application.impressum()
 GET     /server                     controllers.Application.server()
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
+GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
 
-GET     /startserver         controllers.Server.startServer()
+GET     /startserver                controllers.Server.startServer()
 
-POST    /log                        controllers.Log.get()
+POST    /log/:id                    controllers.Log.getLatest(id: Long)
+POST    /log/single/:id             controllers.Log.getLog(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

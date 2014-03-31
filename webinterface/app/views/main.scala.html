@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(onlyLoggedIn: Boolean)(content: Html)
 
 <!DOCTYPE html>
 
@@ -11,18 +11,50 @@
         
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
 
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery.fancybox.css")">
+
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
 
+        <script src="@routes.Assets.at("javascripts/jquery.form.min.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.at("javascripts/jquery.fancybox.js")" type="text/javascript"></script>
+
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.at("javascripts/custom.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.at("javascripts/modal.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.at("javascripts/topology-list.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.at("javascripts/topology-filter.js")" type="text/javascript"></script>
     </head>
     <body>
         @menu.render
         <div class="container">
-            @content
+            @(if(models.User.loggedIn(onlyLoggedIn, session.get("name"), session.get("session"))) {
+              content
+            } else {
+              user_control.login.render
+            })
         </div>
     </body>
+
+    <div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel"></h4>
+          </div>
+          <div class="modal-body">
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
 </html>

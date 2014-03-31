@@ -9,7 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 public class TwitterUserLoader {
+	
+        private static final Logger log = LogManager.getLogger(TwitterUserLoader.class); 
 
         /**
          * 
@@ -25,7 +31,7 @@ public class TwitterUserLoader {
                         fis = new FileInputStream(path);
                         prop.load(fis);
                 } catch (IOException e) {
-                        System.err.println("Could not load properties file: " + path);
+                        log.error(String.format("Could not load properties file from relative path '%s'. Not Existent or not readable.", path));
                 } finally {
                         if (fis != null) {
                                 try {
@@ -53,7 +59,7 @@ public class TwitterUserLoader {
                         prop.load(is);
 
                 } catch (IOException e) {
-                        System.err.println("Could not load properties file from Jar archive: " + path);
+                        log.error(String.format("Could not load properties file from absolute class-path '/%s'. Not Existent or not readable.", path));
                 } finally {
                         if (is != null) {
                                 try {

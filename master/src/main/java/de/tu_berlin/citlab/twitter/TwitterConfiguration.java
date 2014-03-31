@@ -10,9 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class TwitterConfiguration implements Serializable {
 
         private static final long serialVersionUID = 4888981421926856894L;
+        private static final Logger log = LogManager.getLogger(TwitterConfiguration.class); 
 
         // a list of valid field names for the output tuple
         private static final List<String> validOutputFields = new ArrayList<String>(
@@ -69,6 +73,7 @@ public class TwitterConfiguration implements Serializable {
          */
         public boolean isValid() {
                 if (twitterUser == null) {
+                        log.warn("properties representation of auth credentials for twitter is null");
                         return false;
                 }
 
@@ -78,18 +83,22 @@ public class TwitterConfiguration implements Serializable {
                                 || twitterUser.get("oAuthConsumerSecret") == null
                                 || twitterUser.get("oAuthAccessToken") == null
                                 || twitterUser.get("oAuthAccessTokenSecret") == null) {
+                        log.warn("at least one of the fields 'username', 'password', 'oAuthConsumerKey', 'oAuthConsumerSecret', 'oAuthAccessToken' or 'oAuthAccessTokenSecret' of the twitter config is null");
                         return false;
                 }
                 if (keywords == null || keywords.length == 0) {
+                        log.warn("keywords are null or empty");
                         return false;
                 }
 
                 if (outputFields == null || outputFields.length == 0) {
+                        log.warn("outputFields are null or empty");
                         return false;
                 }
 
                 for (String s : outputFields) {
                         if (!validOutputFields.contains(s)) {
+                                log.warn("outputfield '%s' is not valid", s);
                                 return false;
                         }
                 }

@@ -33,6 +33,33 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+		
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>de.tu_berlin.citlab.storm.topologies.TopologySubmitter</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Storm-Main-Class>de.tu_berlin.citlab.storm.topologies.TopologySubmitter</Storm-Main-Class>
+							<Topology-Name>to_be_set_by_webinterface</Topology-Name>
+						</manifestEntries>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 	</build>
@@ -114,12 +141,12 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.0-beta9</version>
+			<version>2.0-rc1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.0-beta9</version>
+			<version>2.0-rc1</version>
 		</dependency>
 
 		<!-- route every log to log4j2 -->

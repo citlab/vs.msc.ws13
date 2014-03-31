@@ -28,10 +28,6 @@ import java.util.List;
  */
 public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTest_WordFlatMap>
 {
-    static {
-        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, System.getProperty("user.dir")+"/master/log4j2-testsuite.xml");
-    }
-
     public static final String testName ="WordFlatMap";
     private static final Fields inputFields = new Fields("user_id", "msg", "id");
     private static final Fields outputFields = new Fields("user_id", "word", "id");
@@ -50,8 +46,8 @@ public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTe
 	public List<Tuple> generateInputTuples() {
         return TupleMockFactory.generateTupleList_ByFields(
                 new Values[]{new Values(1, "hey leute", 0),
-                        new Values(1, "sinnvoller Post.", 0),
-                        new Values(1, "bomben bauen macht spass", 0)},
+                             new Values(1, "sinnvoller Post.", 0),
+                             new Values(1, "Window Test.", 0)},
                 inputFields);
     }
 
@@ -125,7 +121,10 @@ class OpTest_WordFlatMap extends OperatorTest
         List<List<Object>> outputVals = new ArrayList<List<Object>>();
         outputVals.add(new Values(1, "hey", 0));
         outputVals.add(new Values(1, "leute", 0));
-        outputVals.add(new Values(1, "heute.", 0));
+        outputVals.add(new Values(1, "sinnvoller", 0));
+        outputVals.add(new Values(1, "Post.", 0));
+        outputVals.add(new Values(1, "Window", 0));
+        outputVals.add(new Values(1, "Test.", 0));
         return outputVals;
     }
 }

@@ -14,4 +14,6 @@ public interface Window<I, O> extends Serializable, Cloneable {
 
     public Window<I, O> clone();
 
+    public int size();
+
 }

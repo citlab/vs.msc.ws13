@@ -13,7 +13,7 @@ import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 import de.tu_berlin.citlab.storm.window.TupleComparator;
 
-public class StaticHashJoinOperator implements IOperator {
+public class StaticHashJoinOperator extends IOperator {
 	
 	private static final long serialVersionUID = -1921795142772743781L;
 
@@ -107,13 +107,13 @@ public class StaticHashJoinOperator implements IOperator {
 				
 				List<Tuple> memoryTuples = hashTable.get( joinComparator.getTupleKey(tuple) );
 				for( Tuple memoryTuple : memoryTuples ){
-					collector.emit(projection.project(memoryTuple,tuple));
+					collector.emit(projection.project(tuple, memoryTuple));
 				}
 
-                System.out.println("debug: static join ("+joinComparator.getTupleKey(tuple)+") YES "+tuple );
+                getUDFBolt().log_debug("static join (" + joinComparator.getTupleKey(tuple) + ") YES " + tuple);
 			}//if
             else {
-                System.out.println("debug: static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
+                getUDFBolt().log_debug("static join ("+joinComparator.getTupleKey(tuple)+") NO "+tuple );
             }
 		}//while
 	}	

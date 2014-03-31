@@ -55,7 +55,6 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 
 	public void add(I entity) {
 		slots.add(new TimeEntity<I>(entity));
-		Collections.sort(slots);
 	}
 
 	/**
@@ -89,7 +88,12 @@ public class TimeWindow<I> implements Window<I, List<I>> {
 		return newInstance;
 	}
 
-	@Override
+    @Override
+    public int size() {
+        return slots.size();
+    }
+
+    @Override
 	public String toString() {
 		return slots.toString();
 	}

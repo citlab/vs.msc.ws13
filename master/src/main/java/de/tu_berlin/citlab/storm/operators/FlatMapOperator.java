@@ -7,7 +7,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.udf.IOperator;
 
 @SuppressWarnings("serial")
-public class FlatMapOperator implements IOperator {
+public class FlatMapOperator extends IOperator {
 
 	protected FlatMapper flatMapper;
 	protected boolean chaining = false;
