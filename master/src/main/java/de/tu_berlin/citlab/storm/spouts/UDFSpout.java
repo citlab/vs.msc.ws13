@@ -12,10 +12,13 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 abstract public class UDFSpout extends BaseRichSpout implements UDFOutput {
 
     protected static final Logger LOGGER = LogManager.getLogger("Spout");
+    protected static final Marker STATS = MarkerManager.getMarker("Statistics");
 
     protected SpoutOutputCollector collector;
 
@@ -34,8 +37,7 @@ abstract public class UDFSpout extends BaseRichSpout implements UDFOutput {
 
     public SpoutOutputCollector getOutputCollector(){ return this.collector; }
 
-    public void open(){
-    }
+    public abstract void open();
 
     @Override
     public void nextTuple() {

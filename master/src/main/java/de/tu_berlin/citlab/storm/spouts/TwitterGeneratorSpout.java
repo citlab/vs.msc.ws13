@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import twitter4j.FilterQuery;
@@ -24,15 +25,14 @@ import de.tu_berlin.citlab.twitter.ConfiguredTwitterStreamBuilder;
 import de.tu_berlin.citlab.twitter.InvalidTwitterConfigurationException;
 import de.tu_berlin.citlab.twitter.TwitterConfiguration;
 
-public class TwitterGeneratorSpout extends BaseRichSpout
+public class TwitterGeneratorSpout extends UDFSpout
 {
 
 /* Global Constants: */
 /* ================= */
     private static final long serialVersionUID = 8565086975251710154L;
-    private static final Logger LOGGER = LogManager.getLogger("Spout");
 
-    private final String[] outputFields = {"user", "tweet_id", "tweet"};
+    private static final Fields outputFields = new Fields("user", "tweet_id", "tweet");
 
     private final String[] users;
     private final Map<String, Integer> userIDs;
@@ -45,7 +45,7 @@ public class TwitterGeneratorSpout extends BaseRichSpout
 /* Global Variables: */
 /* ================= */
 
-    private SpoutOutputCollector collector;
+    private int tupleCount;
 
 
 /* Constructor: */
@@ -54,6 +54,7 @@ public class TwitterGeneratorSpout extends BaseRichSpout
     public TwitterGeneratorSpout(String[] users, String[] dictionary, int wordsPerTweet,
                                  int tweetsPerSecond)
     {
+        super(outputFields);
         this.users = users;
         this.dictionary = dictionary;
         this.wordsPerTweet = wordsPerTweet;
@@ -61,6 +62,7 @@ public class TwitterGeneratorSpout extends BaseRichSpout
         initUserIDs();
 
         this.tweetsPerSecond = tweetsPerSecond;
+        this.tupleCount = 0;
     }
 
 
@@ -69,9 +71,8 @@ public class TwitterGeneratorSpout extends BaseRichSpout
 /* =============== */
 
     @Override
-    public void open(Map conf, TopologyContext context,
-                     SpoutOutputCollector collector) {
-        this.collector = collector;
+    public void open() {
+        LOGGER.info(STATS, "Opened TwitterGeneratorSpout. Emitting {} Tweets per Second.", tweetsPerSecond);
     }
 
     @Override
@@ -80,31 +81,25 @@ public class TwitterGeneratorSpout extends BaseRichSpout
 
         Values tweetVal = generateTweet();
         collector.emit(tweetVal);
-    }
 
+        if((tweetsPerSecond <= 5)){
+            LOGGER.info(STATS, "Emitting generated Twitter-Message. Message-Number: {}, Message: {}",
+                    tupleCount,
+                    LogPrinter.toValString(tweetVal));
+        }
+        else{ //if more than 5 messages per second are emitted, only log every tenth:
+            if((tupleCount % 10) == 0) {
+                LOGGER.info(STATS, "Snapshot of 1/10 emitted Twitter-Messages: Message-Number: {}, Message {}",
+                        tupleCount,
+                        LogPrinter.toValString(tweetVal));
+            }
+        }
 
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public Map<String, Object> getComponentConfiguration() {
-        Config ret = new Config();
-        ret.setMaxTaskParallelism(1);
-        return ret;
-    }
-
-    @Override
-    public void ack(Object id) {
-    }
-
-    @Override
-    public void fail(Object id) {
     }
 
     @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(outputFields));
+    public Fields getOutputFields() {
+        return outputFields;
     }
 
 
