@@ -7,6 +7,12 @@ import play.mvc.Http.*;
 import views.html.*;
 import models.aws.Instance;
 import models.ClusterDatabase;
+import models.Nimbus;
+import models.Cassandra;
+
+import play.libs.Json;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Server extends Controller {
 
@@ -18,6 +24,21 @@ public class Server extends Controller {
             String[] action = request().getQueryString("action").split("_");
             return startServerByAction(action[0], action[1]);
         }
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result updateServerData() {
+        ObjectNode result = Json.newObject();
+        result.put("Nimbus", Server.updateStatusFor(new Nimbus()));
+        result.put("Cassandra", Server.updateStatusFor(new Cassandra()));
+        return ok(result);
+    }
+
+    private static ObjectNode updateStatusFor(models.Server server) {
+        ObjectNode result = Json.newObject();
+        result.put("ip", server.getIp());
+        result.put("status", server.getStatus());
+        return result;
     }
 
     private static Result startServerByAction(String action, String server) {

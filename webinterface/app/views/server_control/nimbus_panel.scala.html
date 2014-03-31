@@ -1,13 +1,23 @@
-<div class="col-md-6">
+<div class="col-md-6" id="nimbus">
   <div class="panel panel-primary">
     <div class="panel-heading">
       <h3 class="panel-title">Nimbus</h3>
     </div>
     <div class="panel-body">
-      <strong>Nimbus IP:</strong> @Nimbus.getIp()
+      <div class="row">
+        <div class="col-md-12">
+          <strong>Nimbus IP:</strong>
+          <a href="" class="fancybox fancybox.iframe" id="server-nimbus-ip"></a>
+        </div>
+
+        <div class="col-md-12">
+          <strong>Status:</strong>
+          <span id="server-nimbus-status"></span>
+        </div>
+      </div>
     </div>
     <div class="panel-footer">
-      @server_control.buttons.render("Nimbus", "nimbus", Nimbus.isUp())
+      @server_control.buttons.render("Nimbus", "nimbus", (new Nimbus()).isUp())
     </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 (function ($, global) {
   "use strict";
   $(function () {
-    global.topology_filter = $('#topology-list .filter');
+    global.topology_filter = $('#topology-list');
 
     topology_filter.selected = "*";
 
@@ -9,9 +9,13 @@
       if(!topology_filter.include(name)) {
         var elem = $("<li>" + name + "</li>");
         elem.attr("data-filter-value", name);
-        topology_filter.append(elem);
+        topology_filter.find(".dynamic-filter").append(elem);
       }
     };
+
+    topology_filter.find('text-filter').on("change", function() {
+      
+    });
 
     topology_filter.setFilter = function(filter) {
       topology_list.find("tbody tr:hidden").show();

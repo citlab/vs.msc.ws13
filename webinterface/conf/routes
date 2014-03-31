@@ -14,6 +14,7 @@ GET    /kontakt                     controllers.Application.kontakt()
 GET    /impressum                   controllers.Application.impressum()
 
 GET     /server                     controllers.Application.server()
+POST    /server/update              controllers.Server.updateServerData()
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
 GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
