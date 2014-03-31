@@ -6,14 +6,12 @@
   <h2>Manage Cluster:</h2>
   <div class="controls">
     <form action="/startserver" class="start-form">
-      <div class="row">
+      <div class="row" id="server-control">
         @server_control.nimbus_panel()
 
         @server_control.cassandra_panel()
 
         @server_control.supervisor_panel()
-
-        @server_control.cluster_panel()
     </form>
   </div>
 }

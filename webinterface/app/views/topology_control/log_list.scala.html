@@ -1,8 +1,11 @@
 <div id="topology-list" class="col-md-12">
-  <ul class="filter">
+  <ul class="static-filter">
     <li class="toggleLogging"><span class="glyphicon glyphicon-pause"></span></li>
     <li data-filter-value="*">Alles</li>
+    <li class="input-filter"><input type="text" placeholder="Filter" class="text-filter"></li>
     <li data-filter-value="danger" class="pull-right">Fehler</li>
+  </ul>
+  <ul class="dynamic-filter">
   </ul>
   <div class="log-list">
     <table class="table table-striped table-hover">

@@ -115,6 +115,11 @@ public class TwitterGeneratorSpout extends UDFSpout
         }
     }
 
+    private int generateTweetID()
+    {
+        return tupleCount;
+    }
+
     private Values generateTweet()
     {
         int randUserIndex = (int) Math.round(Math.random() * (users.length -1));
@@ -132,6 +137,6 @@ public class TwitterGeneratorSpout extends UDFSpout
             tweet += randWord;
         }
 
-        return new Values(randUser, randUserID, tweet);
+        return new Values(randUser, generateTweetID(), tweet);
     }
 }
