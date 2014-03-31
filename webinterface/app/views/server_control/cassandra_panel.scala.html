@@ -6,17 +6,18 @@
     <div class="panel-body">
       <div class="row">
         <div class="col-md-12">
-          <strong>Cassandra IP:</strong> @Cassandra.getIp()
+          <strong>Cassandra IP:</strong>
+          <span id="server-cassandra-ip"></span>
         </div>
 
         <div class="col-md-12">
           <strong>Status:</strong>
-          @Cassandra.getStatus()
+          <span id="server-cassandra-status"></span>
         </div>
       </div>
     </div>
     <div class="panel-footer">
-      @server_control.buttons.render("Cassandra", "cassancra", Cassandra.isUp())
+      @server_control.buttons.render("Cassandra", "cassancra", new Cassandra().isUp())
     </div>
   </div>
 </div>

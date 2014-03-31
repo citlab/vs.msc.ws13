@@ -5,18 +5,18 @@ import models.aws.AwsCli;
 
 import com.github.kevinsawicki.http.*;
 
-public class Cassandra {
+public class Cassandra implements Server {
 
-  public static String getIp() {
+  public String getIp() {
     String requestUrl = "http://54.195.243.38:9000/lookup?type=cassandra";
     return HttpRequest.get(requestUrl).body().replaceAll("\\s","");
   }
 
-  public static Boolean isUp() {
-    return Cassandra.getIp() != null;
+  public Boolean isUp() {
+    return this.getIp() != null;
   }
 
-  public static String getStatus() {
+  public String getStatus() {
     try {
       Instance[] instances = AwsCli.describeInstances();
       Instance instance = null;
