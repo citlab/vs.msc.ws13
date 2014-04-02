@@ -57,8 +57,10 @@ This section gives details about the most important structures than are used to 
 
 \subsection{Windows}
 \label{sect:windows}
+\texttt{CIT-Storm} provides two \iwindow\ implementations that are described in this section.
 
 \subsubsection{CountWindows}
+A \texttt{CountWindow} stores a specific amount of input values. This amount is the \textsl{size} of the window and has to be defined by the user. The window is satisfied, if and only if it contains the maximum amount of values. A flush returns the complete list of values and removes a certain amount of stored data. How much it is, is defined by a \textsl{slide-offset}. The \textsl{slide-offset} defines how many elements are removed from the stored list starting with the first element that was added. If no \textsl{slide-offset} is defined by the user, the \textsl{slide-offset} equals the window's size, so that on a flush the complete list is emptied.
 
 \subsubsection{TimeWindows}
 \label{sect:Timewindow}
