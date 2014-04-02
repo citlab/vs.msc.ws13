@@ -12,7 +12,7 @@
 	 \descriptor{Operator-Tests}
 		Are describing the validity of a specific user defined function that is caring about the input tuple execution inside a Bolt. For a well defined testing setup, each Bolt inside the testing topology should have an Operator- \& a Bolt-Test (described beneath) to fully assure that the respective Bolt is behaving as expected \textit{without any outside influences}, namely predecessor Bolts that are sending unexpected input to this Bolt. An Operator-Test is thus using pre-defined tuple input and checks if the asserted output of the operator to be tested is matching with the factual output.
 		\begin{center}
-			\includegraphics[width=0.4\textwidth]{./images/08_testing/OperatorTests.png}
+			\includegraphics[width=0.4\textwidth]{./images/09_testing/OperatorTests.png}
 		\end{center}
 
 		
@@ -20,19 +20,30 @@
 		Are combining Operator-Tests with additional Window-Handling, as needed to build streaming input execution. In our CIT-Storm implementation (as defined in \ref{sect:udfBolt}), we are using \textit{Time-} or \textit{Count-Windows} to wait a specific time or for a specific amount of input tuples, until the execution of those input tuples will be passed to the Operator. \\
 		In perspective if this Testing-Suite, the Operator-Test (which was already successfully executed before) is only returning the correctness of a given input, relative to an asserted output, whereas a Bolt-Test includes testing with focus on the used window and its output after a \texttt{window.flush()}. The Bolt-Test will only be successful when a window returns the expected tuples after a given time and the Operator will correctly handle this input.
 		\begin{center}
-			\includegraphics[width=0.4\textwidth]{./images/08_testing/BoltTests.png}
+			\includegraphics[width=0.4\textwidth]{./images/09_testing/BoltTests.png}
 		\end{center}
 	 
 	 \descriptor{Topology-Tests}
 		In order to test the topology as a whole, the Test-Suite provides a test skeleton named \texttt{TopologyTest}. A specific TopologyTest-Scenario is inherited by this class and allows the test-designer to test \textit{chains of Bolts with a Spout as source} in one run. Of course, this is not handling the complexity that Storm could cope with in its topologies, but as the Test-Suite is running outside a Storm environment (more on the implementation details may be found in the upcoming section \ref{sect:TestSuiteRealization}), it would be a likewise complex (and error-prone) task to completely simulate every aspect of Storm.\\
 		The Topology-Test however does focus on linear topologies, which is describing most of the regular use-cases inside a Big-Data scenario. Even if the real Storm topology would use different Stream-Groupings (described in \ref{sect:StreamGroupings} on page \pageref{StreamGroupings}), the shuffled topology input could mostly be baked onto a linear topology. \\
 		In order to set up a TopologyTest, import each Bolt from the topology to be tested into the test-class's \texttt{defineTopologySetup()} and add the respective Bolt in a \texttt{BoltTestConfig} in the order you want them to be placed in the testing chain. Each \texttt{BoltTestConfig} is carrying the respective \texttt{UDFBolt}, a Bolt-TestName, a timeout per tuple input (needed for \texttt{TimeWindows}) and an assertedOutput with it, in order to fully define a TopologyTest. The test run is then defined as an execution of different Bolt-Tests, initialized by the different \texttt{BoltTestConfigs}. Each Bolt-Test receives the output of the predecessing Bolt-Test as its own input. A Topology-Test could thus only succeed, if each Bolt-Test (and the Operator-Tests inside those) succeeds and on top of that, if the final output matches with the final asserted output of the topology, respective to the initial input.
-		
+		\begin{center}
+			\includegraphics[width=0.4\textwidth]{./images/09_testing/BoltTests.png}
+		\end{center}
 		
 	\end{description}
 
 \subsection{Test-Suite Realization}
 \label{sect:TestSuiteRealization}
+	The Test-Suite is independent from Storm, as the Bolt- and Operator-logic should be tested and not the Storm framework itself. Additionally, Storm defines some data types (the \texttt{Tuple}-class is the most famous example), which could not be easily constructed by themselves, even though a constructor would be needed for sufficient testing. This was another selection criteria to choose Mockito as the mockup base for our Class-Mocks - more about Mockito is described in section \ref{sect:Mockito}. \\
+	
+	\subsubsection{Log4j2}
+		As the CIT-Storm environment itself, the Test-Suite also makes uses of Log4j2 as the standard consoleadditionally makes an exhaustive use of Log4J's \texttt{FileAppenders} in order to 
+	
+	\subsubsection{JUnit 4.8.2}
+	
+	\subsubsection{Mockito 1.9.5}
+	\label{sect:Mockito}
 	
 
 \subsection{Treated Use-Cases}
