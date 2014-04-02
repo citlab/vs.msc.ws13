@@ -9,7 +9,7 @@ As depicted in section \ref{sect:operators}, each operator has its own general s
 All operators inherit from a general Bolt called \texttt{UDFBolt} that follows an extensible standard behavior:
 
 \begin{enumerate}
-	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. Also, it is checked if the bold has been extended with a \texttt{TimeWindow} (See \ref{sect:Timewindow }). If so, the \storm\ property responsible for \textsl{tick}-tuple emission frequency is 
+	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. Also, it is checked if the bolt has been extended with a \texttt{TimeWindow} (See \ref{sect:Timewindow}). If so, the \storm\ property responsible for \textsl{tick}-tuple emission frequency is set according to the \texttt{TimeWindow}'s size.
 	%This is later referred to as the \textsl{prepare} event.
 	%After this phase the topology starts, and tuples begin to arrive at the bolt.
 	
@@ -18,16 +18,22 @@ All operators inherit from a general Bolt called \texttt{UDFBolt} that follows a
 	%		\item The tuple is applied to an implementation of \texttt{IKeyConfig.getKeyOf(Tuple tuple)} to get the window key of it. 
 	%	\end{enumerate}
 	\item
-		When a tuple arrives, it is first checked if it is a \textsl{tick}-tuple or one that contains data. 
-		
-		 passed to a \textsl{windowHandler} that is responsible for queuing tuples before processing them.
-		
-		an implementation of the \ikeyconfig\ (See \ikeyconfig\ in section \ref{sect:interfaces}) interface. The resulting key in interpreted as \textsl{window-key}. Foreach \textsl{window-key} a distinct 
+		In the event that a tuple arrives, it is first checked if it is a \textsl{tick}-tuple or one that contains data. 
+		\begin{itemize} 
+			\item
+				If it is a \textsl{tick}-tuple, the \texttt{UDF-Bolt} decides, that all \texttt{TimeWindow}s have  to be satisfied, and flushes them. This is not a good design, because a \iwindow\ implementation should have control about its state (See \ref{sect:interfaces} \iwindow).
+			\item
+				If the arrived tuple contains data, it is added the specific \iwindow\ implementation the tuple belongs to. This is determined by an implementation of the \ikeyconfig\ interface (See \ref{sect:interfaces} \ikeyconfig) that has to be provided by the user. The resulting key in interpreted as \textsl{window-key}. Foreach \textsl{window-key} a distinct object of the user provided \iwindow\ implementation is created.
+		\end{itemize}
+	\item
+		Each existing \iwindow\ object is checked if it is satisfied. If so it is flushed. The resulting collection of tuples is then split by applying each tuple to another user-provided \ikeyconfig\ implementation, that is interpreted as \textsl{group-key}. The resulting \textsl{groups} are then passed to a user-provided \ioperator\ (See \ref{sect:interfaces} \ioperator) implementation, that contains the actual application logic of a user.
 \end{enumerate}
+
+In summary, a \texttt{UDF-Bolt}'s standard behavior can be extended by providing one implementation of the \ioperator\ interface, that contains the actual application logic, one implementation of the \iwindow\ interface, that defines the windowing strategy, one implementation of the \ikeyconfig\ interface, that is interpreted as the \textsl{window-key}, and another one, that is interpreted as the \textsl{group-key}. Mandatory is only an \ioperator\ implementation. If the user provides no \iwindow\ implementation, a \texttt{CountWindow} with size 1 is used, which is equal to no windowing at all. If the user provides no \ikeyconfig\ implementation, a \textsl{default-key} is used, which returns "\texttt{0}" for any input.
 
 \subsection{Interfaces}
 \label{sect:interfaces}
-This section gives details about the most important structures than are used to extend a UDFBolts functionality.
+This section gives details about the most important structures than are used to extend a \texttt{UDFBolt}'s functionality.
 \begin{description}
 	\item[IOperator] \hfill \\
 	The \ioperator\ interface provides one function: \\
