@@ -9,11 +9,20 @@ As depicted in section \ref{sect:operators}, each operator has its own general s
 All operators inherit from a general Bolt called \texttt{UDFBolt} that follows an extensible standard behavior:
 
 \begin{enumerate}
-	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. This is later referred to as the \textsl{prepare} event. After this phase the topology starts, and tuples begin to arrive at the bolt.
-	\item The arrival of a tuple triggers the following sequence of operations:
-		\begin{enumerate}
-			\item The tuple is applied to an implementation of \texttt{IKeyConfig.getKeyOf(Tuple tuple)} to get the window key of it. 
-		\end{enumerate}
+	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. Also, it is checked if the bold has been extended with a \texttt{TimeWindow} (See \ref{sect:Timewindow }). If so, the \storm\ property responsible for \textsl{tick}-tuple emission frequency is 
+	%This is later referred to as the \textsl{prepare} event.
+	%After this phase the topology starts, and tuples begin to arrive at the bolt.
+	
+	%\item The arrival of a tuple triggers the following sequence of operations:
+	%	\begin{enumerate}
+	%		\item The tuple is applied to an implementation of \texttt{IKeyConfig.getKeyOf(Tuple tuple)} to get the window key of it. 
+	%	\end{enumerate}
+	\item
+		When a tuple arrives, it is first checked if it is a \textsl{tick}-tuple or one that contains data. 
+		
+		 passed to a \textsl{windowHandler} that is responsible for queuing tuples before processing them.
+		
+		an implementation of the \ikeyconfig\ (See \ikeyconfig\ in section \ref{sect:interfaces}) interface. The resulting key in interpreted as \textsl{window-key}. Foreach \textsl{window-key} a distinct 
 \end{enumerate}
 
 \subsection{Interfaces}
@@ -23,8 +32,9 @@ This section gives details about the most important structures than are used to 
 	\item[IOperator] \hfill \\
 	The \ioperator\ interface provides one function: \\
 	\texttt{execute(List<Tuple> input, \\ OutputCollector collector)} \\
-	It is used to provided higher-order- or user-defined-functions. Depending on the bolt's windowing strategy the \texttt{input} list may always have a size of one like it is supposed to be in a \map\ or \filter\ operator. For these cases implementations of \ioperator\ exist like the \texttt{MapOperator} that in turn require an implementation of a \texttt{Mapper} interface that providers one method \texttt{Values map(Tuple tuple)}, what is more intuitive for a map operation.
+	It is used to provide higher-order- or user-defined-functions. Depending on the bolt's windowing strategy the \texttt{input} list may always have a size of one, like it is supposed to be in a \map\ or \filter\ operator. For these cases implementations of \ioperator\ exist like the \texttt{MapOperator} that in turn require an implementation of a \texttt{Mapper} interface that providers one method \texttt{Values map(Tuple tuple)}, what is more intuitive for a map operation.
 	\item[IKeyConfig] \hfill \\
+	\label{item:ikeyconfig}
 	The \ikeyconfig\ interface provides one function \\ \texttt{getKeyOf(Tuple tuple)}. It is used to assign keys to tuples in order to group them. Tuples that belong to the same group produce the same key. Commonly used keys are values of certain fields or a tuples source component or stream. For these types of commodity  \ikeyconfig\ implementations a factory \texttt{KeyConfigFactory} provides methods like \\
 	 \texttt{byFields(String... fields)} or \texttt{bySource()} that return corresponding implementations.
 	\item[Window] \hfill \\
@@ -36,7 +46,7 @@ This section gives details about the most important structures than are used to 
 	\texttt{O addSafely(I input)}
 	method, that first checks its state, if satisfied flushs it, then adds the value.
 	A windows input and output types \texttt{I} and \texttt{O} are generic. \\
-	\textsl{In a future release} there will be a \texttt{void tick()} method, that indicates that a second of time has passed. By that a \iwindow\ implementation may hold complete control about time constraints. Furthermore a \texttt{Context prepare()} method will be available to pass context information about cluster and topology configuration. 
+	\textsl{In a future release} there will be a \texttt{void tick()} method, that indicates that a second of time has passed. By that a \iwindow\ implementation may hold complete control about time constraints, that currently must be enforced from outside a \iwindow\ implementation. Furthermore a \texttt{void prepare(Context ctx)} method will be available to pass context information about cluster and topology configuration. 
 \end{description}
 
 \subsection{Windows}
@@ -45,3 +55,4 @@ This section gives details about the most important structures than are used to 
 \subsubsection{CountWindows}
 
 \subsubsection{TimeWindows}
+\label{sect:Timewindow}
