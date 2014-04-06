@@ -5,7 +5,6 @@
       return $(global.server_control).find("[value=start_nimbus]").is(':disabled');
     }
 
-    global.server_control.panel.nimbus.old_status = "stopped";
     global.server_control.panel.nimbus.status = "stopped";
 
     global.server_control.panel.nimbus.enableStart = function() {
@@ -51,7 +50,7 @@
       global.server_control.panel.nimbus.status = "starting";
       global.server_control.panel.nimbus.updateStatus();
 
-      global.server_request("start","nimbus");
+      global.server_request("start","nimbus", global.server_control.panel.nimbus);
     });
 
     global.server_control.panel.nimbus.find("[value=stop_nimbus]").on('click', function() {
@@ -59,7 +58,7 @@
       $(global.server_control).find("[value=stop_nimbus]").attr('disabled', true);
       global.server_control.panel.nimbus.status = "stopping";
 
-      global.server_request("stop","nimbus");
+      global.server_request("stop","nimbus", global.server_control.panel.nimbus);
     });
   });
 }(jQuery, this))
