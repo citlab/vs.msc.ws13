@@ -10,7 +10,9 @@
   </div>
 
   <div class="row">
-    @topology_control.form()
+    @if(new Nimbus().isUp()) {
+      @topology_control.form()
+    }
   </div>
   <div class="row">
     @for(t <- topologies) {

@@ -15,11 +15,22 @@ GET    /impressum                   controllers.Application.impressum()
 
 GET     /server                     controllers.Application.server()
 POST    /server/update              controllers.Server.updateServerData()
+
+POST    /server/nimbus/start        controllers.Server.startNimbus()
+POST    /server/nimbus/stop         controllers.Server.stopNimbus()
+POST    /server/nimbus/reboot       controllers.Server.rebootNimbus()
+
+POST    /server/cassandra/start     controllers.Server.startCassandra()
+POST    /server/cassandra/stop      controllers.Server.stopCassandra()
+POST    /server/cassandra/reboot    controllers.Server.rebootCassandra()
+
+POST    /server/supervisor/start/:count    controllers.Server.startSupervisor(count: Int)
+POST    /server/supervisor/stop     controllers.Server.stopSupervisor()
+POST    /server/supervisor/reboot   controllers.Server.rebootSupervisor()
+
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
 GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
-
-GET     /startserver                controllers.Server.startServer()
 
 POST    /log/:id                    controllers.Log.getLatest(id: Long)
 POST    /log/single/:id             controllers.Log.getLog(id: Long)
