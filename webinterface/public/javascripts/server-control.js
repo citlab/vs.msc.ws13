@@ -27,7 +27,7 @@
         type: 'POST',
         success: global.server_control.updateData,
         error: function() {
-          alert('Error in update Server Data');
+          console.log('Error in update Server Data');
         }
       });
     };

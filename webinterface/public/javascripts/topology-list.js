@@ -27,7 +27,7 @@
         type: 'POST',
         success: global.topology_list.addJson,
         error: function() {
-          alert('Topology List fetch latest throws an error');
+          console.log('Topology List fetch latest throws an error');
         }
       });
     }

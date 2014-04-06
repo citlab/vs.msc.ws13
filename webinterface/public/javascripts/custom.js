@@ -10,6 +10,13 @@
 
     $(".ajax-form").ajaxForm({
       dataType: 'json',
+      beforeSubmit: function(arr, $form, options) {
+        console.log($form.find('button span'));
+        $form.find('button span').addClass('glyphicon-refresh');
+        $form.find('button span').addClass('rotating');
+        $form.find('button span').removeClass('glyphicon-cloud-upload');
+        $form.find('button').attr('disabled', true);
+      },
       success: function(response, status, xhr, form) {
         location.reload();
       },
