@@ -36,7 +36,7 @@
 
     global.server_control.panel.supervisor.find("[value=start_supervisor]").on('click', function() {
       var count = $("#n_sv").val();
-      global.server_request("start","supervisor", count);
+      global.server_request("start","supervisor", "", count);
     });
 
     global.server_control.panel.supervisor.find("[value=stop_supervisor]").on('click', function() {
