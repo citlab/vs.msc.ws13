@@ -9,6 +9,7 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
+import de.tu_berlin.citlab.testsuite.diagrams.BoltTupleChart;
 import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
@@ -21,6 +22,9 @@ import org.apache.logging.log4j.Marker;
 import org.junit.Assert;
 
 import java.util.List;
+
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 
 /**
@@ -60,7 +64,6 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* ========================= */
 
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
-    private  Logger log = LogManager.getLogger("lol");
     private static final Logger HEADLINER = LogManager.getLogger(DebugLogger.HEADER_ID);
     private static final Marker BASIC = DebugLogger.getBasicMarker();
     private static final Marker DEFAULT = DebugLogger.getDefaultMarker();
@@ -149,7 +152,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
             LOGGER.debug(DEFAULT, "Initialized windowless UDFBolt.");
         }
 		else if(windowHandler == null){
-			udfBolt = new UDFBoltMock(outputFields, operator, window);
+			udfBolt = spy(new UDFBoltMock(outputFields, operator, window));
 
             //Logging:
             if(window.getClass().equals(CountWindow.class))
@@ -207,6 +210,7 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 
         OutputCollectorMock.resetOutput();
+        BoltTupleChart tupleChart = new BoltTupleChart(testName);
 
 		long startTime = System.currentTimeMillis();
 
@@ -225,8 +229,12 @@ abstract public class BoltTest implements UDFBoltTestMethods
 			}
 			//Execution of the main Handler in the UDF-Bolt:
 			udfBolt.execute(actTuple);
-		}
+            tupleChart.addTupleToChart(actTuple, System.currentTimeMillis());
 
+            if(udfBolt.wasJustFlushed()){
+                tupleChart.flushWindow();
+            }
+		}
 
         List<List<Object>> outputVals = OutputCollectorMock.output;
         List<List<Object>> assertRes = this.assertWindowedOutput(inputTuples);
@@ -234,6 +242,8 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 		long endTime = System.currentTimeMillis();
 		long inputTimeDiff = endTime - startTime;
+
+        tupleChart.createChart(startTime, endTime);
 
 
         try{
