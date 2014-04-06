@@ -1,22 +1,41 @@
 @(t: Topology)
 
-<div class="col-md-3">
+<div class="col-md-4">
   <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3 class="panel-title">@t.getName</h3>
-    </div>
-    <div class="panel-body">
-      <strong>Datum:</strong> @t.getDate
-      <strong>Servername: </strong> @t.getTitle;
-    </div>
-    <div class="panel-footer">
-      <div class="btn btn-default start-deployment">
-        <span class="glyphicon glyphicon-play"></span>
-      </div>
-
-      <a href="/deployment/delete/@t.getTitle" class="btn btn-danger delete-topology pull-right">
+    <div class="panel-heading" style="overflow:hidden">
+      <h3 class="panel-title pull-left">@t.getName</h3>
+      <a href="/deployment/delete/@t.getTitle" class="btn btn-danger btn-xs delete-topology pull-right">
         <span class="glyphicon glyphicon-remove"></span>
       </a>
+    </div>
+    <div class="panel-body">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Hochgeladen</th><td>@t.getDate</td>
+          </tr>
+          <tr>
+            <th>Ersteller</th><td>@t.getUser;</td>
+          </tr>
+          <tr>
+            <td colspan="2"><strong>Name auf Server</strong><br>@t.getTitle;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel-footer" style="overflow:hidden">
+      <form class="ajax-form" action="/deployment/start/@t.getTitle" method="post">
+        <div class="row">
+          <div class="col-md-8">
+            <input class="form-control" type="text" name="start_as">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-default start-deployment pull-right" type="submit">
+              <span class="glyphicon glyphicon-play"></span>
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>
