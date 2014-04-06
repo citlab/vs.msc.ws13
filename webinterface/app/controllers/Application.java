@@ -34,6 +34,12 @@ public class Application extends Controller {
         return ok(impressum.render());
     }
 
+    public static Result startTopology(String topologyName) {
+        String startAs = request().body().asFormUrlEncoded().get("start_as")[0];
+        String request = HttpRequest.get("http://"+ new Nimbus().getIp() +":8081/run", true, "file", topologyName, "name", startAs).body();
+        return ok("started " + topologyName);
+    }
+
     public static Result deploy() {
         ArrayList<Topology> topologies = Topology.readFiles(session("name"));
         return ok(deploy.render(topologies));

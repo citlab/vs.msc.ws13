@@ -17,7 +17,12 @@ public class Topology {
   }
 
   public static ArrayList<Topology> readFiles(String user) {
-    ArrayList<Topology> list = FileDatabase.getInstance().getFilesForUser(user);
+    ArrayList<Topology> list = null;
+    if(user.equals("admin")) {
+      list = FileDatabase.getInstance().getAllFiles();
+    } else {
+      list = FileDatabase.getInstance().getFilesForUser(user);
+    }
 
     return list;
   }

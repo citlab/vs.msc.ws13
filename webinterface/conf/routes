@@ -30,6 +30,7 @@ POST    /server/supervisor/reboot   controllers.Server.rebootSupervisor()
 
 GET     /deployment                 controllers.Application.deploy()
 POST    /deployment/upload          controllers.Application.upload()
+POST     /deployment/start/:name    controllers.Application.startTopology(name: String)
 GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
 
 POST    /log/:id                    controllers.Log.getLatest(id: Long)
