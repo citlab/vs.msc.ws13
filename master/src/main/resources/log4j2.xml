@@ -24,11 +24,20 @@
                 <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
             </filters>
 		</Console>
+
+        <File name="StdFileAppender" fileName="logs/Statistics.log" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+
 	</Appenders>
 
 	<Loggers>
 		<Root level="info">
 			<AppenderRef ref="Console" />
+            <AppenderRef ref="StdFileAppender" />
 			<!-- <AppenderRef ref="databaseAppender" /> -->
 		</Root>
 	</Loggers>

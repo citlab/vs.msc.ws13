@@ -9,22 +9,38 @@ As depicted in section \ref{sect:operators}, each operator has its own general s
 All operators inherit from a general Bolt called \texttt{UDFBolt} that follows an extensible standard behavior:
 
 \begin{enumerate}
-	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. This is later referred to as the \textsl{prepare} event. After this phase the topology starts, and tuples begin to arrive at the bolt.
-	\item The arrival of a tuple triggers the following sequence of operations:
-		\begin{enumerate}
-			\item The tuple is applied to an implementation of \texttt{IKeyConfig.getKeyOf(Tuple tuple)} to get the window key of it. 
-		\end{enumerate}
+	\item In a prepare phase all information that is provided by \storm\ about the cluster and topology configuration is gathered and stored. Also, it is checked if the bolt has been extended with a \texttt{TimeWindow} (See \ref{sect:Timewindow}). If so, the \storm\ property responsible for \textsl{tick}-tuple emission frequency is set according to the \texttt{TimeWindow}'s size.
+	%This is later referred to as the \textsl{prepare} event.
+	%After this phase the topology starts, and tuples begin to arrive at the bolt.
+	
+	%\item The arrival of a tuple triggers the following sequence of operations:
+	%	\begin{enumerate}
+	%		\item The tuple is applied to an implementation of \texttt{IKeyConfig.getKeyOf(Tuple tuple)} to get the window key of it. 
+	%	\end{enumerate}
+	\item
+		In the event that a tuple arrives, it is first checked if it is a \textsl{tick}-tuple or one that contains data. 
+		\begin{itemize} 
+			\item
+				If it is a \textsl{tick}-tuple, the \texttt{UDF-Bolt} decides, that all \texttt{TimeWindow}s have  to be satisfied, and flushes them. This is not a good design, because a \iwindow\ implementation should have control about its state (See \ref{sect:interfaces} \iwindow).
+			\item
+				If the arrived tuple contains data, it is added the specific \iwindow\ implementation the tuple belongs to. This is determined by an implementation of the \ikeyconfig\ interface (See \ref{sect:interfaces} \ikeyconfig) that has to be provided by the user. The resulting key in interpreted as \textsl{window-key}. Foreach \textsl{window-key} a distinct object of the user provided \iwindow\ implementation is created.
+		\end{itemize}
+	\item
+		Each existing \iwindow\ object is checked if it is satisfied. If so it is flushed. The resulting collection of tuples is then split by applying each tuple to another user-provided \ikeyconfig\ implementation, that is interpreted as \textsl{group-key}. The resulting \textsl{groups} are then passed to a user-provided \ioperator\ (See \ref{sect:interfaces} \ioperator) implementation, that contains the actual application logic of a user.
 \end{enumerate}
+
+In summary, a \texttt{UDF-Bolt}'s standard behavior can be extended by providing one implementation of the \ioperator\ interface, that contains the actual application logic, one implementation of the \iwindow\ interface, that defines the windowing strategy, one implementation of the \ikeyconfig\ interface, that is interpreted as the \textsl{window-key}, and another one, that is interpreted as the \textsl{group-key}. Mandatory is only an \ioperator\ implementation. If the user provides no \iwindow\ implementation, a \texttt{CountWindow} with size 1 is used, which is equal to no windowing at all. If the user provides no \ikeyconfig\ implementation, a \textsl{default-key} is used, which returns "\texttt{0}" for any input.
 
 \subsection{Interfaces}
 \label{sect:interfaces}
-This section gives details about the most important structures than are used to extend a UDFBolts functionality.
+This section gives details about the most important structures than are used to extend a \texttt{UDFBolt}'s functionality.
 \begin{description}
 	\item[IOperator] \hfill \\
 	The \ioperator\ interface provides one function: \\
 	\texttt{execute(List<Tuple> input, \\ OutputCollector collector)} \\
-	It is used to provided higher-order- or user-defined-functions. Depending on the bolt's windowing strategy the \texttt{input} list may always have a size of one like it is supposed to be in a \map\ or \filter\ operator. For these cases implementations of \ioperator\ exist like the \texttt{MapOperator} that in turn require an implementation of a \texttt{Mapper} interface that providers one method \texttt{Values map(Tuple tuple)}, what is more intuitive for a map operation.
+	It is used to provide higher-order- or user-defined-functions. Depending on the bolt's windowing strategy the \texttt{input} list may always have a size of one, like it is supposed to be in a \map\ or \filter\ operator. For these cases implementations of \ioperator\ exist like the \texttt{MapOperator} that in turn require an implementation of a \texttt{Mapper} interface that providers one method \texttt{Values map(Tuple tuple)}, what is more intuitive for a map operation.
 	\item[IKeyConfig] \hfill \\
+	\label{item:ikeyconfig}
 	The \ikeyconfig\ interface provides one function \\ \texttt{getKeyOf(Tuple tuple)}. It is used to assign keys to tuples in order to group them. Tuples that belong to the same group produce the same key. Commonly used keys are values of certain fields or a tuples source component or stream. For these types of commodity  \ikeyconfig\ implementations a factory \texttt{KeyConfigFactory} provides methods like \\
 	 \texttt{byFields(String... fields)} or \texttt{bySource()} that return corresponding implementations.
 	\item[Window] \hfill \\
@@ -36,12 +52,17 @@ This section gives details about the most important structures than are used to 
 	\texttt{O addSafely(I input)}
 	method, that first checks its state, if satisfied flushs it, then adds the value.
 	A windows input and output types \texttt{I} and \texttt{O} are generic. \\
-	\textsl{In a future release} there will be a \texttt{void tick()} method, that indicates that a second of time has passed. By that a \iwindow\ implementation may hold complete control about time constraints. Furthermore a \texttt{Context prepare()} method will be available to pass context information about cluster and topology configuration. 
+	\textsl{In a future release} there will be a \texttt{void tick()} method, that indicates that a second of time has passed. By that a \iwindow\ implementation may hold complete control about time constraints, that currently must be enforced from outside a \iwindow\ implementation. Furthermore a \texttt{void prepare(Context ctx)} method will be available to pass context information about cluster and topology configuration. 
 \end{description}
 
 \subsection{Windows}
 \label{sect:windows}
+\texttt{CIT-Storm} provides two \iwindow\ implementations that are described in this section.
 
 \subsubsection{CountWindows}
+A \texttt{CountWindow} stores a specific amount of input values. This amount is the \textsl{size} of the window and has to be defined by the user. The window is satisfied, if and only if it contains the maximum amount of values. A flush returns the complete list of values and removes a certain amount of stored data. How much it is, is defined by a \textsl{slide-offset}. The \textsl{slide-offset} defines how many elements are removed from the stored list starting with the first element that was added. If no \textsl{slide-offset} is defined by the user, the \textsl{slide-offset} equals the window's size, so that on a flush the complete list is emptied.
 
 \subsubsection{TimeWindows}
+\label{sect:Timewindow}
+
+A \texttt{TimeWindow} stores an arbitrary amount of data, that is bounded by time intervals. The size of a  \texttt{TimeWindow}, that has to be set by the user, defines the size of that interval in seconds. In theory, a \texttt{TimeWindow} is satisfied, if and only if it has acquired a time interval, that equals the defined size. In practice, this definition leads to problems, for example if a \texttt{TimeWindow} gets no or only one input element, providing too few input data to calculate the acquired interval. Therefore, a \texttt{TimeWindow} needs to track the absolute time, and to return its gathered inputs in defined frequencies. At the moment this cannot be done within a \iwindow\ implementation, because \iwindow\ implementations are only invoced on data tuple arrival, which is why the \texttt{UDF-Bolt} has to force a flush, when a \textsl{tick}-tuple arrives. \textsl{In a future release} there will be a \texttt{tick()} method to update a \iwindow's state, that will allow internal time constraining. The user can also define a \textsl{slide-offset} \texttt{n}, that will effect the window to remove the first \texttt{n} seconds of arrived input data on a flush. If left open, the \textsl{slide-offset} equals the window's size, so the window's data list is completely emptied when flushed.

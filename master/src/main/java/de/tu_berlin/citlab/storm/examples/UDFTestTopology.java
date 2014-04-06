@@ -5,6 +5,7 @@ import java.util.List;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
@@ -18,12 +19,26 @@ import de.tu_berlin.citlab.storm.operators.MapOperator;
 import de.tu_berlin.citlab.storm.operators.Mapper;
 import de.tu_berlin.citlab.storm.operators.ReduceOperator;
 import de.tu_berlin.citlab.storm.operators.Reducer;
+import de.tu_berlin.citlab.storm.topologies.TopologyCreation;
 import de.tu_berlin.citlab.storm.window.CountWindow;
-public class UDFTestTopology {
+public class UDFTestTopology implements TopologyCreation {
 
 	@SuppressWarnings("serial")
 	public static void main(String[] args) throws Exception {
 
+		Config conf = new Config();
+		conf.setDebug(true);
+
+		conf.setMaxTaskParallelism(1);
+		conf.setMaxSpoutPending(1);
+
+		LocalCluster cluster = new LocalCluster();
+		cluster.submitTopology("udf-test", conf, new UDFTestTopology().createTopology(false));
+	}
+
+	@Override
+	public StormTopology createTopology(boolean isCluster) {
+		
 		TopologyBuilder builder = new TopologyBuilder();
 
 		builder.setSpout("spout", new CounterProducer(), 1);
@@ -113,16 +128,8 @@ public class UDFTestTopology {
 			),
 			1
 		).fieldsGrouping("filter", new Fields("value"));
-
 		
-		Config conf = new Config();
-		conf.setDebug(true);
-
-		conf.setMaxTaskParallelism(1);
-		conf.setMaxSpoutPending(1);
-
-		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("udf-test", conf, builder.createTopology());
+		return builder.createTopology();
 	}
 
 }
