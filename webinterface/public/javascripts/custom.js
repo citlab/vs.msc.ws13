@@ -30,7 +30,7 @@
       }
     });
 
-    global.server_request = function(action, server, success, count) {
+    global.server_request = function(action, server, obj, count) {
       var url = "server/" + server + "/" + action;
       if(count != undefined)
          url += "/" + count;
@@ -40,9 +40,19 @@
         data: {count: count},
         dataType: 'text',
         type: 'POST',
-        success: success,
         error: function() {
-          alert('Error at server action ' + server + ' - ' + action);
+
+          if(obj.status == "stopping")
+            obj.status = "started";
+          else
+            obj.status = "stopped";
+
+          global.server_control.panel.nimbus.updateStatus();
+          global.server_control.panel.cassandra.updateStatus();
+          global.server_control.panel.supervisor.updateStatus();
+
+          $('.rotating').removeClass("rotating");
+          console.log('Error at server action ' + server + ' - ' + action);
         }
       });
     }

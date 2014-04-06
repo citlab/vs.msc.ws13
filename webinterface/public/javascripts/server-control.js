@@ -42,7 +42,7 @@
       global.server_control.panel.supervisor.updateIp(data.Supervisor.ip);
       global.server_control.panel.supervisor.updateStatus(data.Supervisor.status);
 
-      window.setTimeout(function() {global.server_control.update();}, 10000);
+      window.setTimeout(function() {global.server_control.update();}, 5000);
     }
 
     if(!$("#server-control").length == 0) {
