@@ -6,6 +6,7 @@ import play.mvc.Http.*;
 
 import views.html.*;
 import models.aws.Instance;
+import models.aws.AwsCli;
 import models.ClusterDatabase;
 import models.Nimbus;
 import models.Cassandra;
@@ -35,38 +36,41 @@ public class Server extends Controller {
     }
 
     public static Result startNimbus() {
-        return ok("started");
+        Instance.createNimbus();
+        return ok("started nimbus");
     }
 
     public static Result stopNimbus() {
-        return ok("stoped");
+        return ok("stoped nimbus");
     }
 
     public static Result rebootNimbus() {
-        return ok("rebooted");
+        return ok("rebooted nimbus");
     }
 
     public static Result startCassandra() {
-        return ok("started");
+        Instance.createCassandra();
+        return ok("started cassandra");
     }
 
     public static Result stopCassandra() {
-        return ok("stoped");
+        return ok("stoped cassandra");
     }
 
     public static Result rebootCassandra() {
-        return ok("rebooted");
+        return ok("rebooted cassandra");
     }
 
     public static Result startSupervisor(int count) {
+        Instance.createSupervisors(count);
         return ok("started" + count + "Supervisors");
     }
 
     public static Result stopSupervisor() {
-        return ok("stoped");
+        return ok("stoped supervisor");
     }
 
     public static Result rebootSupervisor() {
-        return ok("rebooted");
+        return ok("rebooted supervisor");
     }
 }
