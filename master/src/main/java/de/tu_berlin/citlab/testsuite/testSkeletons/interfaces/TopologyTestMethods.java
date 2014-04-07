@@ -17,7 +17,7 @@ import java.util.List;
 public interface TopologyTestMethods
 {
 	/**
-	 * The Test-designer needs to specify the first TupleInput as a {@link java.util.List} of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock TupleMocks}
+	 * The Test-Designer needs to specify the first TupleInput as a {@link java.util.List} of {@link de.tu_berlin.citlab.testsuite.mocks.TupleMock TupleMocks}
 	 * and the {@link backtype.storm.tuple.Fields OutputFields} of the output for the first UDFBolt that will be tested
 	 * inside a {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest}.
 	 *
@@ -26,8 +26,15 @@ public interface TopologyTestMethods
 	 */
 	public abstract BoltEmission defineFirstBoltsInput();
 
+
+    /**
+     * The Test-Designer has to return the name of the Topology-Test here. Needed for plotting and testDir-creation.
+     * @return The name of the Topology as a {@link String}.
+     */
+    public abstract String nameTopologyTest();
+
 	/**
-	 * The Test-designer needs to specify the topology-chain, represented by a {@link java.util.List} of {@link BoltTestConfig BoltTestConfigs}.
+	 * The Test-Designer needs to specify the topology-chain, represented by a {@link java.util.List} of {@link BoltTestConfig BoltTestConfigs}.
 	 * Each BoltTestConfig defines the TestName for the regarding {@link de.tu_berlin.citlab.testsuite.testSkeletons.BoltTest BoltTest}
 	 * and the {@link de.tu_berlin.citlab.storm.bolts.UDFBolt UDFBolt} itself.
 	 * @return 	The chain of {@link BoltTestConfig BoltTestConfigs}, which will be tested by the {@link de.tu_berlin.citlab.testsuite.testSkeletons.TopologyTest TopologyTest}

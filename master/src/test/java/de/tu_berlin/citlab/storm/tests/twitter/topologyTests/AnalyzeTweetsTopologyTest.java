@@ -24,13 +24,18 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     {
 		String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
 		String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
-												"bombe", "berlin", "gott", "allah",
+												"bombe", "berlin", "ggott", "allah",
 												"Pilates", "Politik", "Kapital", "Twitter",
 												"der", "die", "das", "google", "microsoft", "facebook"};
 		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 5, 15, 2);
 
         BoltEmission firstInput = new BoltEmission(twitterTuples);
         return firstInput;
+    }
+
+    @Override
+    public String nameTopologyTest() {
+        return this.getClass().getSimpleName();
     }
 
     @Override
@@ -49,6 +54,10 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
         final UDFBolt reduceUserSign = topology.reduceUserSignificance();
         BoltTestConfig userSignTest = testUserSign(reduceUserSign);
         testTopology.add(userSignTest);
+
+        final UDFBolt badWordsWithCounter = topology.mapToBadWordsWithCounter();
+        BoltTestConfig badWordsTest = testBadWordsWithCounter(badWordsWithCounter);
+        testTopology.add(badWordsTest);
 
         return testTopology;
     }
@@ -71,7 +80,7 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 /* ====================== */
 
     private BoltTestConfig testMapTweetWords(UDFBolt testingBolt) {
-        final String boltTestName = "flatmap_tweet_words";
+        final String boltTestName = "flatmapTweetWords";
 //        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
 //        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
@@ -79,12 +88,17 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
-        final String boltTestName = "join_with_badwords";
+        final String boltTestName = "joinWithBadwords";
         return new BoltTestConfig(boltTestName, testingBolt, 100, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {
-        final String boltTestName = "reduce_to_user_significance";
+        final String boltTestName = "reduceToUserSignificance";
+        return new BoltTestConfig(boltTestName, testingBolt, 100, null);
+    }
+
+    private BoltTestConfig testBadWordsWithCounter(UDFBolt testingBolt) {
+        final String boltTestName = "badWordsWithCounter";
         return new BoltTestConfig(boltTestName, testingBolt, 100, null);
     }
 

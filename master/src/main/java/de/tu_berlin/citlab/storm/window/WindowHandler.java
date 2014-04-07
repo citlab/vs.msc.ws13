@@ -40,8 +40,8 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
     public void setUDFBolt(UDFBolt bolt){
         this.bolt=bolt;
     }
-
     public UDFBolt getUDFBolt(){ return this.bolt; }
+
 
 	/* Constructors: */
 	/* ============= */
@@ -59,7 +59,7 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
         this.windowKey = windowKey;
         this.groupByKey = groupByKey;
 
-        windows = new HashMap<Serializable, Window<Tuple, List<Tuple>>>();
+        this.windows = new HashMap<Serializable, Window<Tuple, List<Tuple>>>();
     }
 
 
@@ -118,7 +118,6 @@ public class WindowHandler implements Window<Tuple, List<List<Tuple>>> {
                 for(List<Tuple> group : groups.values()) {
                     result.add(group);
                 }
-
             }
         }
         return result;

@@ -153,7 +153,7 @@ public class AnalyzeTweetsTopology implements TopologyCreation
 
 
         TupleProjection projection = new TupleProjection(){
-            public Values project(Tuple inMemTuple, Tuple tuple) {
+            public Values project(Tuple tuple, Tuple inMemTuple) {
                 return new Values(
                         tuple.getValueByField("user"),
                         tuple.getValueByField("tweet_id"),

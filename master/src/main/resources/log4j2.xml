@@ -25,11 +25,8 @@
             </filters>
 		</Console>
 
-        <File name="StdFileAppender" fileName="logs/Statistics.log" append="true">
+        <File name="StdFileAppender" fileName="logs/All.log" append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <filters>
-                <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
-            </filters>
         </File>
 
 	</Appenders>
