@@ -2,9 +2,7 @@ package de.tu_berlin.citlab.testsuite.diagrams;
 
 
 import backtype.storm.tuple.Tuple;
-import com.xeiam.xchart.BitmapEncoder;
-import com.xeiam.xchart.Chart;
-import com.xeiam.xchart.StyleManager;
+import com.xeiam.xchart.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -24,7 +22,7 @@ public class BoltTupleChart
     private final Map<Long, Set<Tuple>> allTuples;
 
     private final List<Collection<Long>> xDataList;
-    private final List<Collection<Integer>> yDataList;
+    private final List<Collection<Long>> yDataList;
 
     public BoltTupleChart(String boltName)
     {
@@ -54,25 +52,24 @@ public class BoltTupleChart
 
     public void createChart(Long startTime, Long endTime)
     {
-        int maxYVal = prepareChart(startTime);
+        long maxYVal = prepareChart(startTime);
         if(maxYVal > 0){
         // Create Chart
-            Chart chart = new Chart(chartWidth, chartHeight);
             String chartName = "Arrived Tuples on Bolt "+ boltName;
-            chart.setChartTitle(chartName);
-            chart.setXAxisTitle("TimeDiff [ms]");
-            chart.setYAxisTitle("Input-Tuples");
-            chart.getStyleManager().setChartType(StyleManager.ChartType.Scatter);
+            String xAxisName = "TimeDiff [ms]";
+            String yAxisName = "Input-Tuples";
+            Chart chart = new ChartBuilder().chartType(StyleManager.ChartType.Scatter).width(chartWidth).height(chartHeight)
+                                            .title(chartName).xAxisTitle(xAxisName).yAxisTitle(yAxisName).build();
+//            chart.getStyleManager().setChartType(StyleManager.ChartType.Scatter);
 
         // Customize Chart
-            chart.getStyleManager().setChartTitleVisible(true);
             chart.getStyleManager().setLegendPosition(StyleManager.LegendPosition.OutsideE);
             chart.getStyleManager().setXAxisMin(0L);
             chart.getStyleManager().setXAxisMax(endTime - startTime);
             chart.getStyleManager().setYAxisMin(1L);
 
-            chart.getStyleManager().setYAxisTickMarkSpacingHint(chartHeight / maxYVal);
-
+            chart.getStyleManager().setYAxisTickMarkSpacingHint(Math.round(chartHeight / maxYVal));
+            chart.getStyleManager().setBarWidthPercentage(.01);
 
         // Add Series
             for (int i = 0; i < xDataList.size(); i++) {
@@ -92,10 +89,10 @@ public class BoltTupleChart
 
 
 
-    private int prepareChart(Long startTime)
+    private long prepareChart(Long startTime)
     {
         int currSeriesIndex = 0;
-        int maxYSize = 0;
+        long maxYSize = 0;
 
         Long[] sortedTimeStamps = new Long[timeStampArr.size()];
         sortedTimeStamps= timeStampArr.toArray(sortedTimeStamps);
@@ -104,10 +101,10 @@ public class BoltTupleChart
             Long actTimeStamp = sortedTimeStamps[n];
             Set<Tuple> actTupleSet = allTuples.get(actTimeStamp);
 
-            int i;
+            long i;
             for (i = 1; i <= actTupleSet.size(); i++) {
                 Collection<Long> seriesXData;
-                Collection<Integer> seriesYData;
+                Collection<Long> seriesYData;
                 try {
                     seriesXData = xDataList.get(currSeriesIndex);
                     seriesYData = yDataList.get(currSeriesIndex);
