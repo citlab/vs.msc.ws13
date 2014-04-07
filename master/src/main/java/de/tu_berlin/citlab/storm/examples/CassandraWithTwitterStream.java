@@ -71,7 +71,7 @@ public class CassandraWithTwitterStream {
         cassandraCfg.setParams(  //optional, but defaults not always sensable
                 "citstorm",
                 "tweets",
-                new PrimaryKey("user", "id"), /* CassandraFactory.PrimaryKey(..)  */
+                new PrimaryKey("user", "user_id"), /* CassandraFactory.PrimaryKey(..)  */
                 new Fields() /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
         );
 
