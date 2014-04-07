@@ -79,6 +79,10 @@
   margin-top: 50px;
 }
 
+.margin-right {
+  margin-right: 10px;
+}
+
 .col-centered {
   float: none;
   margin: 0 auto;
