@@ -66,6 +66,7 @@ abstract public class TopologyTest implements TopologyTestMethods
         List<BoltTestConfig> testTopology = defineTopologySetup();
         this.topologyTestName = nameTopologyTest();
         System.setProperty("logTestName", topologyTestName);
+        System.setProperty("logTopologyName", topologyTestName);
 
         org.apache.logging.log4j.core.LoggerContext ctx =
                 (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);

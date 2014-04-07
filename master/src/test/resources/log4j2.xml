@@ -37,7 +37,13 @@
 
 
         <!-- Test Suite File-Appenders: -->
-        <File name="TestSuiteFile" fileName="logs/${sys:logTestName}/Test-Suite.log" append="false">
+        <File name="TestRunFile" fileName="logs/${sys:logTestName}/TestRun.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <filters>
+                <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
+            </filters>
+        </File>
+        <File name="TestTopologyFile" fileName="logs/${sys:logTopologyName}/TopologyRun.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <filters>
                 <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -86,7 +92,8 @@
     <!-- TestSuite Logging: -->
         <logger name="TestSuite" level="debug"  additivity="false">
             <AppenderRef ref="TestSuiteConsole" />
-            <AppenderRef ref="TestSuiteFile" />
+            <AppenderRef ref="TestRunFile" />
+            <AppenderRef ref="TestTopologyFile" />
         </logger>
         <logger name="TestSuite.Headers" level="debug"  additivity="true">
             <AppenderRef ref="UDFMockFile" />
