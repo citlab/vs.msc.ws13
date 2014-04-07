@@ -5,6 +5,7 @@ import backtype.storm.tuple.Tuple;
 import de.tu_berlin.citlab.storm.bolts.UDFBolt;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
+import de.tu_berlin.citlab.testsuite.charts.TopologyIOChart;
 import de.tu_berlin.citlab.testsuite.helpers.*;
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.TopologyTestMethods;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +51,9 @@ abstract public class TopologyTest implements TopologyTestMethods
     private static final ArrayList<BoltTest> boltTests = new ArrayList<BoltTest>();
     private final TopologySetup topologySetup;
 
+    private final String topologyTestName;
+    private final TopologyIOChart topologyChart;
+
 
 /* Global Private Variables: */
 /* ========================= */
@@ -63,7 +67,17 @@ abstract public class TopologyTest implements TopologyTestMethods
     public TopologyTest()
     {
         List<BoltTestConfig> testTopology = defineTopologySetup();
-        topologySetup = new TopologySetup(testTopology);
+        this.topologyTestName = nameTopologyTest();
+        System.setProperty("logTestName", topologyTestName);
+        System.setProperty("logTopologyName", topologyTestName);
+
+        org.apache.logging.log4j.core.LoggerContext ctx =
+                (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        ctx.reconfigure();
+
+        topologyChart = new TopologyIOChart(topologyTestName);
+
+        topologySetup = new TopologySetup(topologyTestName, testTopology);
     }
 
 
@@ -114,6 +128,7 @@ abstract public class TopologyTest implements TopologyTestMethods
                try{
                    BoltEmission firstInput = defineFirstBoltsInput();
                    actBoltTest.initTestSetup(firstInput.tupleList);
+                   topologyChart.addBoltInputToChart(firstInput.tupleList.size(), actTestName);
                }
                catch(NullPointerException e){
                    LOGGER.error(BASIC, "First Bolt Inputs are neeeded to be defined in defineFirstBoltsInput()!", e);
@@ -122,11 +137,14 @@ abstract public class TopologyTest implements TopologyTestMethods
             }
             else{
                 actBoltTest.initTestSetup(lastBoltOutput.tupleList);
+                topologyChart.addBoltInputToChart(lastBoltOutput.tupleList.size(), actTestName);
             }
             boltTests.add(actBoltTest);
             lastBoltOutput = actBoltTest.testUDFBolt(sleepBetweenTuples);
             n++;
         }
+
+        topologyChart.createChart();
     }
 
 //Used in @AfterClass

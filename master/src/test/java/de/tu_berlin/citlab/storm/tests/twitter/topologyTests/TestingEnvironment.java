@@ -19,7 +19,6 @@ public class TestingEnvironment extends TopologyTest
     private static final Logger LOGGER = LogManager.getLogger(DebugLogger.BOLTTEST_ID);
 
 
-
     @BeforeClass
     public static void initEnvironment()
     {
@@ -29,6 +28,11 @@ public class TestingEnvironment extends TopologyTest
         STORAGE.badWords.put("religion", new BadWord("religion", 100));
         STORAGE.badWords.put("macht", new BadWord("macht", 300));
         STORAGE.badWords.put("kampf", new BadWord("kampf", 300));
+    }
+
+    @Override
+    public String nameTopologyTest() {
+        return this.getClass().getCanonicalName();
     }
 
     @Override

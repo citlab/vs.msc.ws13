@@ -73,7 +73,7 @@ public class UDFBoltMock extends UDFBolt
     }
 
     @Override
-    protected void executeBatches(List<List<Tuple>> windows) {
+    public void executeBatches(List<List<Tuple>> windows) {
         super.executeBatches(windows);
 
         //TODO: write List<List<Tuple>> as an LogPrinter String and log it here.

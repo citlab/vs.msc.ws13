@@ -46,7 +46,7 @@ public class TwitterGeneratorSpout extends UDFSpout
 /* ================= */
 
     private int tupleCount;
-
+    public static Object SychronizedTuple = new Object();
 
 /* Constructor: */
 /* ============= */
@@ -94,8 +94,10 @@ public class TwitterGeneratorSpout extends UDFSpout
                         LogPrinter.toValString(tweetVal));
             }
         }
-        tupleCount ++;
 
+        synchronized (SychronizedTuple){
+            tupleCount ++;
+        }
     }
 
     @Override

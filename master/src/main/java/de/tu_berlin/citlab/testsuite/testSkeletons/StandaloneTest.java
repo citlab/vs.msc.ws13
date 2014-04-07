@@ -2,6 +2,7 @@ package de.tu_berlin.citlab.testsuite.testSkeletons;
 
 
 import de.tu_berlin.citlab.testsuite.testSkeletons.interfaces.StandaloneTestMethods;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Test;
 
 
@@ -40,8 +41,16 @@ abstract public class StandaloneTest<B extends BoltTest, O extends OperatorTest>
     {
         this.boltTestDescr = initBoltTestDescr();
         this.opTestDescr = initOpTestDescr();
+        System.setProperty("logTestName", boltTestDescr.testName);
+
+        org.apache.logging.log4j.core.LoggerContext ctx =
+                (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        ctx.reconfigure();
+
         this.opTestDescr.initTestSetup(generateInputTuples());
         this.boltTestDescr.initTestSetup(generateInputTuples());
+
+
     }
 
 

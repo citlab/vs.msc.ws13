@@ -26,15 +26,17 @@
           $(global.server_control).find("[value=stop_nimbus] span").removeClass('rotating');
         }
 
-        $("#server-nimbus-ip").attr('href', '#');
+        $("#server-nimbus-ip-link").attr('href', '#');
       } else {
         global.server_control.panel.nimbus.disableStart();
-        if(global.server_control.panel.nimbus.status == 'starting') {
+        if(global.server_control.panel.nimbus.status == 'stopped') {
+          global.server_control.panel.nimbus.status = "running";
+        } else if(global.server_control.panel.nimbus.status == 'starting') {
           global.server_control.panel.nimbus.status = "running";
           $(global.server_control).find("[value=start_nimbus] span").removeClass('rotating');
         }
 
-        $("#server-nimbus-ip").attr('href', 'http://' + value + ':8080');
+        $("#server-nimbus-ip-link").attr('href', 'http://' + value + ':8080');
       }
 
       $("#server-nimbus-ip").html(value);

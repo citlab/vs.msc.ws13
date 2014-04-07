@@ -31,7 +31,9 @@
         $("#server-cassandra-ip").attr('href', '#');
       } else {
         global.server_control.panel.cassandra.disableStart();
-        if(global.server_control.panel.cassandra.status == 'starting') {
+        if(global.server_control.panel.cassandra.status == 'stopped') {
+          global.server_control.panel.cassandra.status = "running";
+        } else if(global.server_control.panel.cassandra.status == 'starting') {
           global.server_control.panel.cassandra.status = "running";
           $(global.server_control).find("[value=start_cassandra] span").removeClass('rotating');
         }

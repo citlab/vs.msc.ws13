@@ -75,6 +75,7 @@ public class UDFBolt extends BaseRichBolt implements UDFOutput {
     // important for logging
     private String stormComponentId     = "default";
     private int stormTaskId             = -1;
+    private boolean wasJustFlushed      = false;
 
 
 
@@ -118,7 +119,9 @@ public class UDFBolt extends BaseRichBolt implements UDFOutput {
     public WindowHandler getWindowHandler() {
         return windowHandler;
     }
-
+    public boolean wasJustFlushed() {
+        return wasJustFlushed;
+    }
 
 
 /* Public Methods: */
@@ -147,13 +150,16 @@ public class UDFBolt extends BaseRichBolt implements UDFOutput {
     }
 
     public void execute(Tuple input) {
+        this.wasJustFlushed = false;
         if (TupleHelper.isTickTuple(input)) {
             executeBatches(windowHandler.flush());
+            this.wasJustFlushed = true;
         }
         else {
             List<List<Tuple>> windows = windowHandler.addSafely(input);
             if (windows != null) {
                 executeBatches(windows);
+                this.wasJustFlushed = true;
             }
         }
     }
@@ -167,7 +173,7 @@ public class UDFBolt extends BaseRichBolt implements UDFOutput {
 /* Private Methods: */
 /* ================ */
 
-    protected void executeBatches(List<List<Tuple>> windows) {
+    public void executeBatches(List<List<Tuple>> windows) {
         for (List<Tuple> window : windows) {
             log_debug("Executing Operator with window {}", LogPrinter.toTupleListString(window));
 			try {

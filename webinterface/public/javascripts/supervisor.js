@@ -27,19 +27,22 @@
           global.server_control.panel.supervisor.status = "stopped";
           $(global.server_control).find("[value=stop_supervisor] span").removeClass('rotating');
         }
-
-        $("#server-supervisor-ip").attr('href', '#');
       } else {
         global.server_control.panel.supervisor.disableStart();
-        if(global.server_control.panel.supervisor.status == 'starting') {
+        if(global.server_control.panel.supervisor.status == 'stopped') {
+          global.server_control.panel.supervisor.status = "running";
+        } else if(global.server_control.panel.supervisor.status == 'starting') {
           global.server_control.panel.supervisor.status = "running";
           $(global.server_control).find("[value=start_supervisor] span").removeClass('rotating');
         }
-
-        $("#server-supervisor-ip").attr('href', 'http://' + value + ':8080');
       }
 
-      $("#server-supervisor-ip").html(value);
+      var ips = value.split(",")
+      var content = $("<span class='ip-list'></span>");
+      $.each(ips, function(i,v) {
+        content.append($("<span class='badge'>" + v + "</span>"));
+      })
+      $("#server-supervisor-ip").html(content);
     }
 
     global.server_control.panel.supervisor.updateStatus = function(value) {

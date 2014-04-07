@@ -79,6 +79,10 @@
   margin-top: 50px;
 }
 
+.margin-right {
+  margin-right: 10px;
+}
+
 .col-centered {
   float: none;
   margin: 0 auto;
@@ -98,12 +102,31 @@
   margin-bottom: 0;
 }
 
+.panel-body .table tr:first-child th,
+.panel-body .table tr:first-child td {
+  border: none;
+}
+
+.panel-heading {
+  position: relative;
+}
+
+.delete-topology {
+  position: absolute;
+  top: 7px;
+  right: 5px;
+}
+
 body.test {
   background: url('/assets/images/topology.png') no-repeat center center fixed;;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+}
+
+.ip-list .badge {
+  margin-right: 3px;
 }
 
 .rotating {

@@ -54,9 +54,9 @@ abstract public class OperatorTest implements OperatorTestMethods
 /* Global Variables: */
 /* ================= */
 
-    public final String logTag;
+    public final String testName;
+//    public final String logDir;
 
-    private final String testName;
     private List<Tuple> inputTuples;
 
     private IOperator operator;
@@ -68,8 +68,14 @@ abstract public class OperatorTest implements OperatorTestMethods
 
     public OperatorTest(String testName)
     {
-        this.logTag = "OperatorTest_"+testName;
         this.testName = testName;
+//        this.logDir = "OperatorTest_"+testName;
+
+        System.setProperty("logTestName", testName);
+
+        org.apache.logging.log4j.core.LoggerContext ctx =
+                (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        ctx.reconfigure();
     }
 
 

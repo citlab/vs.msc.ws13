@@ -38,6 +38,7 @@ public class BoltEmission
     public BoltEmission(List<List<Object>> outputEmission, Fields outputFields)
     {
         this.tupleList = new ArrayList<Tuple>(outputEmission.size());
+        int n = 0;
         for (List<Object> outputValObjs : outputEmission) {
             Values outputVals = new Values();
             for (Object outVal : outputValObjs) {
@@ -45,6 +46,13 @@ public class BoltEmission
             }
             Tuple actTuple = TupleMock.mockTupleByFields(outputVals, outputFields);
             this.tupleList.add(actTuple);
+
+            if((n % 5) == 0){
+                Tuple tickTuple = TupleMock.mockTickTuple();
+                this.tupleList.add(tickTuple);
+            }
+
+            n++;
         }
     }
 }
