@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="warn" name="CIT-Storm">
 	<Appenders>
-		<JDBC name="databaseAppender" tableName="${sys:log4j2.databaseName}.${sys:log4j2.tableName}">
+		<JDBC name="databaseAppender" tableName="citstorm.log4j2">
 			<ConnectionFactory class="de.tu_berlin.citlab.logging.ConnectionFactory" method="getConnectionStatic" />
 			<Column name="datetime" pattern="%d{yyy-MM-dd HH:mm:ss}" />
 			<Column name="milliseconds" pattern="%d{SSS}" />
@@ -11,25 +11,25 @@
 			<Column name="exception" pattern="%exception" />
 			<Column name="thread" pattern="%thread" />
 			<Column name="marker" pattern="%marker" />
-			<Column name="session" pattern="${sys:log4j2.session}" />
-            <filters>
+			<Column name="session" pattern="static-session" />
+            <!-- filters>
                 <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
-            </filters>
+            </filters> -->
         </JDBC>
 
 
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-            <filters>
+            <!-- <filters>
                 <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
-            </filters>
+            </filters -->>
 		</Console>
 
-        <File name="StdFileAppender" fileName="logs/Statistics.log" append="true">
+        <File name="StdFileAppender" fileName="logs/citstorm.log" append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <filters>
+            <!-- <filters>
                 <MarkerFilter marker="Statistics" onMatch="ACCEPT" onMismatch="DENY"/>
-            </filters>
+            </filters> -->
         </File>
 
 	</Appenders>
@@ -38,7 +38,7 @@
 		<Root level="info">
 			<AppenderRef ref="Console" />
             <AppenderRef ref="StdFileAppender" />
-			<!-- <AppenderRef ref="databaseAppender" /> -->
+			<AppenderRef ref="databaseAppender" />
 		</Root>
 	</Loggers>
 </Configuration>

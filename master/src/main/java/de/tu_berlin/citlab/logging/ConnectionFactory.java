@@ -18,17 +18,17 @@ public class ConnectionFactory {
 	}
 
 	// overridden by config file
-	private String serverName;
-	private String serverPort;
-	private String databaseName;
-	private String tableName;
-	private String user;
-	private String pass;
+	private String serverName = "citstorm.dd-dns.de";
+	private String serverPort = "3306";
+	private String databaseName = "citstorm";
+	private String tableName = "log4j2";
+	private String user = "log4j2";
+	private String pass = "log4j2";
 
 	private BoneCP connectionPool;
 
 	private ConnectionFactory() {
-		if (databaseDriverLoadable() && propertiesLoaded()) {
+		if (databaseDriverLoadable() /*&& propertiesLoaded()*/) {
 			try {
 				connectionPool = new BoneCP(getConfig());
 				// connectionPool.shutdown();
