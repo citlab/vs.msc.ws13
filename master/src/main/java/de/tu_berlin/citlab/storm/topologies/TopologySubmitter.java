@@ -1,18 +1,10 @@
 package de.tu_berlin.citlab.storm.topologies;
 
-import de.tu_berlin.citlab.logging.LoggingConfigurator;
 import backtype.storm.Config;
+import de.tu_berlin.citlab.logging.LoggingConfigurator;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.BaseConfiguration;
-
-/**
- * Created by Constantin on 19.03.2014.
- */
 public class TopologySubmitter
 {
 //    private static AnalyzeTweetsTopology topology;

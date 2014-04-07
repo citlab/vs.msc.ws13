@@ -46,7 +46,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             cassandraBadWordsStatisticsCfg.setIP(cassandraServerIP);
 
             cassandraTweetsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm_test",
                     "tweets",
                     new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -54,7 +54,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraUserSignificanceCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm_test",
                     "user_significance",
                     new PrimaryKey("user"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields("significance"), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -62,7 +62,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraBadWordsStatisticsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm",
+                    "citstorm_test",
                     "badword_occurences",
                     new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -72,15 +72,15 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
 
             List<Tuple> badWordJoinSide = new ArrayList<Tuple>();
 
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", new Long(100))) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", new Long(500) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", new Long(1000))) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", new Long(10) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", new Long(100) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("religion", new Long(200) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("gott", new Long(50) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", new Long(1000) )) );
-            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("heilig", new Long(500) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("bombe", new Long(10))) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("nuklear", new Long(50) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("anschlag", new Long(100))) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("berlin", new Long(1) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("macht", new Long(10) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("religion", new Long(20) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("gott", new Long(5) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("allah", new Long(100) )) );
+            badWordJoinSide.add( TupleHelper.createStaticTuple(new Fields("word", "significance"), new Values("heilig", new Long(50) )) );
 
 
             // HashTable
@@ -104,8 +104,8 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
                                                     "Pilates", "Politik", "Kapital", "Twitter",
                                                     "der", "die", "das", "google", "microsoft", "facebook"};
 
-            //StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
-            StreamSource tweets = new TwitterTestStreamSource(stream, twitterUsers, dictionary, 10, 30);
+            StreamSource tweets = new TwitterStreamSource(stream, keywords, languages, tweets_outputfields);
+            //StreamSource tweets = new TwitterTestStreamSource(stream, twitterUsers, dictionary, 5, 1);
 
 
             StreamSink tweetsSink = new CassandraSink(stream, cassandraTweetsCfg);
