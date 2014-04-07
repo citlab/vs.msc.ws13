@@ -40,7 +40,7 @@
       var ips = value.split(",")
       var content = $("<span class='ip-list'></span>");
       $.each(ips, function(i,v) {
-        content.append($("<span class='elem'>" + v + "</span>"));
+        content.append($("<span class='badge'>" + v + "</span>"));
       })
       $("#server-supervisor-ip").html(content);
     }
