@@ -135,4 +135,39 @@ public class LogDatabase {
 
     return entry;
   }
+
+  public int truncateLogs() {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+
+    try {
+      // Register JDBC driver
+      Class.forName("com.mysql.jdbc.Driver");
+
+      // Open a connection
+      conn = DriverManager.getConnection(getConnectionString());
+
+      // Execute SQL query
+      stmt = conn.prepareStatement("TRUNCATE log4j2");
+
+      ResultSet rs = stmt.executeQuery();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException e) {
+      }
+      try {
+        if (conn != null)
+          conn.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return 0;
+  }
 }

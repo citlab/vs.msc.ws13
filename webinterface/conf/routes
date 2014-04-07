@@ -33,6 +33,7 @@ POST    /deployment/upload          controllers.Application.upload()
 POST     /deployment/start/:name    controllers.Application.startTopology(name: String)
 GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
 
+POST    /log/truncate               controllers.Log.truncate()
 POST    /log/:id                    controllers.Log.getLatest(id: Long)
 POST    /log/single/:id             controllers.Log.getLog(id: Long)
 

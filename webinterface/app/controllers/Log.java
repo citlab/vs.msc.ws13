@@ -56,4 +56,8 @@ public class Log extends Controller {
     return ok(result);
   }
 
+  public static Result truncate() {
+    LogDatabase.getInstance().truncateLogs();
+    return ok("deleted");
+  }
 }

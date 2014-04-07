@@ -51,6 +51,10 @@
       }
     }
 
+    topology_list.truncate = function() {
+      topology_list.find('tbody').html('');
+    };
+
     topology_list.on("click", "tr", function() {
       var id = $($(this).find("td")[0]).html();
       $.ajax({
