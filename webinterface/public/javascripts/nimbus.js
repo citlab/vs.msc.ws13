@@ -29,7 +29,9 @@
         $("#server-nimbus-ip").attr('href', '#');
       } else {
         global.server_control.panel.nimbus.disableStart();
-        if(global.server_control.panel.nimbus.status == 'starting') {
+        if(global.server_control.panel.nimbus.status == 'stopped') {
+          global.server_control.panel.nimbus.status = "running";
+        } else if(global.server_control.panel.nimbus.status == 'starting') {
           global.server_control.panel.nimbus.status = "running";
           $(global.server_control).find("[value=start_nimbus] span").removeClass('rotating');
         }

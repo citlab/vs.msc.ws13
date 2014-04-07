@@ -5,7 +5,7 @@
     <div class="panel-heading" style="overflow:hidden">
       <h3 class="panel-title pull-left">@t.getName</h3>
       <a href="/deployment/delete/@t.getTitle" class="btn btn-danger btn-xs delete-topology pull-right">
-        <span class="glyphicon glyphicon-remove"></span>
+        <span class="glyphicon glyphicon-trash"></span>
       </a>
     </div>
     <div class="panel-body">
@@ -27,7 +27,7 @@
       <form class="ajax-form" action="/deployment/start/@t.getTitle" method="post">
         <div class="row">
           <div class="col-md-8">
-            <input class="form-control" type="text" name="start_as">
+            <input class="form-control" type="text" name="start_as" placeholder="ausführen als">
           </div>
           <div class="col-md-4">
             <button class="btn btn-default start-deployment pull-right" type="submit">
