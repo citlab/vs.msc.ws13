@@ -80,11 +80,11 @@ public class CassandraDAO implements Serializable
 		createTableQueryByFields =
 				ta.createTableQueryByFields( config.getKeyspace(), config.getTable(),
 						ta.fieldsInTuple.toList() );
-
-		setPreparedStatement( ta.createPreparedInsertStatement( config.getKeyspace(),
-				config.getTable() ) );
-
 	}
+	
+    public void prepare(){
+        setPreparedStatement(ta.createPreparedInsertStatement(config.getKeyspace(), config.getTable()));
+    }
 
 	public void createDataStructures()
 	{
