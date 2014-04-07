@@ -49,8 +49,12 @@ public class DeployServlet extends HttpServlet {
 		} else if (uri.equals("/run")) {
 			System.out.println("Run requested");
 			String filename = req.getParameter("file");
+			String name = req.getParameter("name");
+			System.out.println("file=" + filename);
+			System.out.println("name=" + name);
+			
 			if (filename != null) {
-				result = runJob(filename);
+				result = runJob(filename, name);
 				resp.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				result = "No filename";
@@ -58,7 +62,8 @@ public class DeployServlet extends HttpServlet {
 			}
 		} else if (uri.equals("/kill")) {
 			System.out.println("Kill requested");
-			String filename = req.getParameter("file");
+			String filename = req.getParameter("name");
+			System.out.println("name=" + filename);
 			if (filename != null) {
 				result = killJob(filename);
 				resp.setStatus(HttpServletResponse.SC_OK);
@@ -111,7 +116,7 @@ public class DeployServlet extends HttpServlet {
 		}
 	}
 
-	private String runJob(String filename) {
+	private String runJob(String filename, String topologyName) {
 		String folder = Config.getInstance().getPath("job.path");
 		String stormPath = Config.getInstance().getPath("storm.path");
 		File file = new File(folder + "/" + filename);
@@ -127,9 +132,6 @@ public class DeployServlet extends HttpServlet {
 			return "No main class in Manifest";
 		}
 
-		String topologyName = JarTools.getManifestAttributeFromJar(
-				"Topology-Name", file);
-
 		if (topologyName == null) {
 			return "No topology name in Manifest";
 		}
@@ -143,6 +145,7 @@ public class DeployServlet extends HttpServlet {
 				Process p = pb.start();
 				p.waitFor();
 			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 				return "Failed to start topology";
 			}
 			return "Topology started";
@@ -151,38 +154,22 @@ public class DeployServlet extends HttpServlet {
 		}
 	}
 
-	private String killJob(String filename) {
-		String folder = Config.getInstance().getPath("job.path");
+	private String killJob(String topologyName) {
 		String stormPath = Config.getInstance().getPath("storm.path");
-		File file = new File(folder + "/" + filename);
 
-		if (!file.exists()) {
-			return "File does not exist";
+		ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm", "kill",
+				topologyName);
+		pb.directory(new File(stormPath));
+
+		try {
+			Process p = pb.start();
+			p.waitFor();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return "Failed to stop topology";
 		}
+		return "Topology stopped";
 
-		String filePath = file.getAbsolutePath();
-
-		String topologyName = JarTools.getManifestAttributeFromJar(
-				"Topology-Name", file);
-		if (topologyName == null) {
-			return "No topology name in Manifest";
-		}
-
-		if (filePath.startsWith(folder)) {
-			ProcessBuilder pb = new ProcessBuilder("sudo", "bin/storm", "kill",
-					topologyName);
-			pb.directory(new File(stormPath));
-
-			try {
-				Process p = pb.start();
-				p.waitFor();
-			} catch (IOException | InterruptedException e) {
-				return "Failed to stop topology";
-			}
-			return "Topology stopped";
-		} else {
-			return "Invalid file path";
-		}
 	}
 
 	private String uploadFileToServer(HttpServletRequest req)

@@ -3,11 +3,11 @@ package de.tu_berlin.citlab.cluster;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import de.tu_berlin.citlab.database.ClusterDatabase;
 import de.tu_berlin.citlab.database.RegisterDatabase;
 
 public class ClusterManager extends Thread {
 	boolean running = true;
-	long interval = 30_000;
 
 	@Override
 	public void run() {
@@ -17,7 +17,8 @@ public class ClusterManager extends Thread {
 			checkIP(RegisterDatabase.TYPE_NIMBUS);
 
 			try {
-				Thread.sleep(interval);
+				Thread.sleep(Long.parseLong(ClusterDatabase.getInstance()
+						.getProperty("manager.ip-check-interval")));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -41,7 +42,6 @@ public class ClusterManager extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
