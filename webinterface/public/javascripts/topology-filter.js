@@ -36,6 +36,17 @@
       $(this).find("span").toggleClass("glyphicon-pause");
     });
 
+    topology_filter.on("click", "#truncate-logs", function(e) {
+      $.ajax({
+        url: "/log/truncate",
+        type: "post",
+        success: function() {
+          global.topology_list.truncate();
+          global.topology_list.lastId = 0;
+        }
+      });
+    })
+
     topology_filter.include = function (filter) {
       var elems = topology_filter.find("li");
       var r = false
