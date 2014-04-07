@@ -9,12 +9,15 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class RegisterDatabase {
 
 	public static final int TYPE_NIMBUS = 0;
 	public static final int TYPE_CASSANDRA = 1;
+	public static final int TYPE_SUPERVISOR = 2;
 
 	private static final RegisterDatabase INSTANCE = new RegisterDatabase();
 
@@ -278,6 +281,70 @@ public class RegisterDatabase {
 		return result;
 	}
 
+	public String[] getIPs(int type) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+
+		List<String> ips = new ArrayList<String>();
+		String[] result = null;
+
+		try {
+			// Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// Open a connection
+			conn = DriverManager.getConnection(getConnectionString());
+
+			// Execute SQL query
+			stmt = conn.prepareStatement("SELECT * FROM nodes WHERE type = ?");
+
+			stmt.setInt(1, type);
+
+			ResultSet rs = stmt.executeQuery();
+
+			if (rs.first()) {
+				while (true) {
+					ips.add(rs.getString("ip"));
+
+					if (rs.isLast()) {
+						break;
+					}
+
+					rs.next();
+				}
+			}
+
+			rs.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		result = new String[ips.size()];
+
+		for (int i = 0; i < result.length; i++) {
+			result[i] = ips.get(i);
+		}
+
+		return result;
+	}
+
 	public String updateIP(int type, String ip) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -295,6 +362,91 @@ public class RegisterDatabase {
 
 			stmt.setString(1, ip);
 			stmt.setInt(2, type);
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "-1";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "-1";
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return "0";
+	}
+
+	public String addIP(int type, String ip) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+
+		try {
+			// Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// Open a connection
+			conn = DriverManager.getConnection(getConnectionString());
+
+			// Execute SQL query
+			stmt = conn
+					.prepareStatement("INSERT INTO nodes(type,ip) VALUES(?,?)");
+System.out.println(type);
+System.out.println(ip);
+			stmt.setInt(1, type);
+			stmt.setString(2, ip);
+
+			stmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return "-1";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "-1";
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return "0";
+	}
+
+	public String removeIP(String ip) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+
+		try {
+			// Register JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// Open a connection
+			conn = DriverManager.getConnection(getConnectionString());
+
+			// Execute SQL query
+			stmt = conn.prepareStatement("DELETE FROM nodes WHERE ip = ?");
+
+			stmt.setString(1, ip);
 
 			stmt.executeUpdate();
 

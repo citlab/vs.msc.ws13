@@ -25,6 +25,8 @@ public class RegisterServlet extends HttpServlet {
 				result = RegisterDatabase.getInstance().updateIP(1, ip);
 			} else if (param.equals("nimbus")) {
 				result = RegisterDatabase.getInstance().updateIP(0, ip);
+			} else if (param.equals("supervisor")) {
+				result = RegisterDatabase.getInstance().addIP(2, ip);
 			}
 
 			resp.getOutputStream().println(result);

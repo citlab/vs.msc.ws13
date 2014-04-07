@@ -15,6 +15,7 @@ public class ClusterManager extends Thread {
 
 			checkIP(RegisterDatabase.TYPE_CASSANDRA);
 			checkIP(RegisterDatabase.TYPE_NIMBUS);
+			checkSupervisors();
 
 			try {
 				Thread.sleep(Long.parseLong(ClusterDatabase.getInstance()
@@ -37,6 +38,30 @@ public class ClusterManager extends Thread {
 				RegisterDatabase.getInstance().updateIP(type, "null");
 			}
 
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void checkSupervisors() {
+		try {
+			String[] cAddr = RegisterDatabase.getInstance().getIPs(
+					RegisterDatabase.TYPE_SUPERVISOR);
+
+			for (String s : cAddr) {
+				Process p1 = java.lang.Runtime.getRuntime().exec(
+						"ping -c 1 " + s);
+				int returnVal = p1.waitFor();
+				boolean reachable = (returnVal == 0);
+
+				if (!reachable) {
+					RegisterDatabase.getInstance().removeIP(s);
+				}
+			}
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {

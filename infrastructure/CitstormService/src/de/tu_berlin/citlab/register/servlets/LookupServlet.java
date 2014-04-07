@@ -24,6 +24,19 @@ public class LookupServlet extends HttpServlet {
 				ip = RegisterDatabase.getInstance().getIP(1);
 			} else if (param.equals("nimbus")) {
 				ip = RegisterDatabase.getInstance().getIP(0);
+			} else if (param.equals("supervisor")) {
+				String[] ips = RegisterDatabase.getInstance().getIPs(2);
+				if (ips == null) {
+					ip = null;
+				} else {
+					ip = "";
+					for (int i = 0; i < ips.length; i++) {
+						ip += ips[i];
+						if (i < ips.length - 1) {
+							ip += ",";
+						}
+					}
+				}
 			}
 			if (ip == null) {
 				ip = "null";
