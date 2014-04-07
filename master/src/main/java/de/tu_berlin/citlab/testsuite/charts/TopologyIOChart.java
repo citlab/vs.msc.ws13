@@ -1,8 +1,11 @@
-package de.tu_berlin.citlab.testsuite.diagrams;
+package de.tu_berlin.citlab.testsuite.charts;
 
 
 import backtype.storm.tuple.Tuple;
-import com.xeiam.xchart.*;
+import com.xeiam.xchart.BitmapEncoder;
+import com.xeiam.xchart.Chart;
+import com.xeiam.xchart.ChartBuilder;
+import com.xeiam.xchart.StyleManager;
 
 import java.io.IOException;
 import java.util.*;
@@ -10,13 +13,13 @@ import java.util.*;
 /**
  * Created by Constantin on 06.04.2014.
  */
-public class BoltTupleChart
+public class TopologyIOChart
 {
     private final static int chartWidth = 1200;
     private final static int chartHeight = 600;
 
 
-    private final String boltName;
+    private final String testName;
     private final Set<Tuple> currentTuples;
     private final List<Long> timeStampArr;
     private final Map<Long, Set<Tuple>> allTuples;
@@ -24,9 +27,9 @@ public class BoltTupleChart
     private final List<Collection<Long>> xDataList;
     private final List<Collection<Long>> yDataList;
 
-    public BoltTupleChart(String boltName)
+    public TopologyIOChart(String testName)
     {
-        this.boltName = boltName;
+        this.testName = testName;
 
         this.xDataList = new ArrayList<>();
         this.yDataList = new ArrayList<>();
@@ -55,7 +58,7 @@ public class BoltTupleChart
         long maxYVal = prepareChart(startTime);
         if(maxYVal > 0){
         // Create Chart
-            String chartName = "Arrived Tuples on Bolt "+ boltName;
+            String chartName = "Arrived Tuples on Bolt "+ testName;
             String xAxisName = "TimeDiff [ms]";
             String yAxisName = "Input-Tuples";
             Chart chart = new ChartBuilder().chartType(StyleManager.ChartType.Scatter).width(chartWidth).height(chartHeight)
@@ -79,7 +82,7 @@ public class BoltTupleChart
             }
 
             try {
-                BitmapEncoder.savePNG(chart, "./Tuples_"+boltName+".png");
+                BitmapEncoder.savePNG(chart, "./Tuples_"+ testName +".png");
             } catch (IOException e) {
                 e.printStackTrace();
             }

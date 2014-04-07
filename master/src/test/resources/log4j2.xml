@@ -13,15 +13,15 @@
 
     <!-- Network Socket replacements for Testing: -->
         <!-- Storm-Architecture File-Appenders: -->
-        <File name="boltFile" fileName="logs/Bolt.log" append="false">
+        <File name="boltFile" fileName="logs/${sys:logTestName}/Bolt.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
 
-        <File name="operatorFile" fileName="logs/Operator.log" append="false">
+        <File name="operatorFile" fileName="logs/${sys:logTestName}/Operator.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
 
-        <File name="spoutFile" fileName="logs/Spout.log" append="false">
+        <File name="spoutFile" fileName="logs/${sys:logTestName}/Spout.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
 
@@ -37,26 +37,26 @@
 
 
         <!-- Test Suite File-Appenders: -->
-        <File name="TestSuiteFile" fileName="logs/Test-Suite.log" append="false">
+        <File name="TestSuiteFile" fileName="logs/${sys:logTestName}/Test-Suite.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <filters>
                 <MarkerFilter marker="DEFAULT" onMatch="ACCEPT" onMismatch="DENY"/>
             </filters>
         </File>
 
-        <File name="UDFMockFile" fileName="logs/mocks/UDFBolt.log" append="false">
+        <File name="UDFMockFile" fileName="logs/${sys:logTestName}/mocks/UDFBolt.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <filters>
                 <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
             </filters>
         </File>
-        <File name="TupleMockFile" fileName="logs/mocks/Tuple.log" append="false">
+        <File name="TupleMockFile" fileName="logs/${sys:logTestName}/mocks/Tuple.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <filters>
                 <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>
             </filters>
         </File>
-        <File name="OCollMockFile" fileName="logs/mocks/OutputCollector.log" append="false">
+        <File name="OCollMockFile" fileName="logs/${sys:logTestName}/mocks/OutputCollector.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <filters>
                 <MarkerFilter marker="DETAILED" onMatch="ACCEPT" onMismatch="DENY"/>

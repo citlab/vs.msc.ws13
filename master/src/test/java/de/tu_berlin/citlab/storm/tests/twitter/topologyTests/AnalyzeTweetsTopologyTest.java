@@ -24,13 +24,18 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     {
 		String[] twitterUsers 	= new String[]{	"Hennes", "4n4rch7", "ReliOnkel", "Matze Maik", "Capt. Nonaim"};
 		String[] dictionary 	= new String[]{	"Kartoffel", "Gemüse", "Schnitzel",
-												"bombe", "berlin", "gott", "allah",
+												"bombe", "berlin", "ggott", "allah",
 												"Pilates", "Politik", "Kapital", "Twitter",
 												"der", "die", "das", "google", "microsoft", "facebook"};
 		ArrayList<Tuple> twitterTuples = TupleMockFactory.generateTwitterTuples(twitterUsers, dictionary, 5, 15, 2);
 
         BoltEmission firstInput = new BoltEmission(twitterTuples);
         return firstInput;
+    }
+
+    @Override
+    public String nameTopologyTest() {
+        return this.getClass().getSimpleName();
     }
 
     @Override

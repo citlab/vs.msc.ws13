@@ -49,6 +49,7 @@ abstract public class TopologyTest implements TopologyTestMethods
 
     private static final ArrayList<BoltTest> boltTests = new ArrayList<BoltTest>();
     private final TopologySetup topologySetup;
+    private final String topologyTestName;
 
 
 /* Global Private Variables: */
@@ -63,7 +64,14 @@ abstract public class TopologyTest implements TopologyTestMethods
     public TopologyTest()
     {
         List<BoltTestConfig> testTopology = defineTopologySetup();
-        topologySetup = new TopologySetup(testTopology);
+        this.topologyTestName = nameTopologyTest();
+        System.setProperty("logTestName", topologyTestName);
+
+        org.apache.logging.log4j.core.LoggerContext ctx =
+                (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        ctx.reconfigure();
+
+        topologySetup = new TopologySetup(topologyTestName, testTopology);
     }
 
 

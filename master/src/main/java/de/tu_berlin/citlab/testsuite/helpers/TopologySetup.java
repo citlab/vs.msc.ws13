@@ -27,7 +27,7 @@ public class TopologySetup
 	public final Map<String, Integer> boltSleepTimer;
 
 
-    public TopologySetup(List<BoltTestConfig> topology)
+    public TopologySetup(String topologyTestName, List<BoltTestConfig> topology)
     {
         this.boltNameOrder = new ArrayList<String>(topology.size());
         this.boltOPTests = new HashMap<String, OperatorTest>(topology.size());
@@ -35,7 +35,7 @@ public class TopologySetup
 		this.boltSleepTimer = new HashMap<String, Integer>(topology.size());
 
         for (BoltTestConfig actTestConfig : topology) {
-            final String testName = actTestConfig.testName;
+            final String testName = topologyTestName +"/"+ actTestConfig.testName;
             final UDFBolt testBolt = actTestConfig.testBolt;
 			final int boltSleepTimer = actTestConfig.boltSleepTimer;
             final List<List<Object>> assertedOutput = actTestConfig.assertedOutput;

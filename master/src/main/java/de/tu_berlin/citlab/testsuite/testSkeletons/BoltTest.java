@@ -9,7 +9,7 @@ import de.tu_berlin.citlab.storm.window.CountWindow;
 import de.tu_berlin.citlab.storm.window.TimeWindow;
 import de.tu_berlin.citlab.storm.window.Window;
 import de.tu_berlin.citlab.storm.window.WindowHandler;
-import de.tu_berlin.citlab.testsuite.diagrams.BoltTupleChart;
+import de.tu_berlin.citlab.testsuite.charts.BoltTupleChart;
 import de.tu_berlin.citlab.testsuite.helpers.BoltEmission;
 import de.tu_berlin.citlab.testsuite.helpers.DebugLogger;
 import de.tu_berlin.citlab.testsuite.helpers.LogPrinter;
@@ -72,11 +72,14 @@ abstract public class BoltTest implements UDFBoltTestMethods
 /* Global Variables: */
 /* ================= */
 
-    public final String logTag;
+//    public final String logDir;
     public final String testName;
 
     private final OperatorTest opTest;
     private final Fields outputFields;
+
+    private final BoltTupleChart tupleChart;
+
 	private UDFBoltMock udfBolt;
 	
 	private List<Tuple> inputTuples;
@@ -103,8 +106,15 @@ abstract public class BoltTest implements UDFBoltTestMethods
      */
     public BoltTest(String testName, OperatorTest opTest, Fields outputFields)
     {
-        this.logTag = "BoltTest_"+testName;
+//        this.logDir = "BoltTest_"+testName;
         this.testName = testName;
+        System.setProperty("logTestName", testName);
+        org.apache.logging.log4j.core.LoggerContext ctx =
+                (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        ctx.reconfigure();
+
+        tupleChart = new BoltTupleChart(testName);
+
         this.opTest = opTest;
         this.outputFields = outputFields;
     }
@@ -210,7 +220,6 @@ abstract public class BoltTest implements UDFBoltTestMethods
 
 
         OutputCollectorMock.resetOutput();
-        BoltTupleChart tupleChart = new BoltTupleChart(testName);
 
 		long startTime = System.currentTimeMillis();
 

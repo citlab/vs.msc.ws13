@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class Test1_WordFlatMap extends StandaloneTest<BoltTest_WordFlatMap, OpTest_WordFlatMap>
 {
-    public static final String testName ="WordFlatMap";
+    public static final String testName ="StandaloneTest_WordFlatMap";
     private static final Fields inputFields = new Fields("user_id", "msg", "id");
     private static final Fields outputFields = new Fields("user_id", "word", "id");
 
