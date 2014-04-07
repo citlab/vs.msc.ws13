@@ -20,124 +20,66 @@ public class TopologyIOChart
 
 
     private final String testName;
-    private final Set<Tuple> currentTuples;
-    private final List<Long> timeStampArr;
-    private final Map<Long, Set<Tuple>> allTuples;
+    private final List<Double> xBoltNames;
+    private final List<Long> yInputTuples;
 
-    private final List<Collection<Long>> xDataList;
-    private final List<Collection<Long>> yDataList;
+
+    private double count = 0;
+
 
     public TopologyIOChart(String testName)
     {
         this.testName = testName;
 
-        this.xDataList = new ArrayList<>();
-        this.yDataList = new ArrayList<>();
-        this.currentTuples = new HashSet<>();
-        this.allTuples = new HashMap<>();
-        this.timeStampArr = new ArrayList<>();
+        this.xBoltNames = new ArrayList<>();
+        this.yInputTuples= new ArrayList<>();
     }
 
 
-    public void addTupleToChart(Tuple tuple, long timeStamp)
+    public void addBoltInputToChart(long inputTupleCount, String boltName)
     {
-        currentTuples.add(tuple);
-        Set<Tuple> tupleCopy = new HashSet<>(currentTuples);
-        allTuples.put(timeStamp, tupleCopy);
-        timeStampArr.add(timeStamp);
+        if(boltName.contains(testName+"/")){
+            String[] nameSplit = boltName.split(testName+"/");
+//            xBoltNames.add(nameSplit[1]);
+        }
+        else{
+//            xBoltNames.add(boltName);
+        }
+        xBoltNames.add(count);
+        yInputTuples.add(inputTupleCount);
+        count ++;
     }
 
-    public void flushWindow()
-    {
-        currentTuples.clear();
-    }
 
-
-    public void createChart(Long startTime, Long endTime)
-    {
-        long maxYVal = prepareChart(startTime);
-        if(maxYVal > 0){
+    public void createChart() {
+//        long maxYVal = prepareChart(startTime);
+//        if(maxYVal > 0){
         // Create Chart
-            String chartName = "Arrived Tuples on Bolt "+ testName;
-            String xAxisName = "TimeDiff [ms]";
-            String yAxisName = "Input-Tuples";
-            Chart chart = new ChartBuilder().chartType(StyleManager.ChartType.Scatter).width(chartWidth).height(chartHeight)
-                                            .title(chartName).xAxisTitle(xAxisName).yAxisTitle(yAxisName).build();
-//            chart.getStyleManager().setChartType(StyleManager.ChartType.Scatter);
+        String chartName = "Topology-Chain for " + testName;
+        String xAxisName = "Bolt-Names";
+        String yAxisName = "InputTuple / OutputValue Count";
+        Chart chart = new ChartBuilder().chartType(StyleManager.ChartType.Bar).width(chartWidth).height(chartHeight)
+                .title(chartName).xAxisTitle(xAxisName).yAxisTitle(yAxisName).build();
+
 
         // Customize Chart
-            chart.getStyleManager().setLegendPosition(StyleManager.LegendPosition.OutsideE);
-            chart.getStyleManager().setXAxisMin(0L);
-            chart.getStyleManager().setXAxisMax(endTime - startTime);
-            chart.getStyleManager().setYAxisMin(1L);
+        chart.getStyleManager().setLegendPosition(StyleManager.LegendPosition.OutsideE);
+        chart.getStyleManager().setXAxisMin(0L);
+        chart.getStyleManager().setXAxisMax(xBoltNames.size());
+        chart.getStyleManager().setYAxisMin(0L);
+        chart.getStyleManager().setBarWidthPercentage(0.25);
 
-            chart.getStyleManager().setYAxisTickMarkSpacingHint(Math.round(chartHeight / maxYVal));
-            chart.getStyleManager().setBarWidthPercentage(.01);
+//            chart.getStyleManager().setYAxisTickMarkSpacingHint(Math.round(chartHeight / yInputTuples.size()));
+        chart.getStyleManager().setXAxisTickMarkSpacingHint(Math.round(chartWidth / xBoltNames.size()));
 
-        // Add Series
-            for (int i = 0; i < xDataList.size(); i++) {
-                String seriesLegend = "Tuples waiting for "+
-                                      "executeBatches() Iteration "+ i;
-                chart.addSeries(seriesLegend, xDataList.get(i), yDataList.get(i));
-            }
+        chart.addSeries("Input Tuples per Bolt", xBoltNames, yInputTuples);
+//            chart.addSeries("Output Values per Bolt", xBoltNames, yOutputValues);
 
-            try {
-                BitmapEncoder.savePNG(chart, "./Tuples_"+ testName +".png");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            BitmapEncoder.savePNG(chart, "logs/" + testName + "/TopologyChain_" + testName + ".png");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-    }
-
-
-
-    private long prepareChart(Long startTime)
-    {
-        int currSeriesIndex = 0;
-        long maxYSize = 0;
-
-        Long[] sortedTimeStamps = new Long[timeStampArr.size()];
-        sortedTimeStamps= timeStampArr.toArray(sortedTimeStamps);
-        Arrays.sort(sortedTimeStamps);
-        for (int n = 0; n < sortedTimeStamps.length; n++) {
-            Long actTimeStamp = sortedTimeStamps[n];
-            Set<Tuple> actTupleSet = allTuples.get(actTimeStamp);
-
-            long i;
-            for (i = 1; i <= actTupleSet.size(); i++) {
-                Collection<Long> seriesXData;
-                Collection<Long> seriesYData;
-                try {
-                    seriesXData = xDataList.get(currSeriesIndex);
-                    seriesYData = yDataList.get(currSeriesIndex);
-                    seriesXData.add(actTimeStamp - startTime);
-                    seriesYData.add(i);
-                }
-                catch (IndexOutOfBoundsException e){
-                    seriesXData = new ArrayList<>();
-                    seriesYData = new ArrayList<>();
-                    seriesXData.add(actTimeStamp - startTime);
-                    seriesYData.add(i);
-                    xDataList.add(currSeriesIndex, seriesXData);
-                    yDataList.add(currSeriesIndex, seriesYData);
-                }
-            }
-
-            //Scan for the maximum Y-Values in the whole Chart:
-            if(actTupleSet.size() > maxYSize){
-                maxYSize = i;
-            }
-
-            if(n+1 < sortedTimeStamps.length){
-                Set<Tuple> succTupleSet = allTuples.get(sortedTimeStamps[n+1]);
-
-                //Check whether a window-flush has happend in the dataList-successor:
-                if(actTupleSet.size() > succTupleSet.size()){
-                    currSeriesIndex++;
-                }
-            }
-        }
-        return maxYSize;
     }
 }
