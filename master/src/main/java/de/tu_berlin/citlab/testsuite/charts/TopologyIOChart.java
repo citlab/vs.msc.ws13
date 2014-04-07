@@ -20,7 +20,7 @@ public class TopologyIOChart
 
 
     private final String testName;
-    private final List<Double> xBoltNames;
+    private final List<String> xBoltNames;
     private final List<Long> yInputTuples;
 
 
@@ -40,24 +40,21 @@ public class TopologyIOChart
     {
         if(boltName.contains(testName+"/")){
             String[] nameSplit = boltName.split(testName+"/");
-//            xBoltNames.add(nameSplit[1]);
+            xBoltNames.add(nameSplit[1]);
         }
         else{
-//            xBoltNames.add(boltName);
+            xBoltNames.add(boltName);
         }
-        xBoltNames.add(count);
+//        xBoltNames.add(count);
         yInputTuples.add(inputTupleCount);
         count ++;
     }
 
 
     public void createChart() {
-//        long maxYVal = prepareChart(startTime);
-//        if(maxYVal > 0){
-        // Create Chart
         String chartName = "Topology-Chain for " + testName;
         String xAxisName = "Bolt-Names";
-        String yAxisName = "InputTuple / OutputValue Count";
+        String yAxisName = "InputTuple Count";
         Chart chart = new ChartBuilder().chartType(StyleManager.ChartType.Bar).width(chartWidth).height(chartHeight)
                 .title(chartName).xAxisTitle(xAxisName).yAxisTitle(yAxisName).build();
 
@@ -68,9 +65,10 @@ public class TopologyIOChart
         chart.getStyleManager().setXAxisMax(xBoltNames.size());
         chart.getStyleManager().setYAxisMin(0L);
         chart.getStyleManager().setBarWidthPercentage(0.25);
+        chart.getStyleManager().setAxisTitlePadding(20);
 
 //            chart.getStyleManager().setYAxisTickMarkSpacingHint(Math.round(chartHeight / yInputTuples.size()));
-        chart.getStyleManager().setXAxisTickMarkSpacingHint(Math.round(chartWidth / xBoltNames.size()));
+//        chart.getStyleManager().setXAxisTickMarkSpacingHint(Math.round(chartWidth / xBoltNames.size()));
 
         chart.addSeries("Input Tuples per Bolt", xBoltNames, yInputTuples);
 //            chart.addSeries("Output Values per Bolt", xBoltNames, yOutputValues);

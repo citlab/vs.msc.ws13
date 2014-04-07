@@ -55,6 +55,10 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
         BoltTestConfig userSignTest = testUserSign(reduceUserSign);
         testTopology.add(userSignTest);
 
+        final UDFBolt badWordsWithCounter = topology.mapToBadWordsWithCounter();
+        BoltTestConfig badWordsTest = testBadWordsWithCounter(badWordsWithCounter);
+        testTopology.add(badWordsTest);
+
         return testTopology;
     }
 
@@ -76,7 +80,7 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
 /* ====================== */
 
     private BoltTestConfig testMapTweetWords(UDFBolt testingBolt) {
-        final String boltTestName = "flatmap_tweet_words";
+        final String boltTestName = "flatmapTweetWords";
 //        List<List<Object>> assertedOutput = new ArrayList<List<Object>>();
 //        assertedOutput.add(new Values("Name", 123, "Twitter msg."));
 
@@ -84,12 +88,17 @@ public class AnalyzeTweetsTopologyTest extends TopologyTest
     }
 
     private BoltTestConfig testStaticHashJoin(UDFBolt testingBolt) {
-        final String boltTestName = "join_with_badwords";
+        final String boltTestName = "joinWithBadwords";
         return new BoltTestConfig(boltTestName, testingBolt, 100, null);
     }
 
     private BoltTestConfig testUserSign(UDFBolt testingBolt) {
-        final String boltTestName = "reduce_to_user_significance";
+        final String boltTestName = "reduceToUserSignificance";
+        return new BoltTestConfig(boltTestName, testingBolt, 100, null);
+    }
+
+    private BoltTestConfig testBadWordsWithCounter(UDFBolt testingBolt) {
+        final String boltTestName = "badWordsWithCounter";
         return new BoltTestConfig(boltTestName, testingBolt, 100, null);
     }
 

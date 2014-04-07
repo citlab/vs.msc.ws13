@@ -175,7 +175,12 @@ public final class LogPrinter
             String output ="[";
             for(int i = 0 ; i < vals.size() ; i++){
                 Object actObj = vals.get(i);
-                output += actObj.toString();
+                if(actObj != null){
+                    output += actObj.toString();
+                }
+                else{
+                    output += "null";
+                }
 
                 if(i+1 == vals.size())
                     output += "]";
@@ -196,7 +201,12 @@ public final class LogPrinter
 
             for(int i = 0 ; i < fields.size() ; i++){
                 String actField = fields.get(i);
-                output += actField;
+                if(actField != null) {
+                    output += actField;
+                }
+                else{
+                    output += "null";
+                }
 
                 if(i+1 != fields.size())
                     output += ", ";
