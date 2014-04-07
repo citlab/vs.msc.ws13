@@ -22,7 +22,7 @@ public class TupleProjection implements Serializable {
     public static TupleProjection projectLeft(){
         return new TupleProjection(){
             public Values project(Tuple left, Tuple right) {
-                return (Values)left.getValues();
+                return new Values(left.getValues());
             }
         };
     };
