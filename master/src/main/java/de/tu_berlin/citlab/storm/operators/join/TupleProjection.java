@@ -22,14 +22,14 @@ public class TupleProjection implements Serializable {
     public static TupleProjection projectLeft(){
         return new TupleProjection(){
             public Values project(Tuple left, Tuple right) {
-                return new Values(left.getValues());
+                return new Values(left.getValues().toArray());
             }
         };
     };
     public static TupleProjection projectRight(){
         return new TupleProjection(){
             public Values project(Tuple left, Tuple right) {
-                return new Values(right.getValues());
+                return new Values(right.getValues().toArray());
             }
         };
     };

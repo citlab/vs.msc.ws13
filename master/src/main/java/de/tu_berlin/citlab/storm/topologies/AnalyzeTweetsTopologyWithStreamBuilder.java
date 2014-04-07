@@ -29,6 +29,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
     @Override
     public StormTopology createTopology(boolean isCluster) {
         String cassandraServerIP = "127.0.0.1";
+        String keyspace = "citstorm_test";
 
         if(isCluster) {
             cassandraServerIP = CassandraConfig.getCassandraClusterIPFromClusterManager();
@@ -46,7 +47,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             cassandraBadWordsStatisticsCfg.setIP(cassandraServerIP);
 
             cassandraTweetsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm_test",
+                    keyspace,
                     "tweets",
                     new PrimaryKey("user", "tweet_id"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields(), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -54,7 +55,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraUserSignificanceCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm_test",
+                    keyspace,
                     "user_significance",
                     new PrimaryKey("user"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields("significance"), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
@@ -62,7 +63,7 @@ public class AnalyzeTweetsTopologyWithStreamBuilder implements TopologyCreation 
             );
 
             cassandraBadWordsStatisticsCfg.setParams(  //optional, but defaults not always sensable
-                    "citstorm_test",
+                    keyspace,
                     "badword_occurences",
                     new PrimaryKey("word"), /* CassandraFactory.PrimaryKey(..)  */
                     new Fields( "count" ), /*save all fields ->  CassandraFactory.SAVE_ALL_FIELD  */
