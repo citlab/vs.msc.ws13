@@ -5,17 +5,17 @@
       <h3 class="panel-title">Nimbus</h3>
     </div>
     <div class="panel-body">
-      <div class="row">
-        <div class="col-md-12">
-          <strong>Nimbus IP:</strong>
-          <a href="" class="fancybox fancybox.iframe" id="server-nimbus-ip"></a>
-        </div>
+      <table class="table">
+        <tr>
+          <th>Nimbus IP:</th>
+          <td><a href="" class="fancybox fancybox.iframe" id="server-nimbus-ip"></a></td>
+        </tr>
 
-        <div class="col-md-12">
-          <strong>Status:</strong>
-          <span id="server-nimbus-status"></span>
-        </div>
-      </div>
+        <tr>
+          <th>Status:</th>
+          <td id="server-nimbus-status"></td>
+        </tr>
+      </table>
     </div>
     <div class="panel-footer">
       @server_control.buttons.render("Nimbus", "nimbus")

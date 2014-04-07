@@ -3,8 +3,9 @@
 <div class="col-md-4">
   <div class="panel panel-primary">
     <div class="panel-heading" style="overflow:hidden">
-      <h3 class="panel-title pull-left">@t.getName</h3>
-      <a href="/deployment/delete/@t.getTitle" class="btn btn-danger btn-xs delete-topology pull-right">
+      <span class="glyphicon glyphicon-file pull-left margin-right"></span>
+      <h3 class="panel-title">@t.getName</h3>
+      <a href="/deployment/delete/@t.getTitle" class="btn btn-danger btn-xs delete-topology">
         <span class="glyphicon glyphicon-trash"></span>
       </a>
     </div>
@@ -12,10 +13,10 @@
       <table class="table">
         <tbody>
           <tr>
-            <th>Hochgeladen</th><td>@t.getDate</td>
+            <th>Erstellt am</th><td>@t.getDate</td>
           </tr>
           <tr>
-            <th>Ersteller</th><td>@t.getUser;</td>
+            <th>Erstellt von</th><td>@t.getUser</td>
           </tr>
           <tr>
             <td colspan="2"><strong>Name auf Server</strong><br>@t.getTitle;</td>

@@ -5,17 +5,17 @@
       <h3 class="panel-title">Cassandra</h3>
     </div>
     <div class="panel-body">
-      <div class="row">
-        <div class="col-md-12">
-          <strong>Cassandra IP:</strong>
-          <span id="server-cassandra-ip"></span>
-        </div>
+      <table class="table">
+        <tr>
+          <td>Cassandra IP:</td>
+          <td id="server-cassandra-ip"></td>
+        </tr>
 
-        <div class="col-md-12">
-          <strong>Status:</strong>
-          <span id="server-cassandra-status"></span>
-        </div>
-      </div>
+        <tr>
+          <td>Status:</td>
+          <td id="server-cassandra-status"></td>
+        </tr>
+      </table>
     </div>
     <div class="panel-footer">
       @server_control.buttons.render("Cassandra", "cassandra")
