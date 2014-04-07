@@ -31,7 +31,9 @@
         $("#server-supervisor-ip").attr('href', '#');
       } else {
         global.server_control.panel.supervisor.disableStart();
-        if(global.server_control.panel.supervisor.status == 'starting') {
+        if(global.server_control.panel.supervisor.status == 'stopped') {
+          global.server_control.panel.supervisor.status = "running";
+        } else if(global.server_control.panel.supervisor.status == 'starting') {
           global.server_control.panel.supervisor.status = "running";
           $(global.server_control).find("[value=start_supervisor] span").removeClass('rotating');
         }
