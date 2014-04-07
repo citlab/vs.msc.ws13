@@ -1,4 +1,5 @@
 <p class="navbar-text">
+  <span class="glyphicon glyphicon-log-out"></span>
   @if(session.get("name") != null) {
     <a href="/logout">Logout @session.get("name")</a>
   }
