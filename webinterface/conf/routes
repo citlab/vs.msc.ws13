@@ -34,8 +34,8 @@ POST     /deployment/start/:name    controllers.Application.startTopology(name: 
 GET     /deployment/delete/:name    controllers.Application.deleteFile(name: String)
 
 POST    /log/truncate               controllers.Log.truncate()
-POST    /log/:id                    controllers.Log.getLatest(id: Long)
 POST    /log/single/:id             controllers.Log.getLog(id: Long)
+POST    /log/:id/:filter            controllers.Log.getLatest(id: Long, filter: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -36,7 +36,7 @@ public class LogDatabase {
         + prop.getProperty("p_log");
   }
 
-  public ArrayList<LogEntry> getLogs(long lastId) {
+  public ArrayList<LogEntry> getLogs(long lastId, String filter) {
     Connection conn = null;
     PreparedStatement stmt = null;
 
@@ -50,8 +50,9 @@ public class LogDatabase {
       conn = DriverManager.getConnection(getConnectionString());
 
       // Execute SQL query
-      stmt = conn.prepareStatement("SELECT * FROM log4j2 WHERE id>?");
+      stmt = conn.prepareStatement("SELECT * FROM log4j2 WHERE id>? AND INSTR(message, ?)");
       stmt.setLong(1, lastId);
+      stmt.setString(2, filter);
 
       ResultSet rs = stmt.executeQuery();
 

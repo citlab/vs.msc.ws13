@@ -42,6 +42,7 @@
         type: "post",
         success: function() {
           global.topology_list.truncate();
+          global.topology_list.lastId = 0;
         }
       });
     })

@@ -16,11 +16,10 @@ import java.util.ArrayList;
 public class Log extends Controller {
 
   @BodyParser.Of(BodyParser.Json.class)
-  public static Result getLatest(long lastId) {
+  public static Result getLatest(long lastId, String filter) {
     ObjectNode result = Json.newObject();
 
-    //int lastId = Integer.parseInt(request().getQueryString("lastId"));
-    ArrayList<LogEntry> list = LogDatabase.getInstance().getLogs(lastId);
+    ArrayList<LogEntry> list = LogDatabase.getInstance().getLogs(lastId, filter);
 
     for(LogEntry entry : list) {
       ObjectNode message = Json.newObject();
