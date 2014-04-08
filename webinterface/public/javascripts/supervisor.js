@@ -20,7 +20,7 @@
     }
 
     global.server_control.panel.supervisor.updateIp = function(value) {
-      if(value == "null"){
+      if(value == ""){
         value = "Supervisor nicht gestartet!";
         global.server_control.panel.supervisor.enableStart();
         if(global.server_control.panel.supervisor.status == "stopping") {
