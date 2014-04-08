@@ -44,10 +44,11 @@ In the context of stream-processing there is another type of \join\ that consume
 	\groupby\ splits a data set into subsets, where each element of one subset has the same value when applied to a unary \texttt{\_groupby} function. \groupby\ is commonly\cite{w3cs:groupby} not considered an independent operator, but is rather used in conjunction with an aggregating operator like \reduce to build subsets that are all in turn applied to it.
 	
 	In this work \groupby\ is interpreted just so. Another valid interpretation in the stream-processing context would be to split a stream into several other streams.
-	\item[update] \hfill \\
-  TBD \ldots
 	\item[sink] \hfill \\
-  TBD \ldots
+	There is no equivalent in classical batch processing for this operator. The semantic in stream processing is, that the sink operator takes every datum from a stream in stores it into any kind of data storage. 
+	\item[update] \hfill \\
+  	There is no equivalent in classical batch processing for this operator. The semantic in stream processing is, that the update operator takes a user-defined function $ \_key : X \rightarrow \mathbb{K}$ and a function $ \_update : X \times X \rightarrow X$ and then checks in the event of a arriving datum $x_1$, if a database entry $x_2$ exists so that $\_key(x_1) = \_key(x_2)$ and then stores $\_update(x_1, x_2)$ in the database.
+
 \end{description}
 
 %\subsection{Operator Types}
