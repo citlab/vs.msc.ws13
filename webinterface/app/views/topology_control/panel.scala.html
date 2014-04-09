@@ -24,7 +24,7 @@
         </tbody>
       </table>
     </div>
-    @if(show_footer) {
+    @if(show_footer && new Nimbus().isUp()) {
       <div class="panel-footer" style="overflow:hidden">
         <form class="ajax-form" action="/deployment/start/@t.getTitle" method="post">
           <div class="row">
