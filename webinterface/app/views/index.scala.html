@@ -2,4 +2,32 @@
   <div class="page-header">
     <h1>Dashboard <small>Willkommen @session.get("name")</small></h1>
   </div>
+  <div class="row">
+    <div class="col-md-4">
+      <h2>Serverübersicht</h2>
+    </div>
+    <div class="col-md-8">
+      <a href="/server" class="margin-top">Server starten oder stoppen</a>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="row" id="server-control">
+      @server_control.nimbus_panel(false)
+
+      @server_control.cassandra_panel(false)
+
+      @server_control.supervisor_panel(false)
+    </div>
+  </div>
+  <div class="col-md-4">
+      <h2>Deine Topologien</h2>
+    </div>
+    <div class="col-md-8">
+      <a href="/deploy" class="margin-top">Weitere Topoligien hochladen</a>
+    </div>
+  <div class="row">
+    @for(t <- Topology.readFiles(session.get("name"))) {
+      @topology_control.panel(t, false)
+    }
+  </div>
 }
