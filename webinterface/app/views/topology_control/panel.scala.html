@@ -1,4 +1,4 @@
-@(t: Topology)
+@(t: Topology, show_footer: Boolean)
 
 <div class="col-md-4">
   <div class="panel panel-primary">
@@ -24,19 +24,21 @@
         </tbody>
       </table>
     </div>
-    <div class="panel-footer" style="overflow:hidden">
-      <form class="ajax-form" action="/deployment/start/@t.getTitle" method="post">
-        <div class="row">
-          <div class="col-md-8">
-            <input class="form-control" type="text" name="start_as" placeholder="ausführen als">
+    @if(show_footer && new Nimbus().isUp()) {
+      <div class="panel-footer" style="overflow:hidden">
+        <form class="ajax-form" action="/deployment/start/@t.getTitle" method="post">
+          <div class="row">
+            <div class="col-md-8">
+              <input class="form-control" type="text" name="start_as" placeholder="ausführen als">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-default start-deployment pull-right" type="submit">
+                <span class="glyphicon glyphicon-play"></span>
+              </button>
+            </div>
           </div>
-          <div class="col-md-4">
-            <button class="btn btn-default start-deployment pull-right" type="submit">
-              <span class="glyphicon glyphicon-play"></span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    }
   </div>
 </div>

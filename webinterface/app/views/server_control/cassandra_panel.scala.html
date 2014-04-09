@@ -1,4 +1,6 @@
-<div class="col-md-6" id="cassandra">
+@(show_footer: Boolean)
+
+<div class="@if(show_footer) {col-md-6} else {col-md-4}" id="cassandra">
   <div class="panel panel-primary">
     <div class="panel-heading">
       <span class="glyphicon glyphicon-book pull-left margin-right"></span>
@@ -19,8 +21,10 @@
         </tr>
       </table>
     </div>
-    <div class="panel-footer">
-      @server_control.buttons.render("Cassandra", "cassandra")
-    </div>
+    @if(show_footer) {
+      <div class="panel-footer">
+        @server_control.buttons.render("Cassandra", "cassandra")
+      </div>
+    }
   </div>
 </div>
