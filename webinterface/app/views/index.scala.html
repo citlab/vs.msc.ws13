@@ -19,13 +19,13 @@
       @server_control.supervisor_panel(false)
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="row">
+    <div class="col-md-4">
       <h2>Deine Topologien</h2>
     </div>
     <div class="col-md-8">
       <a href="/deployment" class="margin-top">Weitere Topoligien hochladen</a>
     </div>
-  <div class="row">
     @for(t <- Topology.readFiles(session.get("name"))) {
       @topology_control.panel(t, false)
     }
