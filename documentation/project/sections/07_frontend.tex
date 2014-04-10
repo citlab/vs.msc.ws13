@@ -1,2 +1,35 @@
 \section{Frontend}
 \label{sect:frontend}
+
+To have an easy way to start and test our topologies, we decided to develop a frontend. So we defined some requirements. The first was, that it should be accessable as easy as possible. So we wrote the Cit-Storm webinterface.
+
+\subsection{Requirements}
+We defined some requirements for our cluster, the deployment section and security.
+
+For Securtiy, we developed an esay user mangament for login.
+
+Every User should be able to start and stopp the Nimbus and Cassandraserver. For Supervisor starup an amount of servers can ba set.
+
+A topology can be uploaded over the interface and is linked to the uploading user. Topologies can started with a single click after uploading.
+
+To see if the topology runs the user can start the storm ui or filter for logs.
+
+\subsection{Builidng up Cit-Storm Webinterface}
+Because of the complexity of a modern webinterface we used some libraries. As the basic, we used the play Framework. So we can easily start a webserver and develop our requirements in an iterativ and agile process.
+
+For easy and browser compltibility we used jquery with some plugins for ajax request with forms. Styling is set by default bootstrap with some adjustments and own styles.
+
+But first we need a simple user management to be sure that not everyone cann start our Cluster or upload bad jar files and start theme.
+
+Users are stored in a mysql database with user name and hashed passwort. A user need to be logged in to work with the webinterface.
+
+\subsection{Using Cit Strom Webinterface}
+After login you will see a dashboard with some infos about the cluster and uploaded topologies.
+
+If a topologie should run, a nimbus, cassandra and at least one supervisor should run. Over the nimbus is the strom ui accessable. There you get an overview if a topology is allready running.
+
+Starting a part of the cluster is realised over a small webservice which uses a process builder to start the server with aws tools. The status will be update every five seconds an uses the aws tools and parse the json respond.
+
+Topology are stored directly on the nimbus. After click start topology, it will be started and distributed to the supervisors.
+
+Generated logs from the running topologies are stored in the mysql database. Because of the big amount of logs, we need to filter the logs. After typing a text in the filterinput and press enter the logs will update every second.
