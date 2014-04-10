@@ -1,2 +1,74 @@
 \section{Infrastructure}
 \label{sect:Infrastructure}
+To run a Big-Data application, it is important to have a reliable underlying infrastructure. As cloud services matured over the past years, it is not reasonable to run Storm on a dedicated cluster.
+
+We decided to use the \textsl{Amazon EC2} cloud, as we were already familiar with its usage and its capabilities, which perfectly met our demands, and we were also granted free access to it.
+
+Using an out-of-the-box Storm, would surely have sufficed the needs of running the CIT-Storm topology, but it would have been inconvenient in its usage.
+
+We developed a system of tools to manage the cluster and the submitted topologies in a comfortable and efficient way. This section describes, the different parts of CIT-Storm and how they play together.
+
+\subsection{Storm cluster}
+To set up a Storm cluster, three essential software components are needed:
+\begin{itemize}
+\item \textsl{Storm Nimbus}\\
+The heart component of the Storm cluster. The Nimbus manages the starting and stopping of topologies and distributes the workload on all registered worker nodes.
+\item \textsl{Storm Supervisor}\\
+A Supervisor represents the worker in Storm. Every Supervisor has a defined number of independent worker processes, to use the CPU resources more efficient.
+\item \textsl{Apache Zookeeper}
+The Zookeeper has the task to coordinate and synchronize the cluster.
+\end{itemize}
+
+CIT-Storm enhances the collection of software needed, to serve its previously described purpose:
+
+\begin{itemize}
+\item \textsl{Apache Cassandra}\\
+The Cassandra database is used to store the results created by the topology, such as filtered tweets, bad-words and user significance.
+\item \textsl{MySQL}\\
+MySQL is used as a multi-purpose tool to manage user accounts for CIT-Storm access, store logs created by the Supervisors and to hold the IP-addresses of all connected cluster instances.
+\item \textsl{Play-Framwork}\\
+The web-frontend is created using the Play-Framework.
+\end{itemize}
+
+Now, that all software components are determined, they must be assigned to different EC2 instances.
+
+\subsection{EC2 instances}
+To have a dynamic cluster setup it is necessary to identify the roles of all server types in order to install the software and then bundle the system as a bootable instance image.\\
+
+When developing CIT-Storm, a cluster setup with four different instance types appeared to be ideal.
+
+\begin{description}
+\descriptor{CIT-Storm Main Server}
+A central server is needed to provide controls for the CIT-Storm system. In our case, the main server is an always-on instance with a static IP-address, so it can always be addressed the same way. To make the work with CIT-Storm even more convenient, we registered a domain-name at TwoDNS, to make it accessible via:\\
+\texttt{http://citstorm.dd-dns.de}
+
+The central server hosts the MySQL database, and the web-frontend, as well as the Zookeeper. In Storm, every node must be configured via a configuration file called \texttt{storm.yaml}, which is loaded when Storm starts. As the main server has a static IP-address, it can be hard coded in the storm configuration for the Zookeeper.
+
+Unfortunately, the IP-addresses of the other servers are unknown, as they are dynamically determined by Amazon. To obtain and remember them, the Zookeeper could be used, as it provides a naming service. For our project, we decided to develop a compact naming server, as using the Zookeeper would cause overhead for a small sized cluster.\\
+Our naming service is written in Java and uses an embedded Jetty web-server to enable REST-based access. Once a server is started, it registers itself at the naming server by using the relative url:\\
+\texttt{/register?type=server-type},
+where \texttt{server-type} can be one of the following roles \texttt{nimbus}, \texttt{supervisor} and \texttt{cassandra}.\\
+Once the server receives the GET-request, it saves the requesters IP-address along with the server-type to the MySQL database. When a server needs information about the addresses of the other instances, it can call it with the GET-request: \texttt{/lookup?type=server-type}. The server responds either with a single IP-address, as for the Nimbus and Cassandra server, or with a comma-separated-list of IP-addresses for the Supervisors, as there can be more than one of them.\\
+In the background, a timed thread checks recurrently, if the registered instances are still reachable and, if not, deletes them from the database.
+
+The main server also starts up the cluster and in order to do so, it must have access to the Amazon Web Services (AWS). Amazon provides a set of tools to control EC2 instances from a console. These tools, called Amazon AWS Command Line Interface tools, can start and stop instances in EC2 and also request information about all running instances and their current state. The result is printed on the console in the JSON format, and can be processed from there. We wrote a Java program, that can start and stop instances by running the AWS CLI tools with a process builder. This program is accessed by the web-frontend to manage the cluster.
+
+\descriptor{Nimbus}
+The Nimbus instance runs the Storm Nimbus software, as well as a web-interface provided by Storm, the Storm UI. It can be used to observe the cluster, as well as the running topologies.
+
+As our goal was it to make the use of Storm convenient, a method was needed, to store the topologies on the nimbus and start the topology, without hacking cryptic commands on a SSH-terminal. So, we developed a software, that offers a service to upload a file onto the Nimbus and to run and kill a topology. The program is written in Java and uses an embedded Jetty web-server to provide a REST-based web-service.
+
+Using a POST-request, a file can be uploaded to the server using this URL (relative to the base URL of the Nimbus): \texttt{/upload}.\\
+The server returns a unique-file-identifier, which can be used to start and stop the topology stored in the file, or to delete it from the Nimbus. The relative URLs to perform these actions are:\\
+\texttt{/delete?file=filename}\\
+\texttt{/run?file=filename\&name=topology-name}\\
+\texttt{/kill?file=filename}
+
+\descriptor{Supervisor}
+The Supervisor instance only runs the Storm Supervisor, to dedicate all its resources to running the topologies.\\
+When the Supervisor starts up, the configuration file needs to be adapted, as the Nimbus IP-address is unknown at the time of the creation of the instance image. As the main server provides a naming server for all involved machines, the configuration on the Supervisor is rewritten every time it starts up, using the current IP-address of the nimbus.
+
+\descriptor{Cassandra}
+Although the Cassandra database is not updated very frequently, it is installed on a separate EC2 instance, to maintain the possibility of extending the database, whether to a larger instance, or even to a Cassandra cluster,
+
+\end{description}
