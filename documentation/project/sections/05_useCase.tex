@@ -1,9 +1,9 @@
 \section{Use-Case}
 \label{sect:useCase}
 
-To demonstrate the cit-storm framework a twitter stream is analyzed. This section gives a details description about all operatos used and how they are sticked together. Each operator described in section 2 are provide by the cit-storm framework and can be combined with each other to form a meaningfull topology. In this work we analyze the twitter stream in a real-time fashion to find significant users and if once a user has been detected all following tweets are stored in a cassandra database. Tweets are split up into single words and only words from an internal badwords-table filtered to computate a user-tweet significance and finally added to a total user-significance. \newline
+To demonstrate the cit-storm framework a twitter stream is analyzed. This section gives a details description about all operators used and how they are sticked together. Each operator described in section 2 are provided by the cit-storm framework and can be combined with each other to form a meaningfull topology. This work analyze the twitter stream in a real-time fashion to find significant users and if once a user has been detected all following tweets are stored in a cassandra database. Tweets are split up into single words and only words from an internal badwords-table are filtered to computate a total user-tweet significance and finally added to a total user-significance. \newline
 
-Figure 1 shows the final topology which use most of the operators. The Topology consists of two different data streams originatd at the twitter streaming source. The upper stream is responsible to keep a tweet inside the network as long as the tweet is analyzed, what is realized by an delayed-operator. The stream on the bottom analyze the tweets by linking different operators to each other. The first flatmap operator splits each tweet into single words and join these with an internal hashmap to filter only words which belongs to a word-list of interest.
+Figure 1 shows the final topology which use most of the operators to implement the use-case. The Topology consists of two different data streams originated at the twitter streaming source. The upper stream is responsible to keep a tweet inside the network as long as the tweet is analyzed. This is realized by an delayed-operator which receives a parameter in seconds. The stream on the bottom analyze the tweets by combining different operators. The first flatmap operator splits each tweet into single words and join these with an internal hashmap to filter only words which belongs to a word-list of interest. These words are assigned with the corresponding badword significance for further processing.
 
 \begin{figure}[h]
   \centering
@@ -13,7 +13,7 @@ Figure 1 shows the final topology which use most of the operators. The Topology 
 
 \subsection{Topology}
 
-The following section describe the topology used to the project use-case. The topology is divided two different streams orginated at the twitter stream source. The upper stream hold the tweets inside the topology until the second stream has analyzed the tweets and detected significanct users and inform the upper stream if it should skip or store tweets.
+The following section describe the topology used as an project use-case. The topology is divided two different streams orginated at the twitter stream source. The upper stream hold the tweets inside the topology until the second stream has analyzed the tweets and detected significanct users and inform the upper stream if it should skip or store tweets.
 
 \subsubsection{Stream 1: Analyze Tweets}
 \begin{description}
@@ -32,7 +32,7 @@ The following section describe the topology used to the project use-case. The to
       This filter operator allows to filter tweets above a specific significance threshold. In this Use-Case we set this to 1 to process all bad-words from users. The result are new detected users which are forwarded to the join operator of Stream 1 holding the tweets.
 
   \item[detected users] \hfill \\
-      This dottet bolt is only to show the result of the whole stream. Detected users are forwarded to the join operator of Stream 1 holding the tweets. This needs a distinct tuple processing of incoming tuples from different sources. 
+      This dottet node is no real bolt it only depict the result of the whole stream. Detected users are forwarded to the join operator of Stream 1 holding the tweets. This needs a distinct tuple processing of incoming tuples from different sources. 
       
 \end{description}
 
@@ -42,7 +42,7 @@ The following section describe the topology used to the project use-case. The to
       The stream is orginated the the tweet stream source depicted in figure as an green node. The delayed bolt only hold the tweets for a specific time inside the topology until the tweets has been analyzed. The output is the same as the input.
 
   \item[join] \hfill \\
-	The join operator received delayed tweet which are join with an in-memory hashtable containing detected users.
+	The join operator receives delayed tweets which are join with an in-memory hashtable containing detected users.
 \end{description}
 
 \subsection{Cassandra sink}
@@ -57,10 +57,10 @@ The cassandra sink operator takes care storing incoming tuples into cassandra ta
 
 \subsection{Cassandra provider}
 
-The cassandra provider is only used if the topology is shut down and restarts again. The total user-significance is stored in cassandra and is reloaded to keep this in-memory to allow real-time processing. As an initial processing the cassandra-provider read all detected users with its significance and forwarded to the join operator. 
+The cassandra provider is used if the topology is shut down and restarts again. The total user-significance is stored in cassandra and is reloaded to keep this in-memory to allow real-time processing. As an initial processing the cassandra-provider read all detected users with its significance and forwarded to the join operator. 
 
 \subsection{Cassandra schema}
-As an persistent storage cassandra is used to store detected users with its significance and their tweets. The cassandra-operator supports two different modes how to store data into the database. The \keyword{no-counter} mode assigns a specific primary-key to the incoming tuples an puts into a table. The \keyword{counter} mode only allows the increment a specific coulmn field determined by a primary-key.  
+As a persistent storage cassandra is used to store detected users with its significance and their tweets. The cassandra-operator supports two different modes how to store data into the database. The \keyword{no-counter} mode assigns a specific primary-key to the incoming tuples an puts into a table. The \keyword{counter} mode only allows the increment a specific coulmn field determined by a primary-key.  
 
 \begin{description}
   \item[user\_significance] \textit{counter} \hfill \\
