@@ -11,7 +11,6 @@ import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.Session;
 import org.apache.commons.lang.StringUtils;
 
-
 public class Counter implements Serializable
 {
 	CassandraDAO dao;
@@ -22,12 +21,9 @@ public class Counter implements Serializable
 	Cluster cluster;
 	Session session;
 
-
 	public Counter( CassandraConfig config )
 	{
 		this.config = config;
-		//this.config.setIP( "127.0.0.1" );
-		//connect( config.getIP() );
 	}
 
 	public void setConfig( CassandraConfig config )
@@ -43,38 +39,41 @@ public class Counter implements Serializable
 		for ( Host host : metadata.getAllHosts() )
 		{
 			System.out.printf( "Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(),
-            host.getAddress(), host.getRack() );
+					host.getAddress(), host.getRack() );
 		}
 		session = cluster.connect();
 	}
 
+	// Create dedicated counter tables as needed in Cassandra for couting
 	public void createDataStructures()
 	{
-        counterName = config.getTupleFields().get( 0 );
-        pkname = config.getPrimaryKeys().getPrimaryKeyFields()[0];
-        assembledCounterTableName = pkname+"_"+counterName;
-        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        sb.append( config.getKeyspace() );
-        sb.append( String.format( ".%s(%s text PRIMARY KEY,%s counter)",
-                    ""+assembledCounterTableName,
-                    config.getPrimaryKeys().getPrimaryKeyFields()[0],
-                    config.getTupleFields().get( 0 ) ) );
+		counterName = config.getTupleFields().get( 0 );
+		pkname = config.getPrimaryKeys().getPrimaryKeyFields()[ 0 ];
+		assembledCounterTableName = pkname + "_" + counterName;
+		StringBuilder sb = new StringBuilder( "CREATE TABLE IF NOT EXISTS " );
+		sb.append( config.getKeyspace() );
+		sb.append( String.format( ".%s(%s text PRIMARY KEY,%s counter)", ""
+				+ assembledCounterTableName, config.getPrimaryKeys().getPrimaryKeyFields()[ 0 ],
+				config.getTupleFields().get( 0 ) ) );
 
-        String createTableQuery = sb.toString();
-        String createKeyspaceQuery = String.format(
-                "CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3}",
-                config.getKeyspace() );
+		String createTableQuery = sb.toString();
+		String createKeyspaceQuery =
+				String.format(
+						"CREATE KEYSPACE IF NOT EXISTS %s WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3}",
+						config.getKeyspace() );
 
-        executeQuery( createKeyspaceQuery );
-        executeQuery( createTableQuery );
+		executeQuery( createKeyspaceQuery );
+		executeQuery( createTableQuery );
 	}
 
-	public void update ( List<Object> keyValues, long number )
+	// Increment or decrement the counter
+	public void update( List <Object> keyValues, long number )
 	{
 		String keyspace_table = config.getKeyspace() + "." + assembledCounterTableName;
-        String str_keyValues = StringUtils.join(keyValues, "-");
+		String str_keyValues = StringUtils.join( keyValues, "-" );
 
-		executeQuery( String.format( "UPDATE %s SET %s = %s + %d WHERE %s = '%s';", keyspace_table, counterName, counterName, number, pkname, str_keyValues ));
+		executeQuery( String.format( "UPDATE %s SET %s = %s + %d WHERE %s = '%s';", keyspace_table,
+				counterName, counterName, number, pkname, str_keyValues ) );
 	}
 
 	public void executeQuery( String query )
@@ -85,15 +84,7 @@ public class Counter implements Serializable
 		}
 		catch ( Exception e )
 		{
-			// TODO Automatisch generierter Erfassungsblock
 			e.printStackTrace();
 		}
 	}
-
-    public List<Values> findBy(Fields Keyfields, Values values ){
-        // check if the number of fields are equals to the number values
-        assert( Keyfields.size() == values.size() );
-
-        return null;
-    }
 }

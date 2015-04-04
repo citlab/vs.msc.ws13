@@ -39,14 +39,12 @@ public class CassandraOperator extends IOperator {
                 dao.analyzeTuple( tuples.get(0) );
                 dao.createDataStructures();
                 dao.prepare();
-
             }
             else {
                 keyFields = new Fields(config.getPrimaryKeys().getPrimaryKeyFields());
 
                 ctn.connect( config.getIP() );
                 ctn.createDataStructures();
-
             }
 
             initialized = true;
@@ -54,7 +52,6 @@ public class CassandraOperator extends IOperator {
 
         try{
             if( !config.isCounterBolt() ) {
-
                 for( Tuple t : tuples ){
                     this.getUDFBolt().log_debug("cassandra-operator", "store " + t);
                 }
@@ -63,7 +60,6 @@ public class CassandraOperator extends IOperator {
                     dao.store( tuples );
                 }
            } else {
-
                 for( Tuple t : tuples ){
                     List<Object> keyValues = t.select( keyFields  );
                     List<Object> val = t.select(config.getTupleFields());
@@ -75,8 +71,6 @@ public class CassandraOperator extends IOperator {
                     }
                 }//for
             }
-
-
         } catch (Exception e ){
             this.getUDFBolt().log_error("Storing of tuples into Cassandra DB failed!", e );
 
@@ -90,5 +84,4 @@ public class CassandraOperator extends IOperator {
             collector.emit(p.getValues());
         }
     }
-
 }
